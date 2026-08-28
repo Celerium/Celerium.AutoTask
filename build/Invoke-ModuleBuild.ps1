@@ -68,7 +68,11 @@
         [string]$Version,
 
         [Parameter(Mandatory=$false)]
-        [switch]$UnversionedOutputDirectory
+        [switch]$UnversionedOutputDirectory,
+
+        [Parameter(Mandatory=$false)]
+        [ValidateNotNullOrEmpty()]
+        [string]$JsonSpec
     )
 
 #EndRegion  [ Parameters ]
@@ -107,6 +111,13 @@ try {
     }
 
     Build-Module @params -Verbose
+
+    if ($JsonSpec) {
+        Copy-Item $JsonSpec -Destination $(Join-Path -Path $OutputDirectory -ChildPath "$moduleName\$Version")
+    }
+    else{
+        Copy-Item $(Join-Path -Path $modulePath -ChildPath "AutoTaskAPI-v1-2023.6.json") -Destination $(Join-Path -Path $OutputDirectory -ChildPath "$moduleName\$Version")
+    }
 
     #Replace & comment out NestedModules from nonBuilt module
     $modulePath_Built = Join-Path -Path $OutputDirectory -ChildPath "$moduleName\$Version\$moduleName.psd1"
