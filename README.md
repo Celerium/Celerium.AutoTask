@@ -166,8 +166,8 @@ Distributed under the MIT license. See [LICENSE](https://github.com/Celerium/Cel
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
 
-[Az_Pipeline-shield]:               https://img.shields.io/azure-devops/build/AzCelerium/Celerium.AutoTask/15?style=for-the-badge&label=DevOps_Build
-[Az_Pipeline-url]:                  https://dev.azure.com/AzCelerium/Celerium.AutoTask/_build?definitionId=15
+[Az_Pipeline-shield]:               https://img.shields.io/azure-devops/build/AzCelerium/Celerium.AutoTask/18?style=for-the-badge&label=DevOps_Build
+[Az_Pipeline-url]:                  https://dev.azure.com/AzCelerium/Celerium.AutoTask/_build?definitionId=18
 
 [GitHub_Pages-shield]:              https://img.shields.io/github/actions/workflow/status/celerium/Celerium.AutoTask/pages%2Fpages-build-deployment?style=for-the-badge&label=GitHub%20Pages
 [GitHub_Pages-url]:                 https://github.com/Celerium/Celerium.AutoTask/actions/workflows/pages/pages-build-deployment
