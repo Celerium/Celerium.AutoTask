@@ -1,0 +1,22 @@
+﻿Category,EndpointUri,Method,Function,Example,Complete,Notes
+Internal,,GET,Invoke-AutoTaskRequest,N/A,Yes,
+Internal,,PUT,New-AutoTaskResourceDynamicParameter,N/A,Yes,
+Internal,,PUT,Set-AutoTaskResourceDynamicParameter,N/A,Yes,
+Internal,,PUT,Add-AutoTaskAPIKey,N/A,Yes,
+Internal,,GET,Get-AutoTaskAPIKey,N/A,Yes,
+Internal,,DELETE,Remove-AutoTaskAPIKey,N/A,Yes,
+Internal,,GET,Test-AutoTaskAPIKey,N/A,Yes,
+Internal,,PUT,Add-AutoTaskBaseURI,N/A,Yes,
+Internal,,GET,Get-AutoTaskBaseURI,N/A,Yes,
+Internal,,DELETE,Remove-AutoTaskBaseURI,N/A,Yes,
+Internal,,PUT,Export-AutoTaskModuleSettings,N/A,Yes,
+Internal,,GET,Get-AutoTaskModuleSettings,N/A,Yes,
+Internal,,PUT,Import-AutoTaskModuleSettings,N/A,Yes,
+Internal,,PUT,Initialize-AutoTaskModuleSettings,N/A,Yes,
+Internal,,DELETE,Remove-AutoTaskModuleSettings,N/A,Yes,
+Resource,,GET,Get-AutoTaskResource,Invoke-ContactGroupsExample,Yes,Support other methods
+Resource,,PUT,New-AutoTaskBody,Invoke-ContactGroupsExample,Yes,
+Resource,,POST,New-AutoTaskResource,Invoke-ContactGroupsExample,Yes,
+Resource,,DELETE,Remove-AutoTaskResource,Invoke-ContactGroupsExample,Yes,
+Resource,,PATCH,Set-AutoTaskResource,Invoke-ContactGroupsExample,Yes,
+Resource,,GET,Show-AutoTaskResource,N/A,Yes,Shows avaliable resources that can be used with the dynamic -Resource parameter

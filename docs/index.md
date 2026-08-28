@@ -1,3 +1,14 @@
+---
+external help file: Celerium.AutoTask-help.xml
+Module Name: Celerium.AutoTask
+online version: https://github.com/Celerium/Celerium.AutoTask
+schema: 2.0.0
+title: Home
+has_children: true
+layout: default
+nav_order: 1
+---
+
 <h1 align="center">
   <br>
   <a href="https://AutoTask.com"><img src="https://raw.githubusercontent.com/Celerium/Celerium.AutoTask/refs/heads/main/.github/images/PoSHGallery_Celerium.AutoTask.png" alt="Celerium.AutoTask" width="200"></a>
