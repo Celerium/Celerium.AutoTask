@@ -5,7 +5,7 @@ pool:
   vmImage: ubuntu-latest
 
 variables:
-  version: 0.0.2
+  version: 1.0.0
   moduleName: Celerium.AutoTask
 
 jobs:

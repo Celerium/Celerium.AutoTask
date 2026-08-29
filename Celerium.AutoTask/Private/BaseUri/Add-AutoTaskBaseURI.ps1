@@ -116,7 +116,7 @@
 
     process{
 
-        if ($AutoDetect) {
+        if ($AutoDetect -or $PSCmdlet.ParameterSetName -eq 'AutoDetect') {
 
             try {
                 $ValidationUri  = 'https://webservices2.autotask.net/atservicesrest'

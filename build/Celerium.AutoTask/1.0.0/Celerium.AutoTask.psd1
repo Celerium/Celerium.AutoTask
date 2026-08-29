@@ -69,34 +69,10 @@
     # FormatsToProcess = @()
 
     # Modules to import as nested modules of the module specified in RootModule/ModuleToProcess
-    NestedModules = 'Private/ApiCalls/Invoke-AutoTaskRequest.ps1',
-                    'Private/ApiCalls/New-AutoTaskResourceDynamicParameter.ps1',
-                    'Private/ApiCalls/Set-AutoTaskResourceDynamicParameter.ps1',
-
-                    'Private/ApiKeys/Add-AutoTaskAPIKey.ps1',
-                    'Private/ApiKeys/Get-AutoTaskAPIKey.ps1',
-                    'Private/ApiKeys/Remove-AutoTaskAPIKey.ps1',
-                    'Private/ApiKeys/Test-AutoTaskAPIKey.ps1',
-
-                    'Private/BaseUri/Add-AutoTaskBaseURI.ps1',
-                    'Private/BaseUri/Get-AutoTaskBaseURI.ps1',
-                    'Private/BaseUri/Remove-AutoTaskBaseURI.ps1',
-
-                    'Private/ModuleSettings/Export-AutoTaskModuleSettings.ps1',
-                    'Private/ModuleSettings/Get-AutoTaskModuleSettings.ps1',
-                    'Private/ModuleSettings/Import-AutoTaskModuleSettings.ps1',
-                    'Private/ModuleSettings/Initialize-AutoTaskModuleSettings.ps1',
-                    'Private/ModuleSettings/Remove-AutoTaskModuleSettings.ps1',
-
-                    'Public/Get-AutoTaskResource.ps1',
-                    'Public/New-AutoTaskResource.ps1',
-                    'Public/New-AutoTaskBody.ps1',
-                    'Public/Remove-AutoTaskResource.ps1',
-                    'Public/Set-AutoTaskResource.ps1',
-                    'Public/Show-AutoTaskResource.ps1'
+    # NestedModules = @()
 
     # Functions to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no functions to export.
-    FunctionsToExport = '*'
+    FunctionsToExport = @('Invoke-AutoTaskRequest','New-AutoTaskResourceDynamicParameter','Set-AutoTaskResourceDynamicParameter','Add-AutoTaskAPIKey','Get-AutoTaskAPIKey','Remove-AutoTaskAPIKey','Test-AutoTaskAPIKey','Add-AutoTaskBaseURI','Get-AutoTaskBaseURI','Remove-AutoTaskBaseURI','Export-AutoTaskModuleSettings','Get-AutoTaskModuleSettings','Import-AutoTaskModuleSettings','Initialize-AutoTaskModuleSettings','Remove-AutoTaskModuleSettings','Get-AutoTaskResource','New-AutoTaskBody','New-AutoTaskResource','Remove-AutoTaskResource','Set-AutoTaskResource','Show-AutoTaskResource')
 
     # Cmdlets to export from this module
     CmdletsToExport = @()
@@ -105,7 +81,7 @@
     VariablesToExport = '*'
 
     # Aliases to export from this module
-    AliasesToExport = '*'
+    AliasesToExport = @('Set-AutoTaskAPIKey','Set-AutoTaskBaseURI')
 
     # List of all modules packaged with this module
     # ModuleList = @()
@@ -152,3 +128,4 @@
     # DefaultCommandPrefix = ''
 
 }
+
