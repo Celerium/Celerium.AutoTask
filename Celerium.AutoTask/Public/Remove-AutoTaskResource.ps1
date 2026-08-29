@@ -44,7 +44,6 @@ function Remove-AutoTaskResource {
         $ParameterName  = $functionName + '_Parameters'      -replace '-','_'
 
         $ResourceTarget = $PSBoundParameters.Resource
-        #$ResourceUri    = (($AutoTaskModuleQueries | Where-Object { $_.Delete -eq $ResourceTarget }).Name | Select-Object -First 1) -replace '/query', '/{PARENTID}' | Select-Object -First 1
         $ResourceUri    = ($AutoTaskModuleQueries | Where-Object { $_.Delete -eq $ResourceTarget } | Select-Object -First 1).Name -replace '/query$', '/{PARENTID}'
 
     }

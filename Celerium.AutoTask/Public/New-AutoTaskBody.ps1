@@ -108,7 +108,9 @@ function New-AutoTaskBody {
 
             }
 
-            return $OutputResults
+            if ($PSCmdlet.ShouldProcess($TargetURI)) {
+                return $OutputResults
+            }
 
         }
         catch {

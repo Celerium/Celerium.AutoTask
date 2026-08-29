@@ -49,7 +49,7 @@ Aliases:
 
 Required: False
 Position: 1
-Default value: $(Join-Path -Path "$($MyInvocation.MyCommand.Module.ModuleBase)" -ChildPath "AutoTaskAPI-v1-2023.6.json")
+Default value: $(Join-Path -Path "$($MyInvocation.MyCommand.Module.ModuleBase)" -ChildPath "AutoTaskAPI-2023.6.json")
 Accept pipeline input: False
 Accept wildcard characters: False
 ```

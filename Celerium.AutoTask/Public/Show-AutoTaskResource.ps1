@@ -64,7 +64,7 @@ function Show-AutoTaskResource {
         [switch]$UniqueOnly,
 
         [Parameter(Mandatory = $false)]
-        [string]$JsonSpec = $(Join-Path -Path "$($MyInvocation.MyCommand.Module.ModuleBase)" -ChildPath "AutoTaskAPI-v1-2023.6.json")
+        [string]$JsonSpec = $(Join-Path -Path "$($MyInvocation.MyCommand.Module.ModuleBase)" -ChildPath "AutoTaskAPI-2023.6.json")
     )
 
 

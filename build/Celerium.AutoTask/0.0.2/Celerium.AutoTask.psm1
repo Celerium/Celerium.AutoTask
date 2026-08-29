@@ -332,7 +332,7 @@ function Set-AutoTaskResourceDynamicParameter {
     [CmdletBinding(DefaultParameterSetName = 'GenerateResource', SupportsShouldProcess = $true, ConfirmImpact = 'None')]
     Param (
         [Parameter(Mandatory = $false)]
-        [string]$JsonSpec = $(Join-Path -Path "$($MyInvocation.MyCommand.Module.ModuleBase)" -ChildPath "AutoTaskAPI-v1-2023.6.json")
+        [string]$JsonSpec = $(Join-Path -Path "$($MyInvocation.MyCommand.Module.ModuleBase)" -ChildPath "AutoTaskAPI-2023.6.json")
     )
 
     begin {}
@@ -1711,7 +1711,9 @@ function New-AutoTaskBody {
 
             }
 
-            return $OutputResults
+            if ($PSCmdlet.ShouldProcess($TargetURI)) {
+                return $OutputResults
+            }
 
         }
         catch {
@@ -1720,7 +1722,7 @@ function New-AutoTaskBody {
 
     }
 }
-#EndRegion '.\Public\New-AutoTaskBody.ps1' 120
+#EndRegion '.\Public\New-AutoTaskBody.ps1' 122
 #Region '.\Public\New-AutoTaskResource.ps1' -1
 
 function New-AutoTaskResource {
@@ -1849,7 +1851,6 @@ function Remove-AutoTaskResource {
         $ParameterName  = $functionName + '_Parameters'      -replace '-','_'
 
         $ResourceTarget = $PSBoundParameters.Resource
-        #$ResourceUri    = (($AutoTaskModuleQueries | Where-Object { $_.Delete -eq $ResourceTarget }).Name | Select-Object -First 1) -replace '/query', '/{PARENTID}' | Select-Object -First 1
         $ResourceUri    = ($AutoTaskModuleQueries | Where-Object { $_.Delete -eq $ResourceTarget } | Select-Object -First 1).Name -replace '/query$', '/{PARENTID}'
 
     }
@@ -1882,7 +1883,7 @@ function Remove-AutoTaskResource {
 
     }
 }
-#EndRegion '.\Public\Remove-AutoTaskResource.ps1' 80
+#EndRegion '.\Public\Remove-AutoTaskResource.ps1' 79
 #Region '.\Public\Set-AutoTaskResource.ps1' -1
 
 function Set-AutoTaskResource {
@@ -2038,7 +2039,7 @@ function Show-AutoTaskResource {
         [switch]$UniqueOnly,
 
         [Parameter(Mandatory = $false)]
-        [string]$JsonSpec = $(Join-Path -Path "$($MyInvocation.MyCommand.Module.ModuleBase)" -ChildPath "AutoTaskAPI-v1-2023.6.json")
+        [string]$JsonSpec = $(Join-Path -Path "$($MyInvocation.MyCommand.Module.ModuleBase)" -ChildPath "AutoTaskAPI-2023.6.json")
     )
 
 

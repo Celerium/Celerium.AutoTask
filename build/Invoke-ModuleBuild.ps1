@@ -116,7 +116,7 @@ try {
         Copy-Item $JsonSpec -Destination $(Join-Path -Path $OutputDirectory -ChildPath "$moduleName\$Version")
     }
     else{
-        Copy-Item $(Join-Path -Path $modulePath -ChildPath "AutoTaskAPI-v1-2023.6.json") -Destination $(Join-Path -Path $OutputDirectory -ChildPath "$moduleName\$Version")
+        Copy-Item $(Join-Path -Path $modulePath -ChildPath "AutoTaskAPI-2023.6.json") -Destination $(Join-Path -Path $OutputDirectory -ChildPath "$moduleName\$Version")
     }
 
     #Replace & comment out NestedModules from nonBuilt module
