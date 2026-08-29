@@ -212,7 +212,7 @@ $StepNumber++
 
         foreach ($ContactGroup in $CurrentContactGroups) {
             Write-Verbose "Deleting contact group [ $($ContactGroup.name) ] with ID [ $($ContactGroup.id) ]"
-            Remove-AutoTaskResource -Resource ContactGroups -ID $ContactGroup.id | Out-Null
+            Remove-AutoTaskResource -Resource ContactGroups -ID $ContactGroup.id -Confirm:$false
         }
 
     }
