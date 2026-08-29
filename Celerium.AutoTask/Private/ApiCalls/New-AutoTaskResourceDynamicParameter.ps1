@@ -25,7 +25,7 @@ function New-AutoTaskResourceDynamicParameter {
         N/A
 
     .LINK
-        https://celerium.github.io/Celerium.AutoTask/site/ApiCalls/New-AutoTaskResourceDynamicParameter.html
+        https://celerium.github.io/Celerium.AutoTask/site/Internal/New-AutoTaskResourceDynamicParameter.html
 
     .LINK
         https://webservices24.autotask.net/atservicesrest/swagger/ui/index#

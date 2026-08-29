@@ -207,5 +207,5 @@ N/A
 
 ## RELATED LINKS
 
-[https://celerium.github.io/Celerium.AutoTask/site/Public/Get-AutoTaskResource.html](https://celerium.github.io/Celerium.AutoTask/site/Public/Get-AutoTaskResource.html)
+[https://celerium.github.io/Celerium.AutoTask/site/Resource/Get-AutoTaskResource.html](https://celerium.github.io/Celerium.AutoTask/site/Resource/Get-AutoTaskResource.html)
 

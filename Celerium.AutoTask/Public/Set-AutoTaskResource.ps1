@@ -25,7 +25,7 @@ function Set-AutoTaskResource {
         N/A
 
     .LINK
-        https://celerium.github.io/Celerium.AutoTask/site/Public/Set-AutoTaskResource.html
+        https://celerium.github.io/Celerium.AutoTask/site/Resource/Set-AutoTaskResource.html
 #>
 
     [CmdletBinding(SupportsShouldProcess, ConfirmImpact = 'Medium')]

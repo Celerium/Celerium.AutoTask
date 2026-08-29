@@ -22,7 +22,7 @@ function New-AutoTaskResource {
         N/A
 
     .LINK
-        https://celerium.github.io/Celerium.AutoTask/site/Public/New-AutoTaskResource.html
+        https://celerium.github.io/Celerium.AutoTask/site/Resource/New-AutoTaskResource.html
 #>
 
     [CmdletBinding(SupportsShouldProcess, ConfirmImpact = 'Low')]

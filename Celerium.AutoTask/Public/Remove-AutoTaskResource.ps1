@@ -22,7 +22,7 @@ function Remove-AutoTaskResource {
         N/A
 
     .LINK
-        https://celerium.github.io/Celerium.AutoTask/site/Public/Remove-AutoTaskResource.html
+        https://celerium.github.io/Celerium.AutoTask/site/Resource/Remove-AutoTaskResource.html
 #>
 
     [CmdletBinding(SupportsShouldProcess, ConfirmImpact = 'High')]

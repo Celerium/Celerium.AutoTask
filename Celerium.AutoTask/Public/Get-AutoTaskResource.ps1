@@ -62,7 +62,7 @@ function Get-AutoTaskResource {
         N/A
 
     .LINK
-        https://celerium.github.io/Celerium.AutoTask/site/Public/Get-AutoTaskResource.html
+        https://celerium.github.io/Celerium.AutoTask/site/Resource/Get-AutoTaskResource.html
 #>
 
     [CmdletBinding()]

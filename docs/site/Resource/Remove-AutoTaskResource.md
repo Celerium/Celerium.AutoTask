@@ -123,5 +123,5 @@ N/A
 
 ## RELATED LINKS
 
-[https://celerium.github.io/Celerium.AutoTask/site/Public/Remove-AutoTaskResource.html](https://celerium.github.io/Celerium.AutoTask/site/Public/Remove-AutoTaskResource.html)
+[https://celerium.github.io/Celerium.AutoTask/site/Resource/Remove-AutoTaskResource.html](https://celerium.github.io/Celerium.AutoTask/site/Resource/Remove-AutoTaskResource.html)
 

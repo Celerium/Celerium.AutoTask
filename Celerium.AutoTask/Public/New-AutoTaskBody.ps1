@@ -27,7 +27,7 @@ function New-AutoTaskBody {
         N/A
 
     .LINK
-        https://celerium.github.io/Celerium.AutoTask/site/Public/New-AutoTaskBody.html
+        https://celerium.github.io/Celerium.AutoTask/site/Resource/New-AutoTaskBody.html
 #>
 
     [CmdletBinding(DefaultParameterSetName = 'Empty', SupportsShouldProcess = $true, ConfirmImpact = 'None')]

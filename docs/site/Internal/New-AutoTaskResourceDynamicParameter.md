@@ -111,7 +111,7 @@ N/A
 
 ## RELATED LINKS
 
-[https://celerium.github.io/Celerium.AutoTask/site/ApiCalls/New-AutoTaskResourceDynamicParameter.html](https://celerium.github.io/Celerium.AutoTask/site/ApiCalls/New-AutoTaskResourceDynamicParameter.html)
+[https://celerium.github.io/Celerium.AutoTask/site/Internal/New-AutoTaskResourceDynamicParameter.html](https://celerium.github.io/Celerium.AutoTask/site/Internal/New-AutoTaskResourceDynamicParameter.html)
 
 [https://webservices24.autotask.net/atservicesrest/swagger/ui/index#](https://webservices24.autotask.net/atservicesrest/swagger/ui/index#)
 

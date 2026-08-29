@@ -117,5 +117,5 @@ N/A
 
 ## RELATED LINKS
 
-[https://celerium.github.io/Celerium.AutoTask/site/Public/New-AutoTaskBody.html](https://celerium.github.io/Celerium.AutoTask/site/Public/New-AutoTaskBody.html)
+[https://celerium.github.io/Celerium.AutoTask/site/Resource/New-AutoTaskBody.html](https://celerium.github.io/Celerium.AutoTask/site/Resource/New-AutoTaskBody.html)
 

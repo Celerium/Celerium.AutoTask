@@ -1157,12 +1157,8 @@
     </command:examples>
     <command:relatedLinks>
       <maml:navigationLink>
-        <maml:linkText>Online Version:</maml:linkText>
+        <maml:linkText>https://celerium.github.io/Celerium.AutoTask/site/Internal/New-AutoTaskResourceDynamicParameter.html</maml:linkText>
         <maml:uri>https://celerium.github.io/Celerium.AutoTask/site/Internal/New-AutoTaskResourceDynamicParameter.html</maml:uri>
-      </maml:navigationLink>
-      <maml:navigationLink>
-        <maml:linkText>https://celerium.github.io/Celerium.AutoTask/site/ApiCalls/New-AutoTaskResourceDynamicParameter.html</maml:linkText>
-        <maml:uri>https://celerium.github.io/Celerium.AutoTask/site/ApiCalls/New-AutoTaskResourceDynamicParameter.html</maml:uri>
       </maml:navigationLink>
       <maml:navigationLink>
         <maml:linkText>https://webservices24.autotask.net/atservicesrest/swagger/ui/index#</maml:linkText>
@@ -1604,12 +1600,8 @@
     </command:examples>
     <command:relatedLinks>
       <maml:navigationLink>
-        <maml:linkText>Online Version:</maml:linkText>
+        <maml:linkText>https://celerium.github.io/Celerium.AutoTask/site/Internal/Set-AutoTaskResourceDynamicParameter.html</maml:linkText>
         <maml:uri>https://celerium.github.io/Celerium.AutoTask/site/Internal/Set-AutoTaskResourceDynamicParameter.html</maml:uri>
-      </maml:navigationLink>
-      <maml:navigationLink>
-        <maml:linkText>https://celerium.github.io/Celerium.AutoTask/site/ApiCalls/Set-AutoTaskResourceDynamicParameter.html</maml:linkText>
-        <maml:uri>https://celerium.github.io/Celerium.AutoTask/site/ApiCalls/Set-AutoTaskResourceDynamicParameter.html</maml:uri>
       </maml:navigationLink>
       <maml:navigationLink>
         <maml:linkText>https://webservices24.autotask.net/atservicesrest/swagger/ui/index#</maml:linkText>
@@ -1986,12 +1978,8 @@
     </command:examples>
     <command:relatedLinks>
       <maml:navigationLink>
-        <maml:linkText>Online Version:</maml:linkText>
+        <maml:linkText>https://celerium.github.io/Celerium.AutoTask/site/Resource/Get-AutoTaskResource.html</maml:linkText>
         <maml:uri>https://celerium.github.io/Celerium.AutoTask/site/Resource/Get-AutoTaskResource.html</maml:uri>
-      </maml:navigationLink>
-      <maml:navigationLink>
-        <maml:linkText>https://celerium.github.io/Celerium.AutoTask/site/Public/Get-AutoTaskResource.html</maml:linkText>
-        <maml:uri>https://celerium.github.io/Celerium.AutoTask/site/Public/Get-AutoTaskResource.html</maml:uri>
       </maml:navigationLink>
     </command:relatedLinks>
   </command:command>
@@ -2133,12 +2121,8 @@
     </command:examples>
     <command:relatedLinks>
       <maml:navigationLink>
-        <maml:linkText>Online Version:</maml:linkText>
+        <maml:linkText>https://celerium.github.io/Celerium.AutoTask/site/Resource/New-AutoTaskBody.html</maml:linkText>
         <maml:uri>https://celerium.github.io/Celerium.AutoTask/site/Resource/New-AutoTaskBody.html</maml:uri>
-      </maml:navigationLink>
-      <maml:navigationLink>
-        <maml:linkText>https://celerium.github.io/Celerium.AutoTask/site/Public/New-AutoTaskBody.html</maml:linkText>
-        <maml:uri>https://celerium.github.io/Celerium.AutoTask/site/Public/New-AutoTaskBody.html</maml:uri>
       </maml:navigationLink>
     </command:relatedLinks>
   </command:command>
@@ -2297,12 +2281,8 @@
     </command:examples>
     <command:relatedLinks>
       <maml:navigationLink>
-        <maml:linkText>Online Version:</maml:linkText>
+        <maml:linkText>https://celerium.github.io/Celerium.AutoTask/site/Resource/New-AutoTaskResource.html</maml:linkText>
         <maml:uri>https://celerium.github.io/Celerium.AutoTask/site/Resource/New-AutoTaskResource.html</maml:uri>
-      </maml:navigationLink>
-      <maml:navigationLink>
-        <maml:linkText>https://celerium.github.io/Celerium.AutoTask/site/Public/New-AutoTaskResource.html</maml:linkText>
-        <maml:uri>https://celerium.github.io/Celerium.AutoTask/site/Public/New-AutoTaskResource.html</maml:uri>
       </maml:navigationLink>
     </command:relatedLinks>
   </command:command>
@@ -2461,12 +2441,8 @@
     </command:examples>
     <command:relatedLinks>
       <maml:navigationLink>
-        <maml:linkText>Online Version:</maml:linkText>
+        <maml:linkText>https://celerium.github.io/Celerium.AutoTask/site/Resource/Remove-AutoTaskResource.html</maml:linkText>
         <maml:uri>https://celerium.github.io/Celerium.AutoTask/site/Resource/Remove-AutoTaskResource.html</maml:uri>
-      </maml:navigationLink>
-      <maml:navigationLink>
-        <maml:linkText>https://celerium.github.io/Celerium.AutoTask/site/Public/Remove-AutoTaskResource.html</maml:linkText>
-        <maml:uri>https://celerium.github.io/Celerium.AutoTask/site/Public/Remove-AutoTaskResource.html</maml:uri>
       </maml:navigationLink>
     </command:relatedLinks>
   </command:command>
@@ -2649,12 +2625,8 @@
     </command:examples>
     <command:relatedLinks>
       <maml:navigationLink>
-        <maml:linkText>Online Version:</maml:linkText>
+        <maml:linkText>https://celerium.github.io/Celerium.AutoTask/site/Resource/Set-AutoTaskResource.html</maml:linkText>
         <maml:uri>https://celerium.github.io/Celerium.AutoTask/site/Resource/Set-AutoTaskResource.html</maml:uri>
-      </maml:navigationLink>
-      <maml:navigationLink>
-        <maml:linkText>https://celerium.github.io/Celerium.AutoTask/site/Public/Set-AutoTaskResource.html</maml:linkText>
-        <maml:uri>https://celerium.github.io/Celerium.AutoTask/site/Public/Set-AutoTaskResource.html</maml:uri>
       </maml:navigationLink>
     </command:relatedLinks>
   </command:command>
@@ -2809,12 +2781,8 @@
     </command:examples>
     <command:relatedLinks>
       <maml:navigationLink>
-        <maml:linkText>Online Version:</maml:linkText>
+        <maml:linkText>https://celerium.github.io/Celerium.AutoTask/site/Resource/Show-AutoTaskResource.html</maml:linkText>
         <maml:uri>https://celerium.github.io/Celerium.AutoTask/site/Resource/Show-AutoTaskResource.html</maml:uri>
-      </maml:navigationLink>
-      <maml:navigationLink>
-        <maml:linkText>https://celerium.github.io/Celerium.AutoTask/site/Public/Show-AutoTaskResource.html</maml:linkText>
-        <maml:uri>https://celerium.github.io/Celerium.AutoTask/site/Public/Show-AutoTaskResource.html</maml:uri>
       </maml:navigationLink>
     </command:relatedLinks>
   </command:command>

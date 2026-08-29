@@ -232,7 +232,7 @@ function New-AutoTaskResourceDynamicParameter {
         N/A
 
     .LINK
-        https://celerium.github.io/Celerium.AutoTask/site/ApiCalls/New-AutoTaskResourceDynamicParameter.html
+        https://celerium.github.io/Celerium.AutoTask/site/Internal/New-AutoTaskResourceDynamicParameter.html
 
     .LINK
         https://webservices24.autotask.net/atservicesrest/swagger/ui/index#
@@ -323,7 +323,7 @@ function Set-AutoTaskResourceDynamicParameter {
         N/A
 
     .LINK
-        https://celerium.github.io/Celerium.AutoTask/site/ApiCalls/Set-AutoTaskResourceDynamicParameter.html
+        https://celerium.github.io/Celerium.AutoTask/site/Internal/Set-AutoTaskResourceDynamicParameter.html
 
     .LINK
         https://webservices24.autotask.net/atservicesrest/swagger/ui/index#
@@ -1478,7 +1478,7 @@ function Get-AutoTaskResource {
         N/A
 
     .LINK
-        https://celerium.github.io/Celerium.AutoTask/site/Public/Get-AutoTaskResource.html
+        https://celerium.github.io/Celerium.AutoTask/site/Resource/Get-AutoTaskResource.html
 #>
 
     [CmdletBinding()]
@@ -1630,7 +1630,7 @@ function New-AutoTaskBody {
         N/A
 
     .LINK
-        https://celerium.github.io/Celerium.AutoTask/site/Public/New-AutoTaskBody.html
+        https://celerium.github.io/Celerium.AutoTask/site/Resource/New-AutoTaskBody.html
 #>
 
     [CmdletBinding(DefaultParameterSetName = 'Empty', SupportsShouldProcess = $true, ConfirmImpact = 'None')]
@@ -1747,7 +1747,7 @@ function New-AutoTaskResource {
         N/A
 
     .LINK
-        https://celerium.github.io/Celerium.AutoTask/site/Public/New-AutoTaskResource.html
+        https://celerium.github.io/Celerium.AutoTask/site/Resource/New-AutoTaskResource.html
 #>
 
     [CmdletBinding(SupportsShouldProcess, ConfirmImpact = 'Low')]
@@ -1827,7 +1827,7 @@ function Remove-AutoTaskResource {
         N/A
 
     .LINK
-        https://celerium.github.io/Celerium.AutoTask/site/Public/Remove-AutoTaskResource.html
+        https://celerium.github.io/Celerium.AutoTask/site/Resource/Remove-AutoTaskResource.html
 #>
 
     [CmdletBinding(SupportsShouldProcess, ConfirmImpact = 'High')]
@@ -1912,7 +1912,7 @@ function Set-AutoTaskResource {
         N/A
 
     .LINK
-        https://celerium.github.io/Celerium.AutoTask/site/Public/Set-AutoTaskResource.html
+        https://celerium.github.io/Celerium.AutoTask/site/Resource/Set-AutoTaskResource.html
 #>
 
     [CmdletBinding(SupportsShouldProcess, ConfirmImpact = 'Medium')]
@@ -2022,7 +2022,7 @@ function Show-AutoTaskResource {
         N/A
 
     .LINK
-        https://celerium.github.io/Celerium.AutoTask/site/Public/Show-AutoTaskResource.html
+        https://celerium.github.io/Celerium.AutoTask/site/Resource/Show-AutoTaskResource.html
 #>
 
     [CmdletBinding(defaultParameterSetName = 'All')]

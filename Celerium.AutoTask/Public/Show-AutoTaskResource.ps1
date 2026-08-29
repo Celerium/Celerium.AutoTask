@@ -48,7 +48,7 @@ function Show-AutoTaskResource {
         N/A
 
     .LINK
-        https://celerium.github.io/Celerium.AutoTask/site/Public/Show-AutoTaskResource.html
+        https://celerium.github.io/Celerium.AutoTask/site/Resource/Show-AutoTaskResource.html
 #>
 
     [CmdletBinding(defaultParameterSetName = 'All')]
