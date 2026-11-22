@@ -5,42 +5,37 @@ labels: ["type: feature request"]
 assignees:
   - Celerium
 body:
-  - type: checkboxes
-    id: ReadME
+  - type: markdown
     attributes:
-      label: Project README
-      description: "[Project README](https://github.com/Celerium/Celerium.AutoTask/blob/master/README.md)"
-      options:
-        - label: "Have you read the projects README?"
-  - type: checkboxes
-    id: WebDocumentation
-    attributes:
-      label: Online Documentation
-      description: "[Online Documentation](https://Celerium.github.io/Celerium.AutoTask/)"
-      options:
-        - label: "Have you read the online documentation"
-  - type: checkboxes
-    id: PowerShellHelp
-    attributes:
-      label: PowerShell Help
-      description: "Get-Help Get-AutoTask<RESOURCES-NAME> -Full"
-      options:
-        - label: "Have you read the help output?"
+      value: |
+        Helpful resources (optional): [Project README](https://github.com/Celerium/Celerium.AutoTask/blob/main/README.md), [online documentation](https://Celerium.github.io/Celerium.AutoTask/), and PowerShell help for the relevant command. You do not need to confirm that you read these resources before submitting.
   - type: textarea
-    id: NewFeature
+    id: use-case
     attributes:
-      label: Describe the solution you'd like
-      description: A clear and concise description of what you want to happen.
-      render: Text
+      label: Problem or use case
+      description: Explain what you are trying to accomplish and where the current behavior falls short.
+      placeholder: "Describe the task or workflow that prompted this request."
+    validations:
+      required: true
   - type: textarea
-    id: NewFeatureAlternatives
+    id: proposed-feature
     attributes:
-      label: Describe alternatives you've considered
-      description: A clear and concise description of any alternative solutions or features you've considered.
-      render: Text
+      label: Proposed feature or outcome
+      description: Describe the result you would like to see. Implementation details are welcome but not required.
+      placeholder: "Example: Add a command or option that allows me to ..."
+    validations:
+      required: true
   - type: textarea
-    id: ExistingIssue
+    id: alternatives
     attributes:
-      label: Existing Issue?
-      description: Is this related to an existing issue? If so please describe or link.
-      value: "Issue: #12345"
+      label: Alternatives considered
+      description: Optional. Describe other approaches you considered, or enter "Not sure" or "None".
+      placeholder: "Optional"
+    validations:
+      required: false
+  - type: input
+    id: related-issue
+    attributes:
+      label: Related issue or pull request
+      description: Optional. Provide an issue or pull request URL or number if this request is related to existing work.
+      placeholder: "Issue or PR URL or number"

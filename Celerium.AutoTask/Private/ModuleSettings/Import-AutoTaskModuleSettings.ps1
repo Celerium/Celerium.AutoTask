@@ -10,6 +10,10 @@ function Import-AutoTaskModuleSettings {
         By default the configuration file is stored in the following location:
             $env:USERPROFILE\Celerium.AutoTask
 
+        The AUTOTASK_BASE_URI, AUTOTASK_API_USERNAME, AUTOTASK_API_SECRET, & AUTOTASK_API_INTEGRATION_CODE
+        environment variables are also supported and take precedence over the values stored in the
+        configuration file
+
     .PARAMETER AutoTaskConfigPath
         Define the location to store the AutoTask configuration file
 
@@ -21,11 +25,6 @@ function Import-AutoTaskModuleSettings {
 
         By default the configuration file is named:
             config.psd1
-
-    .PARAMETER JsonSpec
-        Defines the path to the swagger json file to use when creating the dynamic parameter
-
-        By default the value used is the one defined in the root of the module folder
 
     .EXAMPLE
         Import-AutoTaskModuleSettings
@@ -62,44 +61,91 @@ function Import-AutoTaskModuleSettings {
     )
 
     begin {
+
         $AutoTaskConfig = Join-Path -Path $AutoTaskConfigPath -ChildPath $AutoTaskConfigFile
 
-        $ModuleVersion = $MyInvocation.MyCommand.Version.ToString()
+        $ModuleVersion = if ($MyInvocation.MyCommand.Version) { $MyInvocation.MyCommand.Version.ToString() } else { '2.0.0' }
 
         switch ($PSVersionTable.PSEdition){
             'Core'      { $UserAgent = "Celerium.AutoTask/$ModuleVersion - PowerShell/$($PSVersionTable.PSVersion) ($($PSVersionTable.Platform) $($PSVersionTable.OS))" }
             'Desktop'   { $UserAgent = "Celerium.AutoTask/$ModuleVersion - WindowsPowerShell/$($PSVersionTable.PSVersion) ($($PSVersionTable.BuildVersion))" }
-            default     { $UserAgent = "Celerium.AutoTask/$ModuleVersion - $([Microsoft.PowerShell.Commands.PSUserAgent].GetMembers('Static, NonPublic').Where{$_.Name -eq 'UserAgent'}.GetValue($null,$null))" }
+            default     { $UserAgent = "Celerium.AutoTask/$ModuleVersion - PowerShell/$($PSVersionTable.PSVersion)" }
         }
 
     }
 
     process {
 
-        if (Test-Path $AutoTaskConfig) {
-            $TempConfig = Import-LocalizedData -BaseDirectory $AutoTaskConfigPath -FileName $AutoTaskConfigFile
+        Set-Variable -Name "AutoTaskModuleUserAgent"            -Value $UserAgent -Scope Global -Force
+        Set-Variable -Name "AutoTaskModuleJSONConversionDepth"  -Value 100 -Scope Global -Force
 
-            $TempConfig.AutoTaskModuleApiSecretKey = ConvertTo-SecureString $TempConfig.AutoTaskModuleApiSecretKey
+        if (Test-Path -Path $AutoTaskConfig) {
 
-            Set-Variable -Name "AutoTaskModuleBaseUri"              -Value $TempConfig.AutoTaskModuleBaseUri                -Option ReadOnly -Scope Global -Force
-            Set-Variable -Name "AutoTaskModuleBaseUriApiVersion"    -Value $TempConfig.AutoTaskModuleBaseUriApiVersion      -Option ReadOnly -Scope Global -Force
-            Set-Variable -Name "AutoTaskModuleBaseUriComplete"      -Value $TempConfig.AutoTaskModuleBaseUriComplete        -Option ReadOnly -Scope Global -Force
-            Set-Variable -Name "AutoTaskModuleApiUsername"          -Value $TempConfig.AutoTaskModuleApiUsername            -Option ReadOnly -Scope Global -Force
-            Set-Variable -Name "AutoTaskModuleApiSecretKey"         -Value $TempConfig.AutoTaskModuleApiSecretKey           -Option ReadOnly -Scope Global -Force
-            Set-Variable -Name "AutoTaskModuleApiIntegrationCode"   -Value $TempConfig.AutoTaskModuleApiIntegrationCode     -Option ReadOnly -Scope Global -Force
-            Set-Variable -Name "AutoTaskModuleUserAgent"            -Value $TempConfig.AutoTaskModuleUserAgent              -Option ReadOnly -Scope Global -Force
-            Set-Variable -Name "AutoTaskModuleJSONConversionDepth"  -Value $TempConfig.AutoTaskModuleJSONConversionDepth    -Option ReadOnly -Scope Global -Force
+            try {
+                $TempConfig = Import-PowerShellDataFile -Path $AutoTaskConfig -ErrorAction Stop
 
-            Write-Verbose "Celerium.AutoTask Module configuration loaded successfully from [ $AutoTaskConfig ]"
+                if ($TempConfig.AutoTaskModuleBaseUri) {
+                    $ApiVersion = if ($TempConfig.AutoTaskModuleBaseUriApiVersion) { $TempConfig.AutoTaskModuleBaseUriApiVersion } else { 'V1.0' }
+                    Set-Variable -Name "AutoTaskModuleBaseUri"              -Value $TempConfig.AutoTaskModuleBaseUri                -Option ReadOnly -Scope Global -Force
+                    Set-Variable -Name "AutoTaskModuleBaseUriApiVersion"    -Value $ApiVersion                                      -Option ReadOnly -Scope Global -Force
+                    Set-Variable -Name "AutoTaskModuleBaseUriComplete"      -Value "$($TempConfig.AutoTaskModuleBaseUri)/$ApiVersion" -Option ReadOnly -Scope Global -Force
+                }
 
-            # Clean things up
-            Remove-Variable "TempConfig"
+                if ($TempConfig.AutoTaskModuleJSONConversionDepth) {
+                    Set-Variable -Name "AutoTaskModuleJSONConversionDepth" -Value ([int]$TempConfig.AutoTaskModuleJSONConversionDepth) -Scope Global -Force
+                }
+
+                if ($TempConfig.AutoTaskModuleApiUsername) {
+                    Set-Variable -Name "AutoTaskModuleApiUsername" -Value $TempConfig.AutoTaskModuleApiUsername -Option ReadOnly -Scope Global -Force
+                }
+
+                if ($TempConfig.AutoTaskModuleApiSecretKey) {
+                    $SecretKey = ConvertTo-SecureString $TempConfig.AutoTaskModuleApiSecretKey
+                    Set-Variable -Name "AutoTaskModuleApiSecretKey" -Value $SecretKey -Option ReadOnly -Scope Global -Force
+                }
+
+                if ($TempConfig.AutoTaskModuleApiIntegrationCode) {
+
+                    # Version 2.0.0+ encrypts the integration code, version 1.x stored it as plain text
+                    try {
+                        $SecureCode         = ConvertTo-SecureString $TempConfig.AutoTaskModuleApiIntegrationCode -ErrorAction Stop
+                        $BSTR               = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($SecureCode)
+                        $IntegrationCode    = [System.Runtime.InteropServices.Marshal]::PtrToStringBSTR($BSTR)
+                    }
+                    catch { $IntegrationCode = $TempConfig.AutoTaskModuleApiIntegrationCode }
+                    finally {
+                        if ($BSTR) { [System.Runtime.InteropServices.Marshal]::ZeroFreeBSTR($BSTR) }
+                    }
+
+                    Set-Variable -Name "AutoTaskModuleApiIntegrationCode" -Value $IntegrationCode -Option ReadOnly -Scope Global -Force
+
+                }
+
+                Write-Verbose "Celerium.AutoTask Module configuration loaded successfully from [ $AutoTaskConfig ]"
+            }
+            catch {
+                Write-Warning "The Celerium.AutoTask Module configuration at [ $AutoTaskConfig ] could not be loaded - $($_.Exception.Message)"
+            }
+            finally {
+                Remove-Variable -Name "TempConfig", "IntegrationCode" -ErrorAction SilentlyContinue
+            }
+
         }
         else {
-            Write-Verbose "No configuration file found at [ $AutoTaskConfig ] run Add-AutoTaskAPIKey & Add-AutoTaskBaseUri to get started"
+            Write-Verbose "No configuration file found at [ $AutoTaskConfig ] run Add-AutoTaskAPIKey & Add-AutoTaskBaseURI to get started"
+        }
 
-            Set-Variable -Name "AutoTaskModuleUserAgent" -Value $UserAgent -Scope Global -Force
-            Set-Variable -Name "AutoTaskModuleJSONConversionDepth" -Value 100 -Scope Global -Force
+        # Environment variables take precedence & are the recommended method for CI\CD, Linux, & macOS
+        if ($env:AUTOTASK_BASE_URI) {
+            try { Add-AutoTaskBaseURI -BaseURI $env:AUTOTASK_BASE_URI }
+            catch { Write-Warning "The AUTOTASK_BASE_URI environment variable is not valid - $($_.Exception.Message)" }
+        }
+
+        if ($env:AUTOTASK_API_USERNAME -and $env:AUTOTASK_API_SECRET -and $env:AUTOTASK_API_INTEGRATION_CODE) {
+            Add-AutoTaskAPIKey -ApiUsername $env:AUTOTASK_API_USERNAME -ApiSecretKey $env:AUTOTASK_API_SECRET -ApiIntegrationCode $env:AUTOTASK_API_INTEGRATION_CODE
+        }
+        elseif ($env:AUTOTASK_API_USERNAME -or $env:AUTOTASK_API_SECRET -or $env:AUTOTASK_API_INTEGRATION_CODE) {
+            Write-Warning 'The AUTOTASK_API_USERNAME, AUTOTASK_API_SECRET, & AUTOTASK_API_INTEGRATION_CODE environment variables must all be set, the API values were not loaded from the environment'
         }
 
     }

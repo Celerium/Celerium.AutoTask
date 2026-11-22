@@ -1,6 +1,6 @@
 <#
 .NOTES
-    Copyright 1990-2024 Celerium
+    Copyright 1990-2027 Celerium
 
     NAME: Install-Prerequisites.ps1
     Type: PowerShell
@@ -8,7 +8,7 @@
         AUTHOR:  David Schulte
         DATE:    2023-04-1
         EMAIL:   celerium@Celerium.org
-        Updated: 2023-09-16
+        Updated: 2026-11-21
 
     TODO:
 
@@ -20,27 +20,29 @@
     build and test a Celerium PowerShell project.
 
     The various prerequisites required allow for the automation of documentation,
-    Azure Pipelines, Pester testing, GitHub repo setup, PowerShell module setup
-    and much more.
+    GitHub Actions, Pester testing, and PowerShell module building.
+
+    The script works on Windows PowerShell 5.1, PowerShell 7+, Linux, & macOS and
+    installs the latest version of every module that is missing or out of date
 
 .PARAMETER Modules
     Defines one or more modules to install
 
-.PARAMETER Update
+.PARAMETER ForceUpdate
     Update the modules if they are already installed
-
-.PARAMETER Force
-    Force install and or update modules
 
 .EXAMPLE
     .\Install-Prerequisites.ps1
 
     Installs the prerequisites needed to build and test a Celerium PowerShell project.
 
-    No progress information is sent to the console while the script is running.
+.EXAMPLE
+    .\Install-Prerequisites.ps1 -Modules Pester -ForceUpdate
+
+    Installs or updates only the Pester module
 
 .INPUTS
-    Modules[string]
+    N/A
 
 .OUTPUTS
     N/A
@@ -59,12 +61,12 @@
 
 [CmdletBinding(DefaultParameterSetName = 'Install', SupportsShouldProcess = $true)]
     param(
-        [Parameter(Mandatory=$false, ParameterSetName = 'Install', ValueFromPipeline = $true)]
+        [Parameter(Mandatory=$false, ParameterSetName = 'Install')]
         [ValidateNotNullOrEmpty()]
-        [string[]]$Modules = @('ModuleBuilder', 'Pester', 'platyPS', 'PSScriptAnalyzer'),
+        [string[]]$Modules = @('ModuleBuilder', 'Pester', 'Microsoft.PowerShell.PlatyPS', 'PSScriptAnalyzer'),
 
         [Parameter(Mandatory=$false, ParameterSetName = 'Update')]
-        [switch]$Force_Update
+        [switch]$ForceUpdate
     )
 
 #EndRegion  [ Parameters ]
@@ -77,6 +79,15 @@ Write-Verbose ''
 
 $StartDate = Get-Date
 
+# Minimum version requirements, the latest version of every module is installed
+#   - Microsoft.PowerShell.PlatyPS replaces the legacy platyPS module
+$ModuleRequirements = @{
+    'ModuleBuilder'                 = @{ MinimumVersion  = '3.2.18' }
+    'Pester'                        = @{ MinimumVersion  = '6.2.0' }
+    'Microsoft.PowerShell.PlatyPS'  = @{ MinimumVersion  = '1.0.0' }
+    'PSScriptAnalyzer'              = @{ MinimumVersion  = '1.25.0' }
+}
+
 #EndRegion  [ Prerequisites ]
 
 Write-Verbose " - (1/2) - $(Get-Date -Format MM-dd-HH:mm) - Checking Package Provider"
@@ -85,10 +96,19 @@ Write-Verbose " - (1/2) - $(Get-Date -Format MM-dd-HH:mm) - Checking Package Pro
 
 try {
 
-    $packageProvider    = Get-PackageProvider | Where-Object {$_.Name -eq 'NuGet'}
+    if ($PSEdition -eq 'Desktop') {
 
-    If ( $null -eq $packageProvider ) {
-        throw 'The NuGet prerequisites are not installed, update NuGet then close & reopen PowerShell'
+        [Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12
+
+        $PackageProvider = Get-PackageProvider -ListAvailable | Where-Object { $_.Name -eq 'NuGet' -and $_.Version -ge [version]'2.8.5.201' }
+        if ($null -eq $PackageProvider) {
+            Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Scope CurrentUser -Force > $null
+        }
+
+    }
+
+    if ((Get-PSRepository -Name PSGallery -ErrorAction Stop).InstallationPolicy -ne 'Trusted') {
+        Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
     }
 
 }
@@ -103,57 +123,58 @@ Write-Verbose " - (2/2) - $(Get-Date -Format MM-dd-HH:mm) - Installing Modules"
 
 #Region     [ Main Code ]
 
-$valid_Modules = [System.Collections.Generic.List[object]]::new()
-    foreach ($module in $modules) {
+foreach ($Module in $Modules) {
 
-        $found_Module = Find-Module -Name $Module -ErrorAction SilentlyContinue
-        if ($found_Module) {
-            $valid_Modules.Add($found_Module) > $null
-        }
-        else{ Write-Warning " -       - $(Get-Date -Format MM-dd-HH:mm) - [ $Module ] is not valid or was not found" }
+    $Requirement = $ModuleRequirements[$Module]
+    if ($null -eq $Requirement) { $Requirement = @{} }
 
+    $InstallParams = @{
+        Name                = $Module
+        Scope               = 'CurrentUser'
+        Force               = $true
+        AllowClobber        = $true
+        SkipPublisherCheck  = $true
+        ErrorAction         = 'Stop'
+    }
+    if ($Requirement.RequiredVersion) { $InstallParams.RequiredVersion = $Requirement.RequiredVersion }
+    if ($Requirement.MinimumVersion)  { $InstallParams.MinimumVersion  = $Requirement.MinimumVersion }
+
+    $FindParams = @{ Name = $Module; ErrorAction = 'SilentlyContinue' }
+    if ($Requirement.RequiredVersion) { $FindParams.RequiredVersion = $Requirement.RequiredVersion }
+    if ($Requirement.MinimumVersion)  { $FindParams.MinimumVersion  = $Requirement.MinimumVersion }
+
+    $Latest = Find-Module @FindParams
+    if (-not $Latest) {
+        Write-Warning " -       - $(Get-Date -Format MM-dd-HH:mm) - [ $Module ] is not valid or was not found"
+        exit 1
     }
 
-if ($valid_Modules) {
+    $Installed = Get-Module -Name $Module -ListAvailable | Where-Object {
+        ( -not $Requirement.RequiredVersion -or $_.Version -eq [version]$Requirement.RequiredVersion ) -and
+        ( -not $Requirement.MinimumVersion  -or $_.Version -ge [version]$Requirement.MinimumVersion )
+    } | Sort-Object Version -Descending | Select-Object -First 1
 
-    foreach ($module in $valid_Modules) {
+    # The latest version is always used, an older version is updated
+    $Outdated = $Installed -and ($Installed.Version -lt [version](($Latest.Version -split '-')[0]))
 
-        if ( [bool](Get-InstalledModule -Name $module.Name -ErrorAction SilentlyContinue) -eq $false ) {
+    if ($null -eq $Installed -or $Outdated -or $ForceUpdate) {
 
-            Write-Verbose " -       - $(Get-Date -Format MM-dd-HH:mm) - Installing [ $($module.Name) | $($module.Version) ]"
+        $Action = if ($null -eq $Installed) { 'Installing' } else { 'Updating' }
 
-            #Temp fix for ModuleBuilder
-            if ($module.Name -eq 'ModuleBuilder') {
-                Write-Host "Installing ModuleBuilder"
-                Install-Module -Name $module.Name -RequiredVersion 3.1.0 -Force -Verbose
+        if ($PSCmdlet.ShouldProcess($Module, $Action)) {
+            Write-Verbose " -       - $(Get-Date -Format MM-dd-HH:mm) - $Action [ $Module ]"
+            try { Install-Module @InstallParams }
+            catch {
+                Write-Error $_
+                exit 1
             }
-            else{
-                Install-Module -Name $module.Name -Force
-            }
-
-        }
-        else{
-
-            if ($Force_Update) {
-
-                $Version = (Find-Module -Name $module.Name).Version
-                Write-Verbose " -       - $(Get-Date -Format MM-dd-HH:mm) - Updating [ $($module.Name)| [ $($module.Version) --> $Version ] ]"
-
-                Update-Module -Name $module.Name -Force
-
-            }
-            else {
-                Write-Verbose " -       - $(Get-Date -Format MM-dd-HH:mm) - Already installed [ $($module.Name) | $($module.Version) ]"
-            }
-
         }
 
     }
+    else {
+        Write-Verbose " -       - $(Get-Date -Format MM-dd-HH:mm) - Already installed [ $($Installed.Name) | $($Installed.Version) ]"
+    }
 
-}
-else{
-    Write-Error " -       - $(Get-Date -Format MM-dd-HH:mm) - No valid modules found at this time"
-    exit 1
 }
 
 #EndRegion  [ Main Code ]

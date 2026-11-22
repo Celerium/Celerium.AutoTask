@@ -1,8 +1,11 @@
 blank_issues_enabled: true
 contact_links:
-  - name: Project Documentation
+  - name: Project documentation
     url: https://celerium.github.io/Celerium.AutoTask/
-    about: Read through the generated documentation
-  - name: Vendor Documentation
-    url: https://api.AutoTask.com/developer
-    about: Read through the vendors documentation
+    about: Browse the project's guides and reference documentation
+  - name: Vendor documentation
+    url: https://www.autotask.net/help/developerhelp/Content/APIs/REST/REST_API_Home.htm
+    about: Browse the vendor's API documentation
+  - name: Website
+    url: https://celerium.org
+    about: Check my website

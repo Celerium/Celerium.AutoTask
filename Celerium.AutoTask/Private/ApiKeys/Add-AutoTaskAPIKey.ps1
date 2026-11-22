@@ -1,39 +1,49 @@
 function Add-AutoTaskAPIKey {
 <#
     .SYNOPSIS
-        Sets your API key used to authenticate all API calls
+        Sets the API username, secret, & integration code used to authenticate all API calls
 
     .DESCRIPTION
-        The Add-AutoTaskAPIKey cmdlet sets your API key which is used to
-        authenticate all API calls made to AutoTask
+        The Add-AutoTaskAPIKey cmdlet sets the API username, secret, & integration code which
+        are used to authenticate all API calls made to the AutoTask API
 
-        AutoTask API keys can be generated via the AutoTask web interface
-            Resources > API User > Credentials
+        The username & integration code are stored in memory as plain text & the secret is
+        stored in memory as a SecureString
+
+        AutoTask API users & their credentials are created in the AutoTask web interface
+            Admin > Resources (Users) > New API User
+
+        The API tracking identifier of the API user is the integration code
 
     .PARAMETER ApiUsername
-        Plain text API username
+        Defines the username of the API user
 
     .PARAMETER ApiSecretKey
-        Plain text API secret key
+        Defines the secret (password) of the API user as plain text
 
-        If not defined the cmdlet will prompt you to enter the API secret key which
-        will be stored as a SecureString
+        If neither ApiSecretKey nor ApiKeySecureString is defined the cmdlet will prompt you
+        to enter the secret which will be stored as a SecureString
 
     .PARAMETER ApiKeySecureString
-        Input a SecureString object containing the API key
+        Input a SecureString object containing the secret of the API user
 
     .PARAMETER ApiIntegrationCode
-        Plain text API integration code
+        Defines the API integration code (tracking identifier) of the API user
 
     .EXAMPLE
-        Add-AutoTaskAPIKey -ApiUsername 'Celerium@Celerium.org' -ApiIntegrationCode '12345'
+        Add-AutoTaskAPIKey -ApiUsername 'api@example.com' -ApiIntegrationCode '12345'
 
-        Prompts to enter in the API secret key which will be stored as a SecureString
+        Prompts to enter in the API secret which will be stored as a SecureString
 
     .EXAMPLE
-        Add-AutoTaskAPIKey -ApiUsername 'Celerium@Celerium.org' -ApiIntegrationCode '12345' -ApiSecretKey '12345'
+        Add-AutoTaskAPIKey -ApiUsername 'api@example.com' -ApiIntegrationCode '12345' -ApiSecretKey '12345'
 
-        Converts the string to a SecureString and stores it in the global variable
+        Converts the secret to a SecureString and stores the values in global variables
+
+    .EXAMPLE
+        '12345' | Add-AutoTaskAPIKey -ApiUsername 'api@example.com' -ApiIntegrationCode '12345'
+
+        The secret is passed in from the pipeline
 
     .NOTES
         N/A
@@ -45,7 +55,7 @@ function Add-AutoTaskAPIKey {
     [CmdletBinding(DefaultParameterSetName = 'AsPlainText')]
     [Alias('Set-AutoTaskAPIKey')]
     Param (
-        [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
+        [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [string]$ApiUsername,
 
@@ -53,42 +63,37 @@ function Add-AutoTaskAPIKey {
         [AllowEmptyString()]
         [string]$ApiSecretKey,
 
-        [Parameter(Mandatory = $false, ValueFromPipeline = $true, ParameterSetName = 'AsSecureString')]
-        [validateNotNullOrEmpty()]
+        [Parameter(Mandatory = $true, ParameterSetName = 'AsSecureString')]
+        [ValidateNotNullOrEmpty()]
         [securestring]$ApiKeySecureString,
 
-        [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
+        [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [string]$ApiIntegrationCode
     )
 
     begin {}
 
-    process{
-
-        Set-Variable -Name "AutoTaskModuleApiUsername"          -Value $ApiUsername -Option ReadOnly -Scope Global -Force
-        Set-Variable -Name "AutoTaskModuleApiIntegrationCode"   -Value $ApiIntegrationCode -Option ReadOnly -Scope Global -Force
+    process {
 
         switch ($PSCmdlet.ParameterSetName) {
-            'AsPlainText'       {
 
+            'AsPlainText'       {
                 if ($ApiSecretKey) {
                     $SecureString = ConvertTo-SecureString $ApiSecretKey -AsPlainText -Force
                 }
                 else {
-                    Write-Output "Please enter your API key:"
-                    $SecureString = Read-Host -AsSecureString
+                    $SecureString = Read-Host -Prompt 'Please enter your API secret' -AsSecureString
                 }
-
-                Set-Variable -Name "AutoTaskModuleApiSecretKey" -Value $SecureString -Option ReadOnly -Scope Global -Force
-
             }
-            'AsSecureString'    {
 
-                Set-Variable -Name "AutoTaskModuleApiSecretKey" -Value $ApiKeySecureString -Option ReadOnly -Scope Global -Force
+            'AsSecureString'    { $SecureString = $ApiKeySecureString }
 
-            }
         }
+
+        Set-Variable -Name 'AutoTaskModuleApiUsername'          -Value $ApiUsername         -Option ReadOnly -Scope Global -Force
+        Set-Variable -Name 'AutoTaskModuleApiSecretKey'         -Value $SecureString        -Option ReadOnly -Scope Global -Force
+        Set-Variable -Name 'AutoTaskModuleApiIntegrationCode'   -Value $ApiIntegrationCode  -Option ReadOnly -Scope Global -Force
 
     }
 

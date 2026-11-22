@@ -4,7 +4,7 @@ parent: Home
 nav_order: 3
 ---
 
-[Source Contributing Guide](https://github.com/Celerium/Celerium.AutoTask/blob/master/.github/CONTRIBUTING.md)
+[Source Contributing Guide](https://github.com/Celerium/Celerium.AutoTask/blob/main/.github/CONTRIBUTING.md)
 
 ---
 

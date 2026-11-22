@@ -10,8 +10,21 @@ function New-AutoTaskBody {
         Helpful when working with resource queries, modifications,
         and creating filters for advanced searches
 
+        The field definitions are read with two GET requests (fields & user defined fields),
+        no data is changed in AutoTask
+
+    .PARAMETER Resource
+        Defines the name of the resource to create a body for, such as Companies or CompanyNotesChild
+
     .PARAMETER Empty
         Creates a new resource body with no content
+
+        Only the fields that are not read-only are included
+
+    .PARAMETER ParentId
+        The parent resource ID used to read the field definitions of a child resource
+
+        Default value: 0
 
     .EXAMPLE
         New-AutoTaskBody -Resource ContactGroups
@@ -30,92 +43,84 @@ function New-AutoTaskBody {
         https://celerium.github.io/Celerium.AutoTask/site/Resource/New-AutoTaskBody.html
 #>
 
-    [CmdletBinding(DefaultParameterSetName = 'Empty', SupportsShouldProcess = $true, ConfirmImpact = 'None')]
+    [CmdletBinding(DefaultParameterSetName = 'Template', SupportsShouldProcess = $true, ConfirmImpact = 'None')]
     Param(
-        [Parameter(Mandatory = $false, ParameterSetName = 'Empty')]
-        [switch]$Empty
-    )
+        [Parameter(Mandatory = $true, Position = 0)]
+        [ArgumentCompleter({ Complete-AutoTaskResource @args })]
+        [ValidateNotNullOrEmpty()]
+        [string]$Resource,
 
-    DynamicParam {
-        $AutoTaskModulePostPatchParameter
-    }
+        [Parameter(Mandatory = $false)]
+        [switch]$Empty,
+
+        [Parameter(Mandatory = $false)]
+        [int64]$ParentId = 0
+    )
 
     begin {
 
-        $FunctionName   = $MyInvocation.InvocationName
-        $ResourceTarget = $PSBoundParameters.Resource
+        $FunctionName = $MyInvocation.MyCommand.Name
 
     }
+
     process {
 
         Write-Verbose "[ $FunctionName ] - Running the [ $($PSCmdlet.ParameterSetName) ] parameterSet"
 
-        $ResourceURI = ($AutoTaskModuleQueries | Where-Object { $_.Post -eq $ResourceTarget } | Select-Object -First 1).Name -replace '/query$', ''
-        if (-not $ResourceURI) {
-            $ResourceURI = ($AutoTaskModuleQueries | Where-Object { $_.Patch -eq $ResourceTarget } | Select-Object -First 1).Name -replace '/query$', ''
+        $FieldsEntry = Get-AutoTaskResourceOperation -Resource $Resource -CommandName $FunctionName | Select-Object -First 1
+        if (-not $FieldsEntry) { throw "The [ $Resource ] resource does not have field definitions. Run Show-AutoTaskResource to list the available resources" }
+
+        $PathValue  = @([regex]::Matches($FieldsEntry.Path, '\{[^}]+\}') | ForEach-Object { $ParentId })
+        $Fields     = Resolve-AutoTaskResource -Resource $Resource -Operation 'QueryFieldDefinitions' -CommandName $FunctionName -PathValue $PathValue
+        $HasUdf     = [bool](Get-AutoTaskResourceOperation -Resource $Resource | Where-Object { $_.Operation -eq 'QueryUserDefinedFieldDefinitions' })
+
+        if (-not $PSCmdlet.ShouldProcess($Fields.ResourceUri, 'Read the field definitions')) { return }
+
+        $ObjectTemplate = (Invoke-AutoTaskRequest -Method GET -ResourceURI $Fields.ResourceUri).fields
+
+        $UDFs = $null
+        if ($HasUdf -and -not $Empty) {
+            $UdfTarget  = Resolve-AutoTaskResource -Resource $Resource -Operation 'QueryUserDefinedFieldDefinitions' -PathValue $PathValue
+            $UDFs       = (Invoke-AutoTaskRequest -Method GET -ResourceURI $UdfTarget.ResourceUri).fields | Select-Object Name, Value
         }
 
-        $TargetURI = "$ResourceURI/entityInformation"
-        try {
-
-
-            $ObjectTemplate = (Invoke-AutoTaskRequest -Method GET -ResourceURI "$TargetURI/fields").fields
-            try {
-                $UDFs = (Invoke-AutoTaskRequest -Method GET -ResourceURI "$TargetURI/userDefinedFields").fields | Select-Object Name,Value
-            }
-            catch {
-                if ( $_.Exception.Response.StatusCode -ne "NotFound" ) { throw }
-            }
-
-            if (-not $ObjectTemplate) { Write-Warning "Could not retrieve entityInformation for [ $ResourceTarget ]" }
-            else {
-
-                $OutputResults  = [System.Collections.Generic.List[object]]::new()
-                $Properties     = [ordered]@{}
-
-                if ($Empty) {
-                    foreach ($Property in $ObjectTemplate | Where-Object { -not $_.IsReadOnly }) {
-                        $Properties[$Property.Name] = $null
-                    }
-                    $OutputResults.Add([PSCustomObject]$Properties)
-                }
-                else {
-                    foreach ($Property in $ObjectTemplate) {
-                        $FieldMetadata = [PSCustomObject]@{
-                            Name           = $Property.Name
-                            DataType       = $Property.DataType
-                            Length         = $Property.Length
-                            IsReadOnly     = $Property.IsReadOnly
-                            IsRequired     = $Property.IsRequired
-                            PickListValues = if ($Property.PickListValues) {
-                                $Property.PickListValues | Select-Object Label,Value,IsActive
-                            } else { $null }
-                        }
-                        $OutputResults.Add($FieldMetadata)
-                    }
-
-                    if ($UDFs) {
-                        $UDFMetadata = [PSCustomObject]@{
-                            Name           = "userDefinedFields"
-                            DataType       = "object[]"
-                            IsReadOnly     = $false
-                            IsRequired     = $false
-                            PickListValues = $UDFs
-                        }
-                        $OutputResults.Add($UDFMetadata)
-                    }
-                }
-
-            }
-
-            if ($PSCmdlet.ShouldProcess($TargetURI)) {
-                return $OutputResults
-            }
-
+        if (-not $ObjectTemplate) {
+            Write-Warning "Could not retrieve the field definitions of [ $Resource ]"
+            return
         }
-        catch {
-            Write-Error $_
+
+        if ($Empty) {
+            $Properties = [ordered]@{}
+            foreach ($Property in $ObjectTemplate | Where-Object { -not $_.IsReadOnly }) {
+                $Properties[$Property.Name] = $null
+            }
+            return [PSCustomObject]$Properties
+        }
+
+        foreach ($Property in $ObjectTemplate) {
+            [PSCustomObject]@{
+                Name           = $Property.Name
+                DataType       = $Property.DataType
+                Length         = $Property.Length
+                IsReadOnly     = $Property.IsReadOnly
+                IsRequired     = $Property.IsRequired
+                PickListValues = if ($Property.PickListValues) { $Property.PickListValues | Select-Object Label, Value, IsActive } else { $null }
+            }
+        }
+
+        if ($UDFs) {
+            [PSCustomObject]@{
+                Name           = 'userDefinedFields'
+                DataType       = 'object[]'
+                Length         = $null
+                IsReadOnly     = $false
+                IsRequired     = $false
+                PickListValues = $UDFs
+            }
         }
 
     }
+
+    end {}
+
 }

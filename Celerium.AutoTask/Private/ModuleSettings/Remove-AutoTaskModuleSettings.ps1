@@ -45,7 +45,7 @@ function Remove-AutoTaskModuleSettings {
         https://celerium.github.io/Celerium.AutoTask/site/Internal/Remove-AutoTaskModuleSettings.html
 #>
 
-    [CmdletBinding(DefaultParameterSetName = 'Destroy',SupportsShouldProcess, ConfirmImpact = 'None')]
+    [CmdletBinding(DefaultParameterSetName = 'Destroy', SupportsShouldProcess, ConfirmImpact = 'None')]
     Param (
         [Parameter()]
         [string]$AutoTaskConfigPath = $(Join-Path -Path $home -ChildPath $(if ($IsWindows -or $PSEdition -eq 'Desktop') {"Celerium.AutoTask"}else{".Celerium.AutoTask"}) ),
@@ -58,18 +58,18 @@ function Remove-AutoTaskModuleSettings {
 
     process {
 
-        if(Test-Path $AutoTaskConfigPath)  {
+        if (Test-Path -Path $AutoTaskConfigPath) {
 
             Remove-Item -Path $AutoTaskConfigPath -Recurse -Force -WhatIf:$WhatIfPreference
 
-            If ($AndVariables) {
-                Remove-AutoTaskApiKey
-                Remove-AutoTaskBaseUri
+            if ($AndVariables) {
+                Remove-AutoTaskAPIKey
+                Remove-AutoTaskBaseURI
             }
 
             if ($WhatIfPreference -eq $false) {
 
-                if (!(Test-Path $AutoTaskConfigPath)) {
+                if (-not (Test-Path -Path $AutoTaskConfigPath)) {
                     Write-Output "The Celerium.AutoTask configuration folder has been removed successfully from [ $AutoTaskConfigPath ]"
                 }
                 else {

@@ -1,0 +1,76 @@
+name: Release
+
+# Builds, tests, & publishes the module when a version tag such as v1.0.0 is pushed
+# Add the PowerShell Gallery API key as the PSGALLERY_API_KEY repository secret to publish
+
+on:
+  push:
+    tags: [ "v[0-9]+.[0-9]+.[0-9]+" ]
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: 'Publish the module to the PowerShell Gallery'
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+jobs:
+
+  release:
+    name: Build, test, & publish
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    defaults:
+      run:
+        shell: pwsh
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Get the module version
+        run: |
+          $Version = (Import-PowerShellDataFile -Path ./Celerium.AutoTask/Celerium.AutoTask.psd1).ModuleVersion
+          if ($env:GITHUB_REF_TYPE -eq 'tag' -and $env:GITHUB_REF_NAME -ne "v$Version") {
+            throw "The tag [ $env:GITHUB_REF_NAME ] does not match the manifest version [ v$Version ]"
+          }
+          Add-Content -Path $env:GITHUB_ENV -Value "MODULE_VERSION=$Version"
+
+      - name: Install prerequisites
+        run: ./build/Install-Prerequisites.ps1 -Verbose
+
+      - name: Build the module
+        run: ./build/Invoke-ModuleBuild.ps1 -Version $env:MODULE_VERSION
+
+      - name: Test the built module
+        run: ./build/Invoke-PesterTests.ps1 -Version $env:MODULE_VERSION -BuildTarget built
+
+      - name: Create the release archive
+        run: Compress-Archive -Path "./build/Celerium.AutoTask/$env:MODULE_VERSION/*" -DestinationPath "./Celerium.AutoTask-$env:MODULE_VERSION.zip"
+
+      - name: Create the GitHub release
+        if: github.ref_type == 'tag'
+        uses: softprops/action-gh-release@v3
+        with:
+          files: Celerium.AutoTask-${{ env.MODULE_VERSION }}.zip
+          generate_release_notes: true
+
+      - name: Publish to the PowerShell Gallery
+        if: github.ref_type == 'tag' || inputs.publish
+        env:
+          PSGALLERY_API_KEY: ${{ secrets.PSGALLERY_API_KEY }}
+        run: |
+          if (-not $env:PSGALLERY_API_KEY) { throw 'The PSGALLERY_API_KEY secret is not set' }
+          ./build/Publish-CeleriumModule.ps1 -Version $env:MODULE_VERSION -NuGetApiKey $env:PSGALLERY_API_KEY
+
+  changelog:
+    name: Update the changelog
+    needs: release
+    if: github.ref_type == 'tag'
+    uses: ./.github/workflows/changelog.yml
+    with:
+      tag: ${{ github.ref_name }}
+    permissions:
+      contents: write

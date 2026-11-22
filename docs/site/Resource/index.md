@@ -6,14 +6,14 @@ has_children: true
 ## Resource - endpoint help & documentation
 
 {: .highlight }
-Some functions will handle more than one endpoint and the numbers below show the total endpoints **not** the total functions
+The generic functions handle every endpoint of the AutoTask OpenAPI spec and the numbers below show the total endpoints **not** the total functions. Write endpoints (POST, PUT, PATCH, DELETE) change data in AutoTask, use `-WhatIf` to preview a request
 
-| **Method** | **Endpoint Count**  |
-|------------|---------------------|
-| DELETE     | 1       |
-| GET        | 2          |
-| PATCH      | 1        |
-| POST       | 1         |
-| PUT        | 1          |
+| **Method** | **Implemented** | **Total** |
+|------------|-----------------|-----------|
+| GET        | 1986        | 1986    |
+| POST       | 627         | 627     |
+| PUT        | 140         | 140     |
+| PATCH      | 139         | 139     |
+| DELETE     | 117         | 117     |
 
-Have a look around and if you would like to contribute please read over the [Contributing guide](https://github.com/Celerium/Celerium.AutoTask/blob/master/.github/CONTRIBUTING.md)
+Have a look around and if you would like to contribute please read over the [Contributing guide](https://github.com/Celerium/Celerium.AutoTask/blob/main/.github/CONTRIBUTING.md)

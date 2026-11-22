@@ -1,131 +1,189 @@
 ---
-external help file: Celerium.AutoTask-help.xml
+document type: cmdlet
+external help file: Celerium.AutoTask-Help.xml
 grand_parent: Internal
+HelpUri: https://celerium.github.io/Celerium.AutoTask/site/Internal/Add-AutoTaskAPIKey.html
+Locale: en-US
 Module Name: Celerium.AutoTask
-online version: https://celerium.github.io/Celerium.AutoTask/site/Internal/Add-AutoTaskAPIKey.html
 parent: PUT
-schema: 2.0.0
+PlatyPS schema version: 2024-05-01
 title: Add-AutoTaskAPIKey
 ---
 
 # Add-AutoTaskAPIKey
 
 ## SYNOPSIS
-Sets your API key used to authenticate all API calls
+
+Sets the API username, secret, & integration code used to authenticate all API calls
 
 ## SYNTAX
 
 ### AsPlainText (Default)
-```powershell
-Add-AutoTaskAPIKey -ApiUsername <String> [-ApiSecretKey <String>] -ApiIntegrationCode <String>
- [<CommonParameters>]
+
+```
+Add-AutoTaskAPIKey -ApiUsername <string> -ApiIntegrationCode <string> [-ApiSecretKey <string>]
 ```
 
 ### AsSecureString
-```powershell
-Add-AutoTaskAPIKey -ApiUsername <String> [-ApiKeySecureString <SecureString>] -ApiIntegrationCode <String>
- [<CommonParameters>]
+
+```
+Add-AutoTaskAPIKey -ApiUsername <string> -ApiKeySecureString <securestring>
+ -ApiIntegrationCode <string>
 ```
 
-## DESCRIPTION
-The Add-AutoTaskAPIKey cmdlet sets your API key which is used to
-authenticate all API calls made to AutoTask
+## ALIASES
 
-AutoTask API keys can be generated via the AutoTask web interface
-    Resources \> API User \> Credentials
+This cmdlet has the following aliases,
+  - Set-AutoTaskAPIKey
+
+## DESCRIPTION
+
+The Add-AutoTaskAPIKey cmdlet sets the API username, secret, & integration code which
+are used to authenticate all API calls made to the AutoTask API
+
+The username & integration code are stored in memory as plain text & the secret is
+stored in memory as a SecureString
+
+AutoTask API users & their credentials are created in the AutoTask web interface
+    Admin > Resources (Users) > New API User
+
+The API tracking identifier of the API user is the integration code
 
 ## EXAMPLES
 
 ### EXAMPLE 1
+
 ```powershell
-Add-AutoTaskAPIKey -ApiUsername 'Celerium@Celerium.org' -ApiIntegrationCode '12345'
+Add-AutoTaskAPIKey -ApiUsername 'api@example.com' -ApiIntegrationCode '12345'
 ```
 
-Prompts to enter in the API secret key which will be stored as a SecureString
+Prompts to enter in the API secret which will be stored as a SecureString
 
 ### EXAMPLE 2
+
 ```powershell
-Add-AutoTaskAPIKey -ApiUsername 'Celerium@Celerium.org' -ApiIntegrationCode '12345' -ApiSecretKey '12345'
+Add-AutoTaskAPIKey -ApiUsername 'api@example.com' -ApiIntegrationCode '12345' -ApiSecretKey '12345'
 ```
 
-Converts the string to a SecureString and stores it in the global variable
+Converts the secret to a SecureString and stores the values in global variables
+
+### EXAMPLE 3
+
+```powershell
+'12345' | Add-AutoTaskAPIKey -ApiUsername 'api@example.com' -ApiIntegrationCode '12345'
+```
+
+The secret is passed in from the pipeline
 
 ## PARAMETERS
 
-### -ApiUsername
-Plain text API username
+### -ApiIntegrationCode
+
+Defines the API integration code (tracking identifier) of the API user
 
 ```yaml
-Type: String
-Parameter Sets: (All)
-Aliases:
-
-Required: True
-Position: Named
-Default value: None
-Accept pipeline input: True (ByValue)
-Accept wildcard characters: False
-```
-
-### -ApiSecretKey
-Plain text API secret key
-
-If not defined the cmdlet will prompt you to enter the API secret key which
-will be stored as a SecureString
-
-```yaml
-Type: String
-Parameter Sets: AsPlainText
-Aliases:
-
-Required: False
-Position: Named
-Default value: None
-Accept pipeline input: True (ByValue)
-Accept wildcard characters: False
+Type: System.String
+DefaultValue: ''
+SupportsWildcards: false
+Aliases: []
+ParameterSets:
+- Name: (All)
+  Position: Named
+  IsRequired: true
+  ValueFromPipeline: false
+  ValueFromPipelineByPropertyName: false
+  ValueFromRemainingArguments: false
+DontShow: false
+AcceptedValues: []
+HelpMessage: ''
 ```
 
 ### -ApiKeySecureString
-Input a SecureString object containing the API key
+
+Input a SecureString object containing the secret of the API user
 
 ```yaml
-Type: SecureString
-Parameter Sets: AsSecureString
-Aliases:
-
-Required: False
-Position: Named
-Default value: None
-Accept pipeline input: True (ByValue)
-Accept wildcard characters: False
+Type: System.Security.SecureString
+DefaultValue: ''
+SupportsWildcards: false
+Aliases: []
+ParameterSets:
+- Name: AsSecureString
+  Position: Named
+  IsRequired: true
+  ValueFromPipeline: false
+  ValueFromPipelineByPropertyName: false
+  ValueFromRemainingArguments: false
+DontShow: false
+AcceptedValues: []
+HelpMessage: ''
 ```
 
-### -ApiIntegrationCode
-Plain text API integration code
+### -ApiSecretKey
+
+Defines the secret (password) of the API user as plain text
+
+If neither ApiSecretKey nor ApiKeySecureString is defined the cmdlet will prompt you
+to enter the secret which will be stored as a SecureString
 
 ```yaml
-Type: String
-Parameter Sets: (All)
-Aliases:
+Type: System.String
+DefaultValue: ''
+SupportsWildcards: false
+Aliases: []
+ParameterSets:
+- Name: AsPlainText
+  Position: Named
+  IsRequired: false
+  ValueFromPipeline: true
+  ValueFromPipelineByPropertyName: false
+  ValueFromRemainingArguments: false
+DontShow: false
+AcceptedValues: []
+HelpMessage: ''
+```
 
-Required: True
-Position: Named
-Default value: None
-Accept pipeline input: True (ByValue)
-Accept wildcard characters: False
+### -ApiUsername
+
+Defines the username of the API user
+
+```yaml
+Type: System.String
+DefaultValue: ''
+SupportsWildcards: false
+Aliases: []
+ParameterSets:
+- Name: (All)
+  Position: Named
+  IsRequired: true
+  ValueFromPipeline: false
+  ValueFromPipelineByPropertyName: false
+  ValueFromRemainingArguments: false
+DontShow: false
+AcceptedValues: []
+HelpMessage: ''
 ```
 
 ### CommonParameters
-This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see [about_CommonParameters](http://go.microsoft.com/fwlink/?LinkID=113216).
+
+This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable,
+-InformationAction, -InformationVariable, -OutBuffer, -OutVariable, -PipelineVariable,
+-ProgressAction, -Verbose, -WarningAction, and -WarningVariable. For more information, see
+[about_CommonParameters](https://go.microsoft.com/fwlink/?LinkID=113216).
 
 ## INPUTS
+
+### System.String
+
+{{ Fill in the Description }}
 
 ## OUTPUTS
 
 ## NOTES
+
 N/A
+
 
 ## RELATED LINKS
 
-[https://celerium.github.io/Celerium.AutoTask/site/Internal/Add-AutoTaskAPIKey.html](https://celerium.github.io/Celerium.AutoTask/site/Internal/Add-AutoTaskAPIKey.html)
-
+- [](https://celerium.github.io/Celerium.AutoTask/site/Internal/Add-AutoTaskAPIKey.html)

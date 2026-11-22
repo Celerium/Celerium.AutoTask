@@ -1,0 +1,102 @@
+name: CI
+
+# Builds the module, then runs the Pester tests against both the source & the built module on
+#   - Windows PowerShell 5.1
+#   - PowerShell 7+ on Windows, Linux, & macOS
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+
+  generated-code:
+    name: Generated code is up to date
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        shell: pwsh
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Regenerate the resource map from the OpenAPI spec
+        run: ./build/New-AutoTaskResourceMap.ps1 -Verbose:$false
+
+      - name: Fail when the generated files differ from the committed files
+        run: |
+          # Intent-to-add makes new generated files part of the diff
+          git add --intent-to-add --all -- Celerium.AutoTask
+          git status --short -- Celerium.AutoTask
+          git diff --exit-code -- Celerium.AutoTask
+          if ($LASTEXITCODE -ne 0) { throw 'Run ./build/New-AutoTaskResourceMap.ps1 and commit the changes' }
+
+  test:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 120
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { name: 'Windows PowerShell 5.1', os: windows-latest, shell: powershell,  id: windows-ps51 }
+          - { name: 'Windows PowerShell 7+',  os: windows-latest, shell: pwsh,        id: windows-pwsh }
+          - { name: 'Linux PowerShell 7+',    os: ubuntu-latest,  shell: pwsh,        id: linux-pwsh }
+          - { name: 'macOS PowerShell 7+',    os: macos-latest,   shell: pwsh,        id: macos-pwsh }
+
+    defaults:
+      run:
+        shell: ${{ matrix.shell }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Show PowerShell version
+        run: $PSVersionTable | Out-String
+
+      - name: Get the module version
+        run: |
+          $Version = (Import-PowerShellDataFile -Path ./Celerium.AutoTask/Celerium.AutoTask.psd1).ModuleVersion
+          Add-Content -Path $env:GITHUB_ENV -Value "MODULE_VERSION=$Version"
+
+      - name: Install prerequisites
+        run: ./build/Install-Prerequisites.ps1 -Verbose
+
+      - name: Test the source module
+        run: ./build/Invoke-PesterTests.ps1 -Version $env:MODULE_VERSION -BuildTarget notBuilt
+
+      - name: Build the module
+        run: ./build/Invoke-ModuleBuild.ps1 -Version $env:MODULE_VERSION
+
+      - name: Test the built module
+        run: ./build/Invoke-PesterTests.ps1 -Version $env:MODULE_VERSION -BuildTarget built
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: test-results-${{ matrix.id }}
+          path: build/*_Results.xml
+          if-no-files-found: warn
+
+      - name: Upload the built module
+        if: matrix.id == 'linux-pwsh'
+        uses: actions/upload-artifact@v7
+        with:
+          name: Celerium.AutoTask-${{ env.MODULE_VERSION }}
+          path: build/Celerium.AutoTask/${{ env.MODULE_VERSION }}
+          if-no-files-found: error

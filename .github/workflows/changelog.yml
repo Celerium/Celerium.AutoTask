@@ -1,0 +1,94 @@
+name: Changelog
+
+# Adds the notes of a published release to CHANGELOG.md on the default branch
+#
+# Runs when a release is published in the GitHub UI, & is called by release.yml after it creates
+# the release of a version tag (a release created by the GITHUB_TOKEN does not trigger other workflows)
+#
+# When the release has no notes, GitHub generates them from the merged pull requests & commits
+
+on:
+  release:
+    types: [ published ]
+  workflow_call:
+    inputs:
+      tag:
+        description: 'The tag of the release, such as v1.0.0'
+        type: string
+        required: true
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'The tag of the release, such as v1.0.0'
+        type: string
+        required: true
+
+permissions:
+  contents: write
+
+concurrency:
+  group: changelog
+  cancel-in-progress: false
+
+jobs:
+
+  changelog:
+    name: Update CHANGELOG.md
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        shell: pwsh
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+          fetch-depth: 0
+
+      - name: Add the release to CHANGELOG.md
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ inputs.tag || github.event.release.tag_name }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+        run: |
+          $Tag = "$env:RELEASE_TAG".Trim()
+          if (-not $Tag) { throw 'No release tag was provided' }
+
+          $Release = gh release view $Tag --repo $env:GITHUB_REPOSITORY --json body,publishedAt,url | ConvertFrom-Json
+          if ($LASTEXITCODE -ne 0) { throw "The release [ $Tag ] was not found" }
+
+          $Notes = "$($Release.body)".Trim()
+          if (-not $Notes) {
+            # The release has no notes, GitHub generates them & they are also saved to the release
+            $Notes = (gh api "repos/$env:GITHUB_REPOSITORY/releases/generate-notes" -f tag_name=$Tag --jq '.body' | Out-String).Trim()
+            if ($Notes) { gh release edit $Tag --repo $env:GITHUB_REPOSITORY --notes $Notes }
+          }
+          if (-not $Notes) { $Notes = 'No notable changes' }
+
+          $Path       = './CHANGELOG.md'
+          $Marker     = '<!-- releases -->'
+          $Heading    = "## [$Tag]($($Release.url)) - $(([datetime]$Release.publishedAt).ToUniversalTime().ToString('yyyy-MM-dd'))"
+
+          $Content = if (Test-Path -Path $Path) { [System.IO.File]::ReadAllText((Resolve-Path -Path $Path)) } else { "# Changelog`n`nAll notable changes to this module are listed here, newest first`n`n$Marker`n" }
+          $Content = $Content -replace "`r`n", "`n"
+
+          if ($Content -match "(?m)^## \[$([regex]::Escape($Tag))\]") {
+            Write-Output "CHANGELOG.md already contains [ $Tag ]"
+            return
+          }
+          if ($Content -notmatch [regex]::Escape($Marker)) { $Content = $Content.TrimEnd() + "`n`n$Marker`n" }
+
+          # Headings in the release notes are moved down one level so they sit below the release heading
+          $Notes  = ($Notes -replace "`r`n", "`n") -replace '(?m)^(#{1,5}) ', '#$1 '
+          $End    = $Content.IndexOf($Marker) + $Marker.Length
+          $Content = $Content.Substring(0, $End) + "`n`n$Heading`n`n$Notes`n`n" + $Content.Substring($End).TrimStart("`n")
+
+          [System.IO.File]::WriteAllText((Join-Path -Path $PWD -ChildPath 'CHANGELOG.md'), ($Content.TrimEnd() + "`n"), [System.Text.UTF8Encoding]::new($false))
+
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- CHANGELOG.md
+          git commit -m "docs: add $Tag to CHANGELOG.md [skip ci]"
+          git push origin "HEAD:$env:DEFAULT_BRANCH"

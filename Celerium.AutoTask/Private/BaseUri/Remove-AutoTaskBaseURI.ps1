@@ -26,18 +26,14 @@ function Remove-AutoTaskBaseURI {
 
     process {
 
-        switch ([bool]$AutoTaskModuleBaseUri) {
-
-            $true   {
-                if ($PSCmdlet.ShouldProcess('AutoTaskModuleBaseUri')) {
-                    Remove-Variable -Name "AutoTaskModuleBaseUri" -Scope Global -Force
-                    Remove-Variable -Name "AutoTaskModuleBaseUriApiVersion" -Scope Global -Force
-                    Remove-Variable -Name "AutoTaskModuleBaseUriComplete" -Scope Global -Force
-                }
+        if ([bool]$AutoTaskModuleBaseUri) {
+            if ($PSCmdlet.ShouldProcess('AutoTaskModuleBaseUri')) {
+                Remove-Variable -Name 'AutoTaskModuleBaseUri' -Scope Global -Force -ErrorAction SilentlyContinue
+                Remove-Variable -Name 'AutoTaskModuleBaseUriApiVersion' -Scope Global -Force -ErrorAction SilentlyContinue
+                Remove-Variable -Name 'AutoTaskModuleBaseUriComplete' -Scope Global -Force -ErrorAction SilentlyContinue
             }
-            $false  { Write-Warning "The AutoTask base URI variable is not set. Nothing to remove" }
-
         }
+        else { Write-Warning "The AutoTask base URI variable is not set. Nothing to remove" }
 
     }
 

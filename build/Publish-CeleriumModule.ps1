@@ -1,14 +1,14 @@
 <#
 .NOTES
-    Copyright 1990-2024 Celerium
+    Copyright 1990-2027 Celerium
 
-    NAME: Publish-celeriumModule.ps1
+    NAME: Publish-CeleriumModule.ps1
     Type: PowerShell
 
         AUTHOR:  David Schulte
         DATE:    2023-09-11
         EMAIL:   celerium@celerium.org
-        Updated: 2023-09-16
+        Updated: 2026-11-21
 
     TODO:
 
@@ -16,15 +16,15 @@
     Publishes a PowerShell module to the PowerShell Gallery
 
 .DESCRIPTION
-    The Publish-celeriumModule script publishes a PowerShell module
+    The Publish-CeleriumModule script publishes a PowerShell module
     to the PowerShell Gallery
 
-.PARAMETER moduleName
+.PARAMETER ModuleName
     The name of the module to update help docs for
 
     Default value: Celerium.AutoTask
 
-.PARAMETER version
+.PARAMETER Version
     The build version to publish
 
 .PARAMETER NuGetApiKey
@@ -32,12 +32,12 @@
     publish modules
 
 .EXAMPLE
-    .\Publish-celeriumModule.ps1 -Version 1.0.0 -NuGetApiKey 12345 -WhatIf -Verbose
+    .\Publish-CeleriumModule.ps1 -Version 1.0.0 -NuGetApiKey 12345 -WhatIf -Verbose
 
     Shows what will happen if a module is pushed to the PowerShell Gallery
 
 .EXAMPLE
-    .\Publish-celeriumModule.ps1 -Version 1.0.0 -NuGetApiKey 12345 -Verbose
+    .\Publish-CeleriumModule.ps1 -Version 1.0.0 -NuGetApiKey 12345 -Verbose
 
     Publishes a PowerShell module to the PowerShell Gallery
 
@@ -56,11 +56,11 @@
 param (
     [Parameter(Mandatory=$false)]
     [ValidateNotNullOrEmpty()]
-    [string]$moduleName = 'Celerium.AutoTask',
+    [string]$ModuleName = 'Celerium.AutoTask',
 
     [Parameter(Mandatory=$true)]
     [ValidateNotNullOrEmpty()]
-    [string]$version,
+    [string]$Version,
 
     [Parameter(Mandatory=$true)]
     [ValidateNotNullOrEmpty()]
@@ -70,15 +70,10 @@ param (
 
 begin {
 
-    if ($IsWindows -or $PSEdition -eq 'Desktop') {
-        $rootPath = "$( $PSCommandPath.Substring(0, $PSCommandPath.IndexOf('\build', [System.StringComparison]::OrdinalIgnoreCase)) )"
-    }
-    else{
-        $rootPath = "$( $PSCommandPath.Substring(0, $PSCommandPath.IndexOf('/build', [System.StringComparison]::OrdinalIgnoreCase)) )"
-    }
+    $RootPath = Split-Path -Path $PSScriptRoot -Parent
 
-    $modulePath = Join-Path -Path $rootPath -ChildPath "\build\$moduleName\$version"
-    $modulePsd1 = Join-Path -Path $modulePath -ChildPath "$moduleName.psd1"
+    $ModulePath = Join-Path -Path (Join-Path -Path (Join-Path -Path $RootPath -ChildPath 'build') -ChildPath $ModuleName) -ChildPath $Version
+    $ModulePsd1 = Join-Path -Path $ModulePath -ChildPath "$ModuleName.psd1"
 
 }
 
@@ -86,19 +81,19 @@ process {
 
     try {
 
-        if ( $($Test = Test-ModuleManifest -Path $modulePsd1 -ErrorAction SilentlyContinue; $?) ) {
+        if ( $($null = Test-ModuleManifest -Path $ModulePsd1 -ErrorAction SilentlyContinue; $?) ) {
 
-            $publish_Params = @{
-                Path        = $modulePath
+            $PublishParams = @{
+                Path        = $ModulePath
                 NuGetApiKey = $NuGetApiKey
                 WhatIf      = $WhatIfPreference
             }
 
-            Publish-Module @publish_Params
+            Publish-Module @PublishParams
 
         }
         else{
-            throw "The [ $moduleName ] module failed Test-ModuleManifest"
+            throw "The [ $ModuleName ] module failed Test-ModuleManifest"
             Write-Error $_
         }
 

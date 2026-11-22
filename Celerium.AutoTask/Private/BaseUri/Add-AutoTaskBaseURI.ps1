@@ -7,21 +7,36 @@
         The Add-AutoTaskBaseURI cmdlet sets the base URI which is used
         to construct the full URI for all API calls
 
+        The base URI is the zone url of the AutoTask API without the API version,
+        such as https://webservices24.autotask.net/atservicesrest
+
+        The API version such as /V1.0 is part of each resource path, a base URI
+        that ends with an API version is accepted & the version is removed
+
     .PARAMETER AutoDetect
-        Attempts to automatically detect the base URI for the AutoTask API connection
+        Automatically detects the base URI (zone) of the AutoTask API user
+
+        The username set by Add-AutoTaskAPIKey is used to make a single unauthenticated
+        GET request to the AutoTask ZoneInformation endpoint
+
+        This is the default when no other parameter is used
 
     .PARAMETER Version
-        Defines the API version to use when constructing the full URI for all API calls
+        Defines the API version that is stored with the base URI & used by -AutoDetect
 
-    .PARAMETER BaseUri
+        Default value: V1.0
+
+    .PARAMETER BaseURI
         Sets the base URI for the AutoTask API connection. Helpful
         if using a custom API gateway or an undocumented AutoTask API endpoint
 
+        The URL must use https
+
     .PARAMETER DataCenter
-        Defines the data center (platform) to use which in turn defines which
+        Defines the data center (zone) to use which in turn defines which
         base API URL is used
 
-        https://ww24.autotask.net/DeveloperHelp/Content/APIs/General/API_Zones.htm
+        https://www.autotask.net/help/developerhelp/Content/APIs/General/API_Zones.htm
 
         Allowed values are:
         America East                    https://webservices3.autotask.net/atservicesrest
@@ -50,17 +65,17 @@
     .EXAMPLE
         Add-AutoTaskBaseURI
 
-        Attempts to automatically detect the base URI for the AutoTask API connection
+        Detects the base URI of the API user that was set by Add-AutoTaskAPIKey
 
     .EXAMPLE
-        Add-AutoTaskBaseURI -BaseUri 'https://gateway.celerium.org'
+        Add-AutoTaskBaseURI -BaseURI 'https://gateway.celerium.org'
 
         The base URI will use https://gateway.celerium.org
 
     .EXAMPLE
         Add-AutoTaskBaseURI -DataCenter 'America West 3'
 
-        The base URI will use https://webservices24.autotask.net/atservicesrest/v1.0
+        The base URI will use https://webservices24.autotask.net/atservicesrest
 
     .NOTES
         N/A
@@ -76,14 +91,14 @@
         [switch]$AutoDetect,
 
         [Parameter(Mandatory = $false)]
-        [ValidateNotNullOrEmpty()]
-        [string]$Version = $((Invoke-RestMethod -Uri "https://webservices2.autotask.net/atservicesrest/VersionInformation").apiVersions | Select-Object -Last 1),
+        [ValidatePattern('^[Vv]\d+(\.\d+)?$')]
+        [string]$Version = 'V1.0',
 
-        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ParameterSetName = 'CustomUri')]
+        [Parameter(Mandatory = $true, ValueFromPipeline = $true, Position = 0, ParameterSetName = 'CustomUri')]
         [ValidateNotNullOrEmpty()]
-        [string]$BaseUri,
+        [string]$BaseURI,
 
-        [Parameter(Mandatory = $false, ParameterSetName = 'Datacenter')]
+        [Parameter(Mandatory = $true, ParameterSetName = 'DataCenter')]
         [ValidateSet(
             'America East',
             'America East 2',
@@ -114,61 +129,79 @@
 
     begin {}
 
-    process{
+    process {
 
-        if ($AutoDetect -or $PSCmdlet.ParameterSetName -eq 'AutoDetect') {
+        switch ($PSCmdlet.ParameterSetName) {
 
-            try {
-                $ValidationUri  = 'https://webservices2.autotask.net/atservicesrest'
-                $BaseUri        = (Invoke-RestMethod -Uri "$ValidationUri/$Version/ZoneInformation?user=$AutoTaskModuleApiUsername").url
+            'AutoDetect' {
+
+                if (-not $AutoTaskModuleApiUsername) {
+                    throw "The AutoTask API username is not set. Run Add-AutoTaskAPIKey first or use the -DataCenter or -BaseURI parameter"
+                }
+
+                # Windows PowerShell does not always negotiate TLS 1.2 by default
+                if ($PSEdition -eq 'Desktop') {
+                    [Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12
+                }
+
+                Write-Verbose "Detecting the base URI of the API user (AutoDetect: $([bool]$AutoDetect))"
+
+                try {
+                    $ValidationUri  ="https://webservices2.autotask.net/atservicesrest/$Version/ZoneInformation?user=$([System.Uri]::EscapeDataString($AutoTaskModuleApiUsername))"
+                    $BaseURI        = (Invoke-RestMethod -Uri $ValidationUri -Method GET -UserAgent $AutoTaskModuleUserAgent -ErrorAction Stop).url
+                }
+                catch {
+                    throw "Could not detect the AutoTask base URI, use the -DataCenter or -BaseURI parameter - $($_.Exception.Message)"
+                }
+
+                if (-not $BaseURI) { throw 'Could not detect the AutoTask base URI, use the -DataCenter or -BaseURI parameter' }
 
             }
-            catch {
-                $ErrorMessage = $_ | Out-String
-                Write-Error "Could not retrieve AutoTask BaseURI. $($ErrorMessage.Trim())"
-                throw
+
+            'DataCenter' {
+
+                $BaseURI = switch ($DataCenter) {
+                    'America East'                  { 'https://webservices3.autotask.net/atservicesrest' }
+                    'America East 2'                { 'https://webservices14.autotask.net/atservicesrest' }
+                    'America East 3'                { 'https://webservices22.autotask.net/atservicesrest' }
+                    'America West'                  { 'https://webservices5.autotask.net/atservicesrest' }
+                    'America West 2'                { 'https://webservices15.autotask.net/atservicesrest' }
+                    'America West 3'                { 'https://webservices24.autotask.net/atservicesrest' }
+                    'America West 4'                { 'https://webservices25.autotask.net/atservicesrest' }
+                    'Australia / New Zealand'       { 'https://webservices6.autotask.net/atservicesrest' }
+                    'Australia 2'                   { 'https://webservices26.autotask.net/atservicesrest' }
+                    'Australia 3'                   { 'https://webservices29.autotask.net/atservicesrest' }
+                    'Deutsch German'                { 'https://webservices18.autotask.net/atservicesrest' }
+                    'Deutsch Pre-Release'           { 'https://prde.autotask.net/atservicesrest' }
+                    'Español Pre-Release'           { 'https://pres.autotask.net/atservicesrest' }
+                    'Español Spanish'               { 'https://webservices12.autotask.net/atservicesrest' }
+                    'EU1 (English Europe and Asia)' { 'https://webservices19.autotask.net/atservicesrest' }
+                    'Limited Release'               { 'https://webservices1.autotask.net/atservicesrest' }
+                    'Pre-release'                   { 'https://webservices2.autotask.net/atservicesrest' }
+                    'UK'                            { 'https://webservices4.autotask.net/atservicesrest' }
+                    'UK Limited Release'            { 'https://webservices17.autotask.net/atservicesrest' }
+                    'UK Pre-release'                { 'https://webservices11.autotask.net/atservicesrest' }
+                    'UK2'                           { 'https://webservices16.autotask.net/atservicesrest' }
+                    'UK3'                           { 'https://webservices28.autotask.net/atservicesrest' }
+                }
+
             }
 
         }
 
-        if ($DataCenter) {
-
-            switch ($DataCenter) {
-                'America East'                  {$BaseUri = 'https://webservices3.autotask.net/atservicesrest'}
-                'America East 2'                {$BaseUri = 'https://webservices14.autotask.net/atservicesrest'}
-                'America East 3'                {$BaseUri = 'https://webservices22.autotask.net/atservicesrest'}
-                'America West'                  {$BaseUri = 'https://webservices5.autotask.net/atservicesrest'}
-                'America West 2'                {$BaseUri = 'https://webservices15.autotask.net/atservicesrest'}
-                'America West 3'                {$BaseUri = 'https://webservices24.autotask.net/atservicesrest'}
-                'America West 4'                {$BaseUri = 'https://webservices25.autotask.net/atservicesrest'}
-                'Australia / New Zealand'       {$BaseUri = 'https://webservices6.autotask.net/atservicesrest'}
-                'Australia 2'                   {$BaseUri = 'https://webservices26.autotask.net/atservicesrest'}
-                'Australia 3'                   {$BaseUri = 'https://webservices29.autotask.net/atservicesrest'}
-                'Deutsch German'                {$BaseUri = 'https://webservices18.autotask.net/atservicesrest'}
-                'Deutsch Pre-Release'           {$BaseUri = 'https://prde.autotask.net/atservicesrest'}
-                'Español Pre-Release'           {$BaseUri = 'https://pres.autotask.net/atservicesrest'}
-                'Español Spanish'               {$BaseUri = 'https://webservices12.autotask.net/atservicesrest'}
-                'EU1 (English Europe and Asia)' {$BaseUri = 'https://webservices19.autotask.net/atservicesrest'}
-                'Limited Release'               {$BaseUri = 'https://webservices1.autotask.net/atservicesrest'}
-                'Pre-release'                   {$BaseUri = 'https://webservices2.autotask.net/atservicesrest'}
-                'UK'                            {$BaseUri = 'https://webservices4.autotask.net/atservicesrest'}
-                'UK Limited Release'            {$BaseUri = 'https://webservices17.autotask.net/atservicesrest'}
-                'UK Pre-release'                {$BaseUri = 'https://webservices11.autotask.net/atservicesrest'}
-                'UK2'                           {$BaseUri = 'https://webservices16.autotask.net/atservicesrest'}
-                'UK3'                           {$BaseUri = 'https://webservices28.autotask.net/atservicesrest'}
-            }
-
+        $ParsedUri = $null
+        if (-not [System.Uri]::TryCreate($BaseURI.Trim(), [System.UriKind]::Absolute, [ref]$ParsedUri) -or $ParsedUri.Scheme -ne 'https') {
+            throw "The base URI [ $BaseURI ] is not valid, it must be an absolute https url such as https://webservices24.autotask.net/atservicesrest"
         }
 
-        if($BaseUri[$BaseUri.Length-1] -eq "/") {
-            $BaseUri = $BaseUri.Substring(0,$BaseUri.Length-1)
-        }
+        # The query string, a trailing slash, & a trailing API version are removed
+        $NormalizedUri = ($ParsedUri.GetLeftPart([System.UriPartial]::Path)).TrimEnd('/') -replace '(?i)/v\d+(\.\d+)?$', ''
 
-        Write-Verbose "Using URI: [ $($BaseURI + "/$Version") ]"
+        Write-Verbose "Using URI: [ $NormalizedUri ]"
 
-        Set-Variable -Name "AutoTaskModuleBaseUri"              -Value $BaseURI -Option ReadOnly -Scope Global -Force
-        Set-Variable -Name "AutoTaskModuleBaseUriApiVersion"    -Value $Version -Option ReadOnly -Scope Global -Force
-        Set-Variable -Name "AutoTaskModuleBaseUriComplete"      -Value ($BaseURI + "/$Version") -Option ReadOnly -Scope Global -Force
+        Set-Variable -Name 'AutoTaskModuleBaseUri'              -Value $NormalizedUri               -Option ReadOnly -Scope Global -Force
+        Set-Variable -Name 'AutoTaskModuleBaseUriApiVersion'    -Value $Version                     -Option ReadOnly -Scope Global -Force
+        Set-Variable -Name 'AutoTaskModuleBaseUriComplete'      -Value "$NormalizedUri/$Version"    -Option ReadOnly -Scope Global -Force
 
     }
 

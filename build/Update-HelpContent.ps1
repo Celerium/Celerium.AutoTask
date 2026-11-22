@@ -1,7 +1,7 @@
 function Update-HelpContent {
 <#
 .NOTES
-    Copyright 1990-2024 Celerium
+    Copyright 1990-2027 Celerium
 
     NAME: Update-HelpContent.ps1
     Type: PowerShell
@@ -9,32 +9,37 @@ function Update-HelpContent {
         AUTHOR:  David Schulte
         DATE:    2022-11-26
         EMAIL:   celerium@celerium.org
-        Updated: 2023-09-16
+        Updated: 2026-11-21
 
     TODO:
-    Find a better way to make\update the main module file, as of 2022-11 this script double generates markdown files
-    When run with PowerShell 7, examples with comma separated values turn into line breaks
-    See about cross platform cab file generation
 
 .SYNOPSIS
     Updates or creates markdown help files
 
 .DESCRIPTION
     The Update-HelpContent script updates or creates markdown help files which are
-    used by both Github pages and as external help.
+    used by both GitHub pages and as external help.
 
     The markdown documents created contain metadata that GitHub pages directly use
     to build its entire documentation structure\site.
 
-    This also generates external XML\cab help files.
-        - 2022-11: More research is needed to fully implement external help
+    The help files are created with the Microsoft.PowerShell.PlatyPS module (the successor of the
+    legacy platyPS module) which works on Windows, Linux, & macOS
 
-.PARAMETER moduleName
+        - docs\<ModuleName>.md                  - Module page
+        - docs\site\<Category>\<Function>.md    - One page per function
+        - docs\site\<Category>\<METHOD>.md      - GitHub pages navigation pages
+        - docs\site\<Category>\index.md         - Category page with the implemented endpoint counts
+        - docs\en-US\<ModuleName>-Help.xml      - External (MAML) help
+
+    Microsoft.PowerShell.PlatyPS does not create cab files, no cab files are created
+
+.PARAMETER ModuleName
     The name of the module to generate help documents for
 
     Example: Celerium.AutoTask
 
-.PARAMETER helpDocsPath
+.PARAMETER HelpDocsPath
     Location to store the markdown help docs
 
     All markdown help docs should be located outside the module folder.
@@ -44,17 +49,17 @@ function Update-HelpContent {
 
     Example: "C:\Celerium\Projects\Celerium.AutoTask\docs"
 
-.PARAMETER csvFilePath
+.PARAMETER CsvFilePath
     Location where the tracking CSV is located including the CSV file name
 
     The tracking CSV should be located in "Celerium.AutoTask\docs"
     Reference:
-        Yes - "Celerium.AutoTask\docs\Endpoints.csv"
-        NO  - "Celerium.AutoTask\Celerium.AutoTask\docs\Endpoints.csv"
+        Yes - "Celerium.AutoTask\docs\endpoints.csv"
+        NO  - "Celerium.AutoTask\Celerium.AutoTask\docs\endpoints.csv"
 
-    Example: "C:\Celerium\Projects\Celerium.AutoTask\docs\Endpoints.csv"
+    Example: "C:\Celerium\Projects\Celerium.AutoTask\docs\endpoints.csv"
 
-.PARAMETER githubPageUri
+.PARAMETER GithubPageUri
     Base url of the modules github pages
 
     Example: "https://celerium.github.io/Celerium.AutoTask"
@@ -63,23 +68,12 @@ function Update-HelpContent {
     Opens the directory with the HelpDocs when completed
 
 .EXAMPLE
-    .\Update-HelpContent.ps1
-        -moduleName Celerium.AutoTask
-        -helpDocsPath "C:\Celerium\Projects\Celerium.AutoTask\docs"
-        -csvFilePath "C:\Celerium\Projects\Celerium.AutoTask\docs\Endpoints.csv"
-        -githubPageUri "https://celerium.github.io/Celerium.AutoTask"
+    Update-HelpContent -ModuleName Celerium.AutoTask -HelpDocsPath "C:\Celerium\Projects\Celerium.AutoTask\docs" -CsvFilePath "C:\Celerium\Projects\Celerium.AutoTask\docs\endpoints.csv" -GithubPageUri "https://celerium.github.io/Celerium.AutoTask"
 
     Updates markdown docs and external help files
 
-    No progress information is sent to the console while the script is running.
-
 .EXAMPLE
-    .\Update-HelpContent.ps1
-        -moduleName Celerium.AutoTask
-        -helpDocsPath "C:\Celerium\Projects\Celerium.AutoTask\docs"
-        -csvFilePath "C:\Celerium\Projects\Celerium.AutoTask\docs\Endpoints.csv"
-        -githubPageUri "https://celerium.github.io/Celerium.AutoTask"
-        -verbose
+    Update-HelpContent -ModuleName Celerium.AutoTask -HelpDocsPath "C:\Celerium\Projects\Celerium.AutoTask\docs" -CsvFilePath "C:\Celerium\Projects\Celerium.AutoTask\docs\endpoints.csv" -GithubPageUri "https://celerium.github.io/Celerium.AutoTask" -Verbose
 
     Updates markdown docs and external help files
 
@@ -100,21 +94,21 @@ function Update-HelpContent {
 
 [CmdletBinding()]
 param(
-        [Parameter(Mandatory=$true, ValueFromPipeline = $true)]
+        [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [string]$moduleName,
+        [string]$ModuleName,
 
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [string]$helpDocsPath,
+        [string]$HelpDocsPath,
 
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [string]$csvFilePath,
+        [string]$CsvFilePath,
 
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [string]$githubPageUri,
+        [string]$GithubPageUri,
 
         [Parameter(Mandatory=$false)]
         [switch]$ShowHelpDocs
@@ -130,72 +124,83 @@ Write-Verbose " - (1/4) - $(Get-Date -Format MM-dd-HH:mm) - Configuring prerequi
 
 #Region     [ Prerequisites ]
 
-$startDate = Get-Date
+$StartDate = Get-Date
 
-#trim trailing slashes from urls
-if ($helpDocsPath[$helpDocsPath.Length-1] -eq "/" -or $helpDocsPath[$helpDocsPath.Length-1] -eq "\") {
-    $helpDocsPath = $helpDocsPath.Substring(0,$helpDocsPath.Length-1)
+$HelpDocsPath   = $HelpDocsPath.TrimEnd('/', '\')
+$GithubPageUri  = $GithubPageUri.TrimEnd('/', '\')
+
+$ModulePage         = Join-Path -Path $HelpDocsPath -ChildPath "$ModuleName.md"
+$TempFolder         = Join-Path -Path ([System.IO.Path]::GetTempPath()) -ChildPath "$ModuleName-help-$([guid]::NewGuid().ToString('N'))"
+$SiteStructureFolder= Join-Path -Path $HelpDocsPath -ChildPath 'site'
+$ExternalHelp       = Join-Path -Path $HelpDocsPath -ChildPath 'en-US'
+
+$DocFolders = $HelpDocsPath, $TempFolder, $SiteStructureFolder, $ExternalHelp
+
+$Utf8NoBom = [System.Text.UTF8Encoding]::new($false)
+
+function Write-DocFile {
+    # Help files are written without a BOM & with LF line endings so that Jekyll can read the front matter
+    # and the files are identical on Windows, Linux, & macOS
+    param ([string]$Path, [string]$Content)
+
+    $Content = ($Content -replace "`r`n", "`n").TrimEnd("`n") + "`n"
+    [System.IO.File]::WriteAllText($Path, $Content, $Utf8NoBom)
 }
-if ($githubPageUri[$githubPageUri.Length-1] -eq "/" -or $githubPageUri[$githubPageUri.Length-1] -eq "\") {
-    $githubPageUri = $githubPageUri.Substring(0,$githubPageUri.Length-1)
+
+function Format-CommandPage {
+    # Cleans up a markdown page that was created by Microsoft.PowerShell.PlatyPS
+    param ([string]$Content, [string[]]$Aliases)
+
+    $Content = $Content -replace "`r`n", "`n"
+
+    # The date changes with every run, it is removed so that only real changes show up in a diff
+    $Content = $Content -replace '(?m)^ms\.date: .*\n', ''
+
+    # The aliases of the command replace the placeholder
+    $AliasText = if ($Aliases.Count) { ($Aliases | ForEach-Object { "  - $_" }) -join "`n" } else { '  - None' }
+    $Content = $Content.Replace('  {{Insert list of aliases}}', $AliasText)
+
+    # The first line of each example is the code of the example
+    $Content = [regex]::Replace($Content, '(?m)^(### EXAMPLE \d+\n\n)(?!```)(.+)$', "`$1``````powershell`n`$2`n``````")
+
+    return $Content
 }
-
-$modulePage         = Join-Path -Path $helpDocsPath -ChildPath "$moduleName.md"
-$tempFolder         = Join-Path -Path $helpDocsPath -ChildPath "temp"
-$siteStructureFolder= Join-Path -Path $helpDocsPath -ChildPath "site"
-$externalHelp       = Join-Path -Path $helpDocsPath -ChildPath "en-US"
-$externalHelpCab    = Join-Path -Path $helpDocsPath -ChildPath "cab"
-
-$docFolders = $helpDocsPath,$tempFolder,$siteStructureFolder,$externalHelp,$externalHelpCab
-
-$TemplatePages = 'DELETE.md', 'GET.md', 'index.md', 'PATCH.md', 'POST.md', 'PUT.md'
 
 Try{
 
-    if (Get-InstalledModule -Name platyPS -ErrorAction SilentlyContinue -Verbose:$false 4>$null) {
-        Import-Module -Name platyPS -Verbose:$false
+    if (Get-Module -Name Microsoft.PowerShell.PlatyPS -ListAvailable -Verbose:$false) {
+        Import-Module -Name Microsoft.PowerShell.PlatyPS -Verbose:$false
     }
     else{
-        throw "The platyPS module was not found"
+        throw "The Microsoft.PowerShell.PlatyPS module was not found, run build\Install-Prerequisites.ps1"
     }
 
-    if ($IsWindows -or $PSEdition -eq 'Desktop') {
-        $rootPath = "$( $PSCommandPath.Substring(0, $PSCommandPath.IndexOf('\build', [System.StringComparison]::OrdinalIgnoreCase)) )"
-    }
-    else{
-        $rootPath = "$( $PSCommandPath.Substring(0, $PSCommandPath.IndexOf('/build', [System.StringComparison]::OrdinalIgnoreCase)) )"
-    }
+    $RootPath = Split-Path -Path $PSScriptRoot -Parent
+    $ModulePath = Join-Path -Path $RootPath -ChildPath $ModuleName
+    $ModulePsd1 = Join-Path -Path $ModulePath -ChildPath "$ModuleName.psd1"
 
-    $modulePath = Join-Path -Path $rootPath -ChildPath $moduleName
-    $modulePsd1 = Join-Path -Path $modulePath -ChildPath "$moduleName.psd1"
-
-        if (Test-Path -Path $modulePsd1 ) {
-            Import-Module -Name $modulePsd1 -Force #-Verbose:$false
-            $Commands = Get-Command -Module $moduleName -ErrorAction Stop | Where-Object {$_.CommandType -eq 'Function'} | Sort-Object Name
+        if (Test-Path -Path $ModulePsd1 ) {
+            Import-Module -Name $ModulePsd1 -Force -Verbose:$false
+            $Commands = Get-Command -Module $ModuleName -ErrorAction Stop | Where-Object {$_.CommandType -eq 'Function'} | Sort-Object Name
         }
         else{
-            throw "The [ $moduleName ] module was not found"
+            throw "The [ $ModuleName ] module was not found"
         }
 
-    ForEach ($folder in $docFolders) {
+    ForEach ($Folder in $DocFolders) {
 
-        if ( ($folder -ne $helpDocsPath) -and (Test-Path -Path $folder -PathType Container) ) {
-            Remove-Item -Path $folder -Force -Recurse
-            New-Item -Path $folder -ItemType Directory > $null
-        }
-        else{
-            if ( (Test-Path -Path $folder -PathType Container) -eq $false ) {
-                New-Item -Path $folder -ItemType Directory > $null
-            }
+        # Nothing is deleted, existing documentation is overwritten. The temp folder only holds files created by this script
+        if ( (Test-Path -Path $Folder -PathType Container) -eq $false ) {
+            New-Item -Path $Folder -ItemType Directory > $null
         }
 
     }
 
-    if ( (Test-Path -Path $csvFilePath -PathType Leaf) -eq $false ) {
-        throw "The required CSV file was not found at [ $csvFilePath ]"
+    if ( (Test-Path -Path $CsvFilePath -PathType Leaf) -eq $false ) {
+        throw "The required CSV file was not found at [ $CsvFilePath ]"
     }
     else{
-        $CSV = Import-Csv -Path $csvFilePath
+        $CSV = Import-Csv -Path $CsvFilePath
     }
 
 }
@@ -206,209 +211,211 @@ Catch{
 
 #EndRegion     [ Prerequisites ]
 
-Write-Verbose " - (2/4) - $(Get-Date -Format MM-dd-HH:mm) - Regenerating module document"
+Write-Verbose " - (2/4) - $(Get-Date -Format MM-dd-HH:mm) - Regenerating [ $( ($Commands | Measure-Object).Count) ] help documents"
 
-#Region     [ Base module help ]
+#Region     [ Command Help ]
 
-New-MarkdownHelp -Module $moduleName -WithModulePage -ModulePagePath $modulePage -OutputFolder $tempFolder -Force > $null
-
-    Update-MarkdownHelpModule -Path $tempFolder -RefreshModulePage -ModulePagePath $modulePage > $null
-
-    Remove-Item -Path $tempFolder -Recurse -Force > $null
-
-Write-Verbose " -       - $(Get-Date -Format MM-dd-HH:mm) - Updating module metadata"
-
-#will change when external help is figured out
-$downloadLink = "$githubPageUri/docs/cab"
-
-    #Add GitHub pages parent
-    $content = Get-Content -Path $ModulePage
-    $newContent = $content -replace "Module Name", "parent: Home `nModule Name"
-    $newContent | Set-Content -Path $modulePage
-
-    #Adjust module download links
-    $content = Get-Content -Path $ModulePage
-    $newContent = $content -replace "(?<=Download Help Link:).*", " $DownloadLink"
-    $newContent | Set-Content -Path $modulePage
-
-    #Adjust module description
-    $moduleDescription = 'This PowerShell module acts as a wrapper for the AutoTask API.'
-
-    $content = Get-Content -Path $ModulePage -Raw
-    [regex]$updateDescription = "{{ Fill in the Description }}"
-    $newContent = $updateDescription.replace($content, "$moduleDescription", 1)
-    $newContent | Set-Content -Path $modulePage -NoNewline
-
-#EndRegion  [ Base module help ]
-
-Write-Verbose " - (3/4) - $(Get-Date -Format MM-dd-HH:mm) - Regenerating [ $( ($Commands | Measure-Object).count) ] help documents"
-
-#Region     [ Organize Markdown ]
+$CategoryMethods    = @{}
+$CommandCategory    = @{}
+$CommandPages       = [System.Collections.Generic.List[string]]::new()
 
 ForEach ( $Cmdlet in $Commands ) {
 
-    #Helps avoid files in use by another process error
-    Start-Sleep -Milliseconds 250
+    $CsvData = $CSV | Where-Object {$_.Function -eq $Cmdlet.Name}
 
-    $CsvData = $CSV | Where-Object {$_.Function -like "*$($Cmdlet.Name)"}
-    #$CsvData = $CSV | Where-Object {$_.Function -eq $Cmdlet.Name}
-
-    $Category = $($CsvData.Category | Select-Object -Unique)
-        if ($null -eq $Category) {
+    $Category = [string]($CsvData.Category | Select-Object -Unique -First 1)
+        if (-not $Category) {
             $Category = '_Unique'
         }
 
-    $Method = $($CsvData.Method | Select-Object -Unique)
-        if ($null -eq $Method) {
+    $Method = [string]($CsvData.Method | Select-Object -Unique -First 1)
+        if (-not $Method) {
             $Method = 'Special'
             Write-Warning " -       - $(Get-Date -Format MM-dd-HH:mm) - Unique command found, manually adjust the CSV file & metadata for [ $($Cmdlet.Name) ]"
         }
 
-        #$Category
-        #Set-Variable -Name Test_CSVData -Value $CsvData -Scope Global -Force
-        #Set-Variable -Name Test_Category -Value $Category -Scope Global -Force
-
-    $CategoryPath = Join-Path -Path $siteStructureFolder -ChildPath $Category
+    $CategoryPath = Join-Path -Path $SiteStructureFolder -ChildPath $Category
         if ( (Test-Path -Path $CategoryPath -PathType Container) -eq $false ) {
             New-Item -Path $CategoryPath -ItemType Directory > $null
         }
 
-    $onlineVersion = "$githubPageUri/site/$Category/$($Cmdlet.Name).html"
-    $newMetadata = @{
-        'title' = $($Cmdlet.Name)
-        'parent' = $Method
-        'grand_parent' = $Category
-    }
-    New-MarkdownHelp -Command $Cmdlet -Metadata $newMetadata -OnlineVersionUrl $onlineVersion -OutputFolder $CategoryPath -Force > $null
+    if (-not $CategoryMethods.ContainsKey($Category)) { $CategoryMethods[$Category] = [System.Collections.Generic.HashSet[string]]::new() }
+    [void]$CategoryMethods[$Category].Add($Method)
+    $CommandCategory[$Cmdlet.Name] = $Category
 
-    #Adjust module uri links
-    $content = Get-Content -Path $modulePage
-    $newContent = $content -replace "$($Cmdlet.Name + '.md')","site/$Category/$($Cmdlet.Name + '.md')"
-    $newContent | Set-Content -Path $modulePage
-
-    #Adjust module powershell code fence
-    $content = Get-Content -Path $( Join-Path -Path $CategoryPath -ChildPath "$($Cmdlet.Name + '.md')" ) -Raw
-    $newContent = $content -replace '(?m)(?<fence>^```)(?=\r\n\w+)', "`${fence}powershell"
-    $newContent | Set-Content -Path $( Join-Path -Path $CategoryPath -ChildPath "$($Cmdlet.Name + '.md')" ) -NoNewline
-
-#Region     [ Template Code ]
-
-    ForEach ($Template in $TemplatePages) {
-
-        $template_Path = $(Join-Path -Path $CategoryPath -ChildPath $Template)
-
-        if ($Template -ne 'index.md') {
-            $fileContents = @"
----
-title: $( ($Template -replace '.md','').ToUpper())
-parent: xxparentxx
-has_children: true
----
-"@
-        }
-        else{ $fileContents = @"
----
-title: xxparentxx
-has_children: true
----
-
-## xxparentxx - endpoint help & documentation
-
-{: .highlight }
-Some functions will handle more than one endpoint and the numbers below show the total endpoints **not** the total functions
-
-| **Method** | **Endpoint Count**  |
-|------------|---------------------|
-| DELETE     | xdeleteCountx       |
-| GET        | xgetCountx          |
-| PATCH      | xpatchCountx        |
-| POST       | xpostCountx         |
-| PUT        | xputCountx          |
-
-Have a look around and if you would like to contribute please read over the [Contributing guide](https://github.com/Celerium/Celerium.AutoTask/blob/master/.github/CONTRIBUTING.md)
-"@
-        }
-
-        if( $Template -eq 'index.md' ) {
-            New-Item -Path $template_Path -ItemType File -Value $fileContents -Force > $null
-        }
-        else{
-            New-Item -Path $( Join-Path -Path $CategoryPath -ChildPath $(($Template -replace '.md','').ToUpper() + '.md') ) -ItemType File -Value $fileContents -Force > $null
-        }
-
-        #Title and Parents
-        $content = Get-Content -Path $template_Path
-        $newContent = $content -replace 'xxparentxx',"$Category"
-        $newContent | Set-Content -Path $template_Path
-
-        if( $Template -eq 'index.md' ) {
-
-            $Counts = 'xdeleteCountx', 'xgetCountx', 'xpatchCountx', 'xpostCountx', 'xputCountx'
-            ForEach ($Count in $Counts) {
-
-                $content = Get-Content -Path $template_Path
-
-                Switch($Count) {
-                    'xdeleteCountx' { $countValue = ($CSV | Where-Object {$_.Method -eq 'Delete' -and $_.Category -eq $Category} | Measure-Object).count }
-                    'xgetCountx'    { $countValue = ($CSV | Where-Object {$_.Method -eq 'Get' -and $_.Category -eq $Category} | Measure-Object).count }
-                    'xpatchCountx'  { $countValue = ($CSV | Where-Object {$_.Method -eq 'Patch' -and $_.Category -eq $Category} | Measure-Object).count }
-                    'xpostCountx'   { $countValue = ($CSV | Where-Object {$_.Method -eq 'Post' -and $_.Category -eq $Category} | Measure-Object).count }
-                    'xputCountx'    { $countValue = ($CSV | Where-Object {$_.Method -eq 'Put' -and $_.Category -eq $Category} | Measure-Object).count }
-                }
-
-                $newContent = $content -replace $Count,$countValue
-                $newContent | Set-Content -Path $template_Path
-
-            }
-        }
-
+    # The values are cast to strings, a PSObject wrapped string is written to the front matter as an object
+    $NewMetadata = @{
+        'title'         = [string]$Cmdlet.Name
+        'parent'        = [string]$Method
+        'grand_parent'  = [string]$Category
     }
 
-#EndRegion  [ Template Code ]
+    $Params = @{
+        CommandInfo     = $Cmdlet
+        OutputFolder    = $TempFolder
+        Metadata        = $NewMetadata
+        HelpUri         = "$GithubPageUri/site/$Category/$($Cmdlet.Name).html"
+        Force           = $true
+    }
+    $TempPage = New-MarkdownCommandHelp @Params
+
+    $Aliases = @(Get-Alias -Definition $Cmdlet.Name -ErrorAction SilentlyContinue | Where-Object { $_.ModuleName -eq $ModuleName } | Sort-Object Name | ForEach-Object { $_.Name })
+
+    $PagePath = Join-Path -Path $CategoryPath -ChildPath "$($Cmdlet.Name).md"
+    Write-DocFile -Path $PagePath -Content (Format-CommandPage -Content ([System.IO.File]::ReadAllText($TempPage.FullName)) -Aliases $Aliases)
+    $CommandPages.Add($PagePath)
 
 }
 
-#EndRegion  [ Organize Markdown ]
+#EndRegion  [ Command Help ]
+
+Write-Verbose " - (3/4) - $(Get-Date -Format MM-dd-HH:mm) - Regenerating module document & GitHub pages structure"
+
+#Region     [ Module help ]
+
+$CommandHelp    = $CommandPages | Import-MarkdownCommandHelp
+$TempModulePage = New-MarkdownModuleFile -CommandHelp $CommandHelp -OutputFolder (Join-Path -Path $TempFolder -ChildPath 'module') -HelpInfoUri $GithubPageUri -Force
+
+$Content = [System.IO.File]::ReadAllText($TempModulePage.FullName) -replace "`r`n", "`n"
+$Content = $Content -replace '(?m)^ms\.date: .*\n', ''
+$Content = $Content -replace '(?m)^(title: .*)$', "`$1`nparent: Home"
+
+# Links point to the function pages in the site folder
+ForEach ($Name in $CommandCategory.Keys) {
+    $Content = $Content.Replace("]($Name.md)", "](site/$($CommandCategory[$Name])/$Name.md)")
+}
+
+Write-DocFile -Path $ModulePage -Content $Content
+
+    #Sync the GitHub pages home page with the README
+    $ReadmePath = Join-Path -Path $RootPath -ChildPath 'README.md'
+    if (Test-Path -Path $ReadmePath -PathType Leaf) {
+
+        $HomeFrontMatter = @"
+---
+Module Name: $ModuleName
+online version: https://github.com/Celerium/$ModuleName
+title: Home
+has_children: true
+layout: default
+nav_order: 1
+---
+
+
+"@
+        Write-DocFile -Path (Join-Path -Path $HelpDocsPath -ChildPath 'index.md') -Content ($HomeFrontMatter + [System.IO.File]::ReadAllText($ReadmePath))
+
+    }
+
+    #Sync the tracking page table with the CSV
+    $TrackingPath = Join-Path -Path $HelpDocsPath -ChildPath 'TrackingCSV.md'
+    if (Test-Path -Path $TrackingPath -PathType Leaf) {
+
+        $TrackingContent    = [System.IO.File]::ReadAllText($TrackingPath) -replace "`r`n", "`n"
+        $TableMarker        = '## CSV markdown table'
+
+        if ($TrackingContent.Contains($TableMarker)) {
+
+            $TableRows = foreach ($Row in $CSV) {
+                '|' + (($Row.Category, $Row.EndpointUri, $Row.Method, $Row.Function, $Row.Example, $Row.Complete, $Row.Notes | ForEach-Object { "$_" -replace '\|', '\|' }) -join '|') + '|'
+            }
+
+            $TrackingTable = @('|Category|EndpointUri|Method|Function|Example|Complete|Notes|', '|--------|-----------|------|--------|-------|--------|-----|') + $TableRows
+            $TrackingHead  = $TrackingContent.Substring(0, $TrackingContent.IndexOf($TableMarker))
+
+            Write-DocFile -Path $TrackingPath -Content ($TrackingHead + $TableMarker + "`n`n" + ($TrackingTable -join "`n"))
+
+        }
+
+    }
+
+#Region     [ Template Code ]
+
+# Only the HTTP methods that have functions get a method page, the index page lists every endpoint tracked in the CSV
+ForEach ($Category in $CategoryMethods.Keys) {
+
+    $CategoryPath = Join-Path -Path $SiteStructureFolder -ChildPath $Category
+
+    ForEach ($Method in $CategoryMethods[$Category]) {
+
+        $MethodContents = @"
+---
+title: $($Method.ToUpper())
+parent: $Category
+has_children: true
+---
+"@
+        Write-DocFile -Path (Join-Path -Path $CategoryPath -ChildPath "$($Method.ToUpper()).md") -Content $MethodContents
+
+    }
+
+    $CategoryCsv    = $CSV | Where-Object { $_.Category -eq $Category }
+    $CountRows      = ForEach ($HttpMethod in 'GET','POST','PUT','PATCH','DELETE') {
+        if ($Category -eq 'Resource') {
+            # The generic Resource functions support every operation of the resource map (OpenAPI spec)
+            $Total          = (Get-AutoTaskResourceMap | Where-Object { $_.Method -eq $HttpMethod } | Measure-Object).Count
+            $Implemented    = $Total
+        }
+        else {
+            $Total          = ($CategoryCsv | Where-Object { $_.Method -eq $HttpMethod } | Measure-Object).Count
+            $Implemented    = ($CategoryCsv | Where-Object { $_.Method -eq $HttpMethod -and $_.Complete -eq 'Yes' } | Measure-Object).Count
+        }
+        "| $($HttpMethod.PadRight(10)) | $($Implemented.ToString().PadRight(11)) | $($Total.ToString().PadRight(7)) |"
+    }
+
+    $IndexContents = @"
+---
+title: $Category
+has_children: true
+---
+
+## $Category - endpoint help & documentation
+
+{: .highlight }
+The generic functions handle every endpoint of the AutoTask OpenAPI spec and the numbers below show the total endpoints **not** the total functions. Write endpoints (POST, PUT, PATCH, DELETE) change data in AutoTask, use ``-WhatIf`` to preview a request
+
+| **Method** | **Implemented** | **Total** |
+|------------|-----------------|-----------|
+$($CountRows -join "`n")
+
+Have a look around and if you would like to contribute please read over the [Contributing guide](https://github.com/Celerium/$ModuleName/blob/main/.github/CONTRIBUTING.md)
+"@
+    Write-DocFile -Path (Join-Path -Path $CategoryPath -ChildPath 'index.md') -Content $IndexContents
+
+}
+
+#EndRegion  [ Template Code ]
+
+#EndRegion  [ Module help ]
 
 Write-Verbose " - (4/4) - $(Get-Date -Format MM-dd-HH:mm) - Regenerating external help"
 
 #Region     [ External Help ]
 
-if ($IsWindows -or $PSEdition -eq 'Desktop') {
-
-    $helpFilePaths = [System.Collections.Generic.List[object]]::new()
-    $helpFiles = (Get-ChildItem -Path $siteStructureFolder -Include "*.md" -Exclude index*,delete*,post*,put*,get.* -Recurse | Sort-Object fullName).fullName
-
-        ForEach ($File in $helpFiles) {
-            $helpFilePaths.Add($File) > $null
-        }
-
-    New-ExternalHelp -Path $helpFilePaths -OutputPath $externalHelp -Force > $null
-
-
-    New-ExternalHelpCab -CabFilesFolder $externalHelp -LandingPagePath $modulePage -OutputFolder $externalHelpCab -IncrementHelpVersion > $null
-
-}
-else{
-    Write-Warning " -       - $(Get-Date -Format MM-dd-HH:mm) - [ New-ExternalHelpCab ] MakeCab.exe requirement is not compatible at this time"
+$TempMaml = Export-MamlCommandHelp -CommandHelp $CommandHelp -OutputFolder (Join-Path -Path $TempFolder -ChildPath 'maml') -Force
+ForEach ($File in @($TempMaml)) {
+    $Content = [System.IO.File]::ReadAllText($File.FullName)
+    Write-DocFile -Path (Join-Path -Path $ExternalHelp -ChildPath $File.Name) -Content $Content
 }
 
 #EndRegion  [ External Help ]
 
-if (Get-Module -Name $moduleName) {
-    Remove-Module -Name $moduleName -Force -Verbose:$false
+Remove-Item -Path $TempFolder -Recurse -Force
+
+if (Get-Module -Name $ModuleName) {
+    Remove-Module -Name $ModuleName -Force -Verbose:$false
 }
 
 #Open File Explorer to show doc output
 if ($ShowHelpDocs) {
-    Invoke-Item $helpDocsPath
+    Invoke-Item $HelpDocsPath
 }
 
 Write-Verbose ''
 Write-Verbose "END - $(Get-Date -Format yyyy-MM-dd-HH:mm)"
 Write-Verbose ''
 
-$TimeToComplete = New-TimeSpan -Start $startDate -End (Get-Date)
+$TimeToComplete = New-TimeSpan -Start $StartDate -End (Get-Date)
 Write-Verbose 'Time to complete'
 Write-Verbose ($TimeToComplete | Select-Object * -ExcludeProperty Ticks,Total*,Milli* | Out-String)
 

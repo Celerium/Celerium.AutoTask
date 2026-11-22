@@ -1,167 +1,145 @@
 <#
-    .SYNOPSIS
-        Pester tests for the Celerium.AutoTask baseURI functions
+.NOTES
+    Copyright 1990-2027 Celerium
 
-    .DESCRIPTION
-        Pester tests for the Celerium.AutoTask baseURI functions
+    NAME: Add-AutoTaskBaseURI.Tests.ps1
+    Type: PowerShell
 
-    .PARAMETER moduleName
-        The name of the local module to import
+.SYNOPSIS
+    Pester tests for the Add-AutoTaskBaseURI function
 
-    .PARAMETER Version
-        The version of the local module to import
+.PARAMETER ModuleName
+    The name of the local module to import
 
-    .PARAMETER buildTarget
-        Which version of the module to run tests against
+.PARAMETER Version
+    The version of the local module to import
 
-        Allowed values:
-            'built', 'notBuilt'
+.PARAMETER BuildTarget
+    Which version of the module to run tests against
 
-    .EXAMPLE
-        Invoke-Pester -Path .\Tests\Private\baseUri\Get-AutoTaskBaseURI.Tests.ps1
+    Allowed values:
+        'built', 'notBuilt'
 
-        Runs a pester test and outputs simple results
-
-    .EXAMPLE
-        Invoke-Pester -Path .\Tests\Private\baseUri\Get-AutoTaskBaseURI.Tests.ps1 -Output Detailed
-
-        Runs a pester test and outputs detailed results
-
-    .INPUTS
-        N/A
-
-    .OUTPUTS
-        N/A
-
-    .NOTES
-        N/A
-
-    .LINK
-        https://celerium.org
+.LINK
+    https://celerium.org
 
 #>
 
-<############################################################################################
-                                        Code
-############################################################################################>
 #Requires -Version 5.1
-#Requires -Modules @{ ModuleName='Pester'; ModuleVersion='5.6.1' }
+#Requires -Modules @{ ModuleName='Pester'; ModuleVersion='6.0.0' }
 
-#Region     [ Parameters ]
-
-#Available in Discovery & Run
 [CmdletBinding()]
 param (
     [Parameter(Mandatory = $false)]
     [ValidateNotNullOrEmpty()]
-    [string]$moduleName = 'Celerium.AutoTask',
+    [string]$ModuleName = 'Celerium.AutoTask',
 
     [Parameter(Mandatory=$true)]
     [ValidateNotNullOrEmpty()]
-    [string]$version,
+    [string]$Version,
 
     [Parameter(Mandatory=$true)]
     [ValidateSet('built','notBuilt')]
-    [string]$buildTarget
+    [string]$BuildTarget
 )
 
-#EndRegion  [ Parameters ]
+BeforeAll {
+    $TestsPath = $PSScriptRoot
+    while ($TestsPath -and -not (Test-Path -Path (Join-Path -Path $TestsPath -ChildPath 'TestHelper.ps1'))) { $TestsPath = Split-Path -Path $TestsPath -Parent }
+    . (Join-Path -Path $TestsPath -ChildPath 'TestHelper.ps1')
 
-#Region     [ Prerequisites ]
+    Import-TestModule -ModuleName $ModuleName -Version $Version -BuildTarget $BuildTarget
+    Add-FakeHttpException
 
-#Available inside It but NOT Describe or Context
-    BeforeAll {
-
-        if ($IsWindows -or $PSEdition -eq 'Desktop') {
-            $rootPath = "$( $PSCommandPath.Substring(0, $PSCommandPath.IndexOf('\tests', [System.StringComparison]::OrdinalIgnoreCase)) )"
-        }
-        else{
-            $rootPath = "$( $PSCommandPath.Substring(0, $PSCommandPath.IndexOf('/tests', [System.StringComparison]::OrdinalIgnoreCase)) )"
-        }
-
-        switch ($buildTarget) {
-            'built'     { $modulePath = Join-Path -Path $rootPath -ChildPath "\build\$moduleName\$version" }
-            'notBuilt'  { $modulePath = Join-Path -Path $rootPath -ChildPath "$moduleName" }
-        }
-
-        if (Get-Module -Name $moduleName) {
-            Remove-Module -Name $moduleName -Force
-        }
-
-        $modulePsd1 = Join-Path -Path $modulePath -ChildPath "$moduleName.psd1"
-
-        Import-Module -Name $modulePsd1 -ErrorAction Stop -ErrorVariable moduleError *> $null
-
-        if ($moduleError) {
-            $moduleError
-            exit 1
-        }
-
-    }
-
-    AfterAll{
-
-        Remove-AutoTaskAPIKey -WarningAction SilentlyContinue
-
-        if (Get-Module -Name $moduleName) {
-            Remove-Module -Name $moduleName -Force
-        }
-
-    }
-
-#Available in Describe and Context but NOT It
-#Can be used in [ It ] with [ -TestCases @{ VariableName = $VariableName } ]
-    BeforeDiscovery{
-
-        $pester_TestName = (Get-Item -Path $PSCommandPath).Name
-        $commandName = $pester_TestName -replace '.Tests.ps1',''
-
-    }
-
-#EndRegion  [ Prerequisites ]
-
-
-Describe "Testing [ $commandName ] functions with [ $pester_TestName ]" -Tag @('baseUri') {
-
-Context "[ $commandName ] testing functions" {
-
-    It "[ $commandName ] should have an alias of [ Set-AutoTaskBaseURI ]" {
-        Get-Alias -Name Set-AutoTaskBaseURI | Should -BeTrue
-    }
-
-    It "Should accept a value from the pipeline" {
-        'https://celerium.org' | Add-AutoTaskBaseURI
-        Get-AutoTaskBaseURI | Should -Be 'https://celerium.org'
-    }
-
-    It "With parameter -BaseUri <value> should return what was inputted" {
-        Add-AutoTaskBaseURI -BaseUri 'https://celerium.org'
-        Get-AutoTaskBaseURI | Should -Be 'https://celerium.org'
-    }
-
-    It "With parameter -DataCenter America West 3 should return the default URI" {
-        Add-AutoTaskBaseURI -DataCenter 'America West 3'
-        Get-AutoTaskBaseURI | Should -Be 'https://webservices24.autotask.net/atservicesrest'
-    }
-
-    It "With invalid parameter value -DataCenter Space should return an error" {
-        Remove-AutoTaskBaseURI
-        {Add-AutoTaskBaseURI -DataCenter Space} | Should -Throw
-    }
-
-    It "The default URI should NOT contain a trailing forward slash" {
-        Add-AutoTaskBaseURI -DataCenter 'America West 3'
-
-        $URI = Get-AutoTaskBaseURI
-        ($URI[$URI.Length-1] -eq "/") | Should -BeFalse
-    }
-
-    It "A custom URI should NOT contain a trailing forward slash" {
-        Add-AutoTaskBaseURI -BaseUri 'https://celerium.org/'
-
-        $URI = Get-AutoTaskBaseURI
-        ($URI[$URI.Length-1] -eq "/") | Should -BeFalse
-    }
+    # Safety net so that a test can never make a real request
+    Mock Invoke-WebRequest -ModuleName $ModuleName { throw 'Unexpected un-mocked request' }
+    Mock Invoke-RestMethod -ModuleName $ModuleName { throw 'Unexpected un-mocked request' }
 }
+
+AfterAll {
+    Remove-TestModule -ModuleName $ModuleName
+}
+
+BeforeDiscovery {
+    $PesterTestName = (Get-Item -Path $PSCommandPath).Name
+    $CommandName = $PesterTestName -replace '.Tests.ps1',''
+    $IsWindowsPlatform = ($PSEdition -eq 'Desktop' -or $IsWindows)
+}
+Describe "Testing [ $CommandName ] function with [ $PesterTestName ]" -Tag @('baseUri') {
+
+    BeforeEach {
+        Remove-AutoTaskBaseURI -WarningAction SilentlyContinue
+        Remove-AutoTaskAPIKey -WarningAction SilentlyContinue
+    }
+
+    Context "[ $CommandName ] testing function" {
+
+        It "Should have an alias of [ Set-AutoTaskBaseURI ]" {
+            (Get-Alias -Name Set-AutoTaskBaseURI).ReferencedCommand.Name | Should -Be 'Add-AutoTaskBaseURI'
+        }
+
+        It "Should accept a value from the pipeline" {
+            'https://api.example.org/atservicesrest' | Add-AutoTaskBaseURI
+            Get-AutoTaskBaseURI | Should -Be 'https://api.example.org/atservicesrest'
+        }
+
+        It "With parameter -BaseURI <value> should return what was inputted" {
+            Add-AutoTaskBaseURI -BaseURI 'https://api.example.org/atservicesrest'
+            Get-AutoTaskBaseURI | Should -Be 'https://api.example.org/atservicesrest'
+        }
+
+        It "With parameter -DataCenter America West 3 should return the zone URI" {
+            Add-AutoTaskBaseURI -DataCenter 'America West 3'
+            Get-AutoTaskBaseURI | Should -Be 'https://webservices24.autotask.net/atservicesrest'
+            Get-AutoTaskBaseURI -AndApiUri | Should -Be 'https://webservices24.autotask.net/atservicesrest/V1.0'
+        }
+
+        It "Accepts the -Platform alias of -DataCenter" {
+            Add-AutoTaskBaseURI -Platform 'UK'
+            Get-AutoTaskBaseURI | Should -Be 'https://webservices4.autotask.net/atservicesrest'
+        }
+
+        It "With invalid parameter value -DataCenter Space should return an error" {
+            { Add-AutoTaskBaseURI -DataCenter 'Space' } | Should -Throw
+        }
+
+        It "A custom URI should NOT contain a trailing forward slash or API version" {
+            Add-AutoTaskBaseURI -BaseURI 'https://api.example.org/atservicesrest/V1.0/'
+            Get-AutoTaskBaseURI | Should -Be 'https://api.example.org/atservicesrest'
+        }
+
+        It "Stores the API version" {
+            Add-AutoTaskBaseURI -BaseURI 'https://api.example.org/atservicesrest' -Version 'V2.0'
+            Get-AutoTaskBaseURI -AndApiUri | Should -Be 'https://api.example.org/atservicesrest/V2.0'
+        }
+
+        It "Rejects an invalid uri <_>" -ForEach 'http://api.example.org', 'api.example.org', 'not a uri' {
+            { Add-AutoTaskBaseURI -BaseURI $_ } | Should -Throw '*not valid*'
+            Get-AutoTaskBaseURI -WarningAction SilentlyContinue | Should -BeNullOrEmpty
+        }
+
+        It "Does not make a web request with -BaseURI or -DataCenter" {
+            Add-AutoTaskBaseURI -BaseURI 'https://api.example.org/atservicesrest'
+            Add-AutoTaskBaseURI -DataCenter 'UK2'
+            Should -Invoke Invoke-RestMethod -ModuleName $ModuleName -Times 0 -Exactly
+        }
+
+        It "Detects the zone of the API user with one unauthenticated GET request" {
+            Add-AutoTaskAPIKey -ApiUsername 'user@example.org' -ApiSecretKey 'secret' -ApiIntegrationCode 'code'
+            Mock Invoke-RestMethod -ModuleName $ModuleName { [PSCustomObject]@{ zoneName = 'America West 3'; url = 'https://webservices24.autotask.net/ATServicesRest/' } }
+
+            Add-AutoTaskBaseURI
+
+            Get-AutoTaskBaseURI | Should -Be 'https://webservices24.autotask.net/ATServicesRest'
+            Should -Invoke Invoke-RestMethod -ModuleName $ModuleName -Times 1 -Exactly -ParameterFilter {
+                $Method -eq 'GET' -and $Uri -eq 'https://webservices2.autotask.net/atservicesrest/V1.0/ZoneInformation?user=user%40example.org' -and $null -eq $Headers
+            }
+        }
+
+        It "Throws when the zone is detected without an API username" {
+            { Add-AutoTaskBaseURI } | Should -Throw '*username*'
+        }
+
+    }
 
 }

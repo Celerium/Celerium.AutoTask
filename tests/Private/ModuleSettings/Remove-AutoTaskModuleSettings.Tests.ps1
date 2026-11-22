@@ -1,166 +1,124 @@
 <#
-    .SYNOPSIS
-        Pester tests for the Celerium.AutoTask ModuleSettings functions
+.NOTES
+    Copyright 1990-2027 Celerium
 
-    .DESCRIPTION
-        Pester tests for the Celerium.AutoTask ModuleSettings functions
+    NAME: Remove-AutoTaskModuleSettings.Tests.ps1
+    Type: PowerShell
 
-    .PARAMETER moduleName
-        The name of the local module to import
+.SYNOPSIS
+    Pester tests for the Remove-AutoTaskModuleSettings function
 
-    .PARAMETER Version
-        The version of the local module to import
+.PARAMETER ModuleName
+    The name of the local module to import
 
-    .PARAMETER buildTarget
-        Which version of the module to run tests against
+.PARAMETER Version
+    The version of the local module to import
 
-        Allowed values:
-            'built', 'notBuilt'
+.PARAMETER BuildTarget
+    Which version of the module to run tests against
 
-    .EXAMPLE
-        Invoke-Pester -Path .\Tests\Private\ModuleSettings\Remove-AutoTaskModuleSettings.Tests.ps1
+    Allowed values:
+        'built', 'notBuilt'
 
-        Runs a pester test and outputs simple results
-
-    .EXAMPLE
-        Invoke-Pester -Path .\Tests\Private\ModuleSettings\Remove-AutoTaskModuleSettings.Tests.ps1 -Output Detailed
-
-        Runs a pester test and outputs detailed results
-
-    .INPUTS
-        N/A
-
-    .OUTPUTS
-        N/A
-
-    .NOTES
-        N/A
-
-    .LINK
-        https://celerium.org
+.LINK
+    https://celerium.org
 
 #>
 
-<############################################################################################
-                                        Code
-############################################################################################>
 #Requires -Version 5.1
-#Requires -Modules @{ ModuleName='Pester'; ModuleVersion='5.6.1' }
+#Requires -Modules @{ ModuleName='Pester'; ModuleVersion='6.0.0' }
 
-#Region     [ Parameters ]
-
-#Available in Discovery & Run
 [CmdletBinding()]
 param (
     [Parameter(Mandatory = $false)]
     [ValidateNotNullOrEmpty()]
-    [string]$moduleName = 'Celerium.AutoTask',
+    [string]$ModuleName = 'Celerium.AutoTask',
 
     [Parameter(Mandatory=$true)]
     [ValidateNotNullOrEmpty()]
-    [string]$version,
+    [string]$Version,
 
     [Parameter(Mandatory=$true)]
     [ValidateSet('built','notBuilt')]
-    [string]$buildTarget
+    [string]$BuildTarget
 )
 
-#EndRegion  [ Parameters ]
+BeforeAll {
+    $TestsPath = $PSScriptRoot
+    while ($TestsPath -and -not (Test-Path -Path (Join-Path -Path $TestsPath -ChildPath 'TestHelper.ps1'))) { $TestsPath = Split-Path -Path $TestsPath -Parent }
+    . (Join-Path -Path $TestsPath -ChildPath 'TestHelper.ps1')
 
-#Region     [ Prerequisites ]
+    Import-TestModule -ModuleName $ModuleName -Version $Version -BuildTarget $BuildTarget
+    Add-FakeHttpException
 
-#Available inside It but NOT Describe or Context
-    BeforeAll {
+    # Safety net so that a test can never make a real request
+    Mock Invoke-WebRequest -ModuleName $ModuleName { throw 'Unexpected un-mocked request' }
+    Mock Invoke-RestMethod -ModuleName $ModuleName { throw 'Unexpected un-mocked request' }
 
-        if ($IsWindows -or $PSEdition -eq 'Desktop') {
-            $rootPath = "$( $PSCommandPath.Substring(0, $PSCommandPath.IndexOf('\tests', [System.StringComparison]::OrdinalIgnoreCase)) )"
-        }
-        else{
-            $rootPath = "$( $PSCommandPath.Substring(0, $PSCommandPath.IndexOf('/tests', [System.StringComparison]::OrdinalIgnoreCase)) )"
-        }
+    $ExportPath = Join-Path -Path ([System.IO.Path]::GetTempPath()) -ChildPath "Celerium.AutoTask_Test_$([guid]::NewGuid().ToString('N'))"
 
-        switch ($buildTarget) {
-            'built'     { $modulePath = Join-Path -Path $rootPath -ChildPath "\build\$moduleName\$version" }
-            'notBuilt'  { $modulePath = Join-Path -Path $rootPath -ChildPath "$moduleName" }
-        }
-
-        if (Get-Module -Name $moduleName) {
-            Remove-Module -Name $moduleName -Force
-        }
-
-        $modulePsd1 = Join-Path -Path $modulePath -ChildPath "$moduleName.psd1"
-        $invalidPath = $(Join-Path -Path $home -ChildPath "invalidApiPath")
-        if ($IsWindows -or $PSEdition -eq 'Desktop') {
-            $exportPath = $(Join-Path -Path $home -ChildPath "Celerium.AutoTask_Test")
-        }
-        else{
-            $exportPath = $(Join-Path -Path $home -ChildPath ".Celerium.AutoTask_Test")
-        }
-
-        Import-Module -Name $modulePsd1 -ErrorAction Stop -ErrorVariable moduleError *> $null
-
-        if ($moduleError) {
-            $moduleError
-            exit 1
-        }
-
+    function Set-TestSettings {
+        Add-AutoTaskBaseURI -BaseURI 'https://api.example.org/atservicesrest'
+        Add-AutoTaskAPIKey -ApiUsername 'user@example.org' -ApiSecretKey 'plain-text-token' -ApiIntegrationCode 'plain-code'
     }
 
-    AfterAll{
-
-        Remove-AutoTaskModuleSettings -AutoTaskConfigPath $exportPath -WarningAction SilentlyContinue
-
-        if (Get-Module -Name $moduleName) {
-            Remove-Module -Name $moduleName -Force
+    function Set-TestSecureStringMock {
+        # The SecureString encryption cmdlets are mocked so that the tests behave the same on Windows, Linux, & macOS
+        Mock ConvertFrom-SecureString -ModuleName $ModuleName { 'ENCRYPTEDVALUE' }
+        Mock ConvertTo-SecureString -ModuleName $ModuleName { Microsoft.PowerShell.Security\ConvertTo-SecureString @PesterBoundParameters }
+        Mock ConvertTo-SecureString -ModuleName $ModuleName -ParameterFilter { -not $AsPlainText } {
+            Microsoft.PowerShell.Security\ConvertTo-SecureString -String 'restored-token' -AsPlainText -Force
         }
-
     }
+}
 
-#Available in Describe and Context but NOT It
-#Can be used in [ It ] with [ -TestCases @{ VariableName = $VariableName } ]
-    BeforeDiscovery{
+AfterAll {
+    if (Test-Path -Path $ExportPath) { Remove-Item -Path $ExportPath -Recurse -Force }
+    Remove-TestModule -ModuleName $ModuleName
+}
 
-        $pester_TestName = (Get-Item -Path $PSCommandPath).Name
-        $commandName = $pester_TestName -replace '.Tests.ps1',''
+BeforeDiscovery {
+    $PesterTestName = (Get-Item -Path $PSCommandPath).Name
+    $CommandName = $PesterTestName -replace '.Tests.ps1',''
+    $IsWindowsPlatform = ($PSEdition -eq 'Desktop' -or $IsWindows)
+}
+Describe "Testing [ $CommandName ] function with [ $PesterTestName ]" -Tag @('moduleSettings') {
 
+    BeforeEach {
+        Remove-AutoTaskAPIKey -WarningAction SilentlyContinue
+        Remove-AutoTaskBaseURI -WarningAction SilentlyContinue
+        if (Test-Path -Path $ExportPath) { Remove-Item -Path $ExportPath -Recurse -Force }
+        Set-TestSecureStringMock
     }
-
-#EndRegion  [ Prerequisites ]
-
-Describe "Testing [ $commandName ] function with [ $pester_TestName ]" -Tag @('moduleSettings') {
-
-    Context "[ $commandName ] testing function" {
+    Context "[ $CommandName ] testing function" {
 
         It "No configuration should throw a warning" {
-            Remove-AutoTaskModuleSettings -AutoTaskConfigPath $invalidPath -WarningAction SilentlyContinue -WarningVariable moduleSettingsWarning
+            Remove-AutoTaskModuleSettings -AutoTaskConfigPath $ExportPath -WarningVariable RemoveWarning -WarningAction SilentlyContinue
+            $RemoveWarning | Should -Not -BeNullOrEmpty
+        }
 
-            [bool]$moduleSettingsWarning | Should -BeTrue
+        It "Honors -WhatIf" {
+            New-Item -Path $ExportPath -ItemType Directory -Force > $null
+            Remove-AutoTaskModuleSettings -AutoTaskConfigPath $ExportPath -WhatIf
+            Test-Path -Path $ExportPath | Should -BeTrue
         }
 
         It "Saved configuration should be removed" {
-            Add-AutoTaskBaseUri -DataCenter 'America West 3'
-            Add-AutoTaskAPIKey -ApiIntegrationCode '12345' -ApiUsername '12345' -ApiSecretKey '12345'
-
-            Export-AutoTaskModuleSettings -AutoTaskConfigPath $exportPath -WarningAction SilentlyContinue
-            Remove-AutoTaskModuleSettings -AutoTaskConfigPath $exportPath
-
-            Test-Path -Path $exportPath | Should -BeFalse
-            [bool](Get-Variable -Name AutoTaskModuleBaseUri -ErrorAction SilentlyContinue)      | Should -BeTrue
-            [bool](Get-Variable -Name AutoTaskModuleApiUsername -ErrorAction SilentlyContinue)  | Should -BeTrue
-            [bool](Get-Variable -Name AutoTaskModuleApiSecretKey -ErrorAction SilentlyContinue) | Should -BeTrue
+            Set-TestSettings
+            Export-AutoTaskModuleSettings -AutoTaskConfigPath $ExportPath -WarningAction SilentlyContinue
+            Remove-AutoTaskModuleSettings -AutoTaskConfigPath $ExportPath | Out-Null
+            Test-Path -Path $ExportPath | Should -BeFalse
         }
 
         It "Saved configuration & variables should be removed" {
-            Add-AutoTaskBaseUri -DataCenter 'America West 3'
-            Add-AutoTaskAPIKey -ApiIntegrationCode '12345' -ApiUsername '12345' -ApiSecretKey '12345'
+            Set-TestSettings
+            Export-AutoTaskModuleSettings -AutoTaskConfigPath $ExportPath -WarningAction SilentlyContinue
 
-            Export-AutoTaskModuleSettings -AutoTaskConfigPath $exportPath -WarningAction SilentlyContinue
-            Remove-AutoTaskModuleSettings -AutoTaskConfigPath $exportPath -AndVariables
+            Remove-AutoTaskModuleSettings -AutoTaskConfigPath $ExportPath -AndVariables | Out-Null
 
-            Test-Path -Path $exportPath | Should -BeFalse
-            [bool](Get-Variable -Name AutoTaskModuleBaseUri -ErrorAction SilentlyContinue)      | Should -BeFalse
-            [bool](Get-Variable -Name AutoTaskModuleApiUsername -ErrorAction SilentlyContinue)  | Should -BeFalse
-            [bool](Get-Variable -Name AutoTaskModuleApiSecretKey -ErrorAction SilentlyContinue) | Should -BeFalse
+            Test-Path -Path $ExportPath | Should -BeFalse
+            Get-AutoTaskBaseURI -WarningAction SilentlyContinue | Should -BeNullOrEmpty
+            Get-AutoTaskAPIKey -WarningAction SilentlyContinue | Should -BeNullOrEmpty
         }
 
     }

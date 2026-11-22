@@ -11,32 +11,34 @@ When updating the documentation for this project, the tracking CSV plays a huge 
 {: .warning }
 I recommend downloading the CSV from the link provided rather then viewing the table below.
 
-[Tracking CSV](https://github.com/Celerium/Celerium.AutoTask/blob/master/docs/endpoints.csv)
+[Tracking CSV](https://github.com/Celerium/Celerium.AutoTask/blob/main/docs/endpoints.csv)
 
 ---
 
 ## CSV markdown table
 
-|Category|EndpointUri              |Method|Function                            |Example                    |Complete|Notes                                                                          |
-|--------|-------------------------|------|------------------------------------|---------------------------|--------|-------------------------------------------------------------------------------|
-|Internal|                         |GET   |Invoke-AutoTaskRequest              |N/A                        |Yes     |                                                                               |
-|Internal|                         |PUT   |New-AutoTaskResourceDynamicParameter|N/A                        |Yes     |                                                                               |
-|Internal|                         |PUT   |Set-AutoTaskResourceDynamicParameter|N/A                        |Yes     |                                                                               |
-|Internal|                         |PUT   |Add-AutoTaskAPIKey                  |N/A                        |Yes     |                                                                               |
-|Internal|                         |GET   |Get-AutoTaskAPIKey                  |N/A                        |Yes     |                                                                               |
-|Internal|                         |DELETE|Remove-AutoTaskAPIKey               |N/A                        |Yes     |                                                                               |
-|Internal|                         |GET   |Test-AutoTaskAPIKey                 |N/A                        |Yes     |                                                                               |
-|Internal|                         |PUT   |Add-AutoTaskBaseURI                 |N/A                        |Yes     |                                                                               |
-|Internal|                         |GET   |Get-AutoTaskBaseURI                 |N/A                        |Yes     |                                                                               |
-|Internal|                         |DELETE|Remove-AutoTaskBaseURI              |N/A                        |Yes     |                                                                               |
-|Internal|                         |PUT   |Export-AutoTaskModuleSettings       |N/A                        |Yes     |                                                                               |
-|Internal|                         |GET   |Get-AutoTaskModuleSettings          |N/A                        |Yes     |                                                                               |
-|Internal|                         |PUT   |Import-AutoTaskModuleSettings       |N/A                        |Yes     |                                                                               |
-|Internal|                         |PUT   |Initialize-AutoTaskModuleSettings   |N/A                        |Yes     |                                                                               |
-|Internal|                         |DELETE|Remove-AutoTaskModuleSettings       |N/A                        |Yes     |                                                                               |
-|Resource|See Show-AutoTaskResource|GET   |Get-AutoTaskResource                |Invoke-ContactGroupsExample|Yes     |Support other methods                                                          |
-|Resource|See Show-AutoTaskResource|PUT   |New-AutoTaskBody                    |Invoke-ContactGroupsExample|Yes     |                                                                               |
-|Resource|See Show-AutoTaskResource|POST  |New-AutoTaskResource                |Invoke-ContactGroupsExample|Yes     |                                                                               |
-|Resource|See Show-AutoTaskResource|DELETE|Remove-AutoTaskResource             |Invoke-ContactGroupsExample|Yes     |                                                                               |
-|Resource|See Show-AutoTaskResource|PATCH |Set-AutoTaskResource                |Invoke-ContactGroupsExample|Yes     |                                                                               |
-|Resource|                         |GET   |Show-AutoTaskResource               |N/A                        |Yes     |Shows avaliable resources that can be used with the dynamic -Resource parameter|
+|Category|EndpointUri|Method|Function|Example|Complete|Notes|
+|--------|-----------|------|--------|-------|--------|-----|
+|Internal||GET|Complete-AutoTaskResource|N/A|Yes|Argument completer of the -Resource & -Operation parameters|
+|Internal||GET|Get-AutoTaskResourceMap|N/A|Yes|Generated by build\New-AutoTaskResourceMap.ps1 from the OpenAPI spec|
+|Internal||GET|Get-AutoTaskResourceOperation|N/A|Yes||
+|Internal||GET|Get-AutoTaskSpecOperation|N/A|Yes||
+|Internal||GET|Invoke-AutoTaskRequest|N/A|Yes||
+|Internal||GET|Resolve-AutoTaskResource|N/A|Yes||
+|Internal||PUT|Add-AutoTaskAPIKey|N/A|Yes||
+|Internal||GET|Get-AutoTaskAPIKey|N/A|Yes||
+|Internal||DELETE|Remove-AutoTaskAPIKey|N/A|Yes||
+|Internal||GET|Test-AutoTaskAPIKey|N/A|Yes||
+|Internal||PUT|Add-AutoTaskBaseURI|N/A|Yes||
+|Internal||GET|Get-AutoTaskBaseURI|N/A|Yes||
+|Internal||DELETE|Remove-AutoTaskBaseURI|N/A|Yes||
+|Internal||PUT|Export-AutoTaskModuleSettings|N/A|Yes||
+|Internal||GET|Get-AutoTaskModuleSettings|N/A|Yes||
+|Internal||PUT|Import-AutoTaskModuleSettings|N/A|Yes||
+|Internal||DELETE|Remove-AutoTaskModuleSettings|N/A|Yes||
+|Resource|See Show-AutoTaskResource|GET|Get-AutoTaskResource|Invoke-CompanyReportExample|Yes|Every GET operation & the POST query & count operations|
+|Resource|See Show-AutoTaskResource|GET|New-AutoTaskBody|Invoke-CompanyReportExample|Yes|Reads the field definitions of a resource|
+|Resource|See Show-AutoTaskResource|POST|New-AutoTaskResource|N/A|Yes|Write - ShouldProcess & ConfirmImpact High|
+|Resource|See Show-AutoTaskResource|DELETE|Remove-AutoTaskResource|N/A|Yes|Write - ShouldProcess & ConfirmImpact High|
+|Resource|See Show-AutoTaskResource|PATCH|Set-AutoTaskResource|N/A|Yes|Write - ShouldProcess & ConfirmImpact High (PUT with -Operation UpdateEntity)|
+|Resource||GET|Show-AutoTaskResource|N/A|Yes|Shows the resources & operations that can be used with the -Resource & -Operation parameters|
