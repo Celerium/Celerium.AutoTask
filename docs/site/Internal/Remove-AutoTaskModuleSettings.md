@@ -1,26 +1,36 @@
 ---
-external help file: Celerium.AutoTask-help.xml
+document type: cmdlet
+external help file: Celerium.AutoTask-Help.xml
 grand_parent: Internal
+HelpUri: https://celerium.github.io/Celerium.AutoTask/site/Internal/Remove-AutoTaskModuleSettings.html
+Locale: en-US
 Module Name: Celerium.AutoTask
-online version: https://celerium.github.io/Celerium.AutoTask/site/Internal/Remove-AutoTaskModuleSettings.html
 parent: DELETE
-schema: 2.0.0
+PlatyPS schema version: 2024-05-01
 title: Remove-AutoTaskModuleSettings
 ---
 
 # Remove-AutoTaskModuleSettings
 
 ## SYNOPSIS
+
 Removes the stored AutoTask configuration folder
 
 ## SYNTAX
 
-```powershell
-Remove-AutoTaskModuleSettings [[-AutoTaskConfigPath] <String>] [-AndVariables] [-WhatIf] [-Confirm]
- [<CommonParameters>]
+### Destroy (Default)
+
+```
+Remove-AutoTaskModuleSettings [[-AutoTaskConfigPath] <string>] [-AndVariables] [-WhatIf] [-Confirm]
 ```
 
+## ALIASES
+
+This cmdlet has the following aliases,
+  - None
+
 ## DESCRIPTION
+
 The Remove-AutoTaskModuleSettings cmdlet removes the AutoTask folder and its files
 This cmdlet also has the option to remove sensitive AutoTask variables as well
 
@@ -30,6 +40,7 @@ By default configuration files are stored in the following location and will be 
 ## EXAMPLES
 
 ### EXAMPLE 1
+
 ```powershell
 Remove-AutoTaskModuleSettings
 ```
@@ -40,6 +51,7 @@ The default location of the AutoTask configuration folder is:
     $env:USERPROFILE\Celerium.AutoTask
 
 ### EXAMPLE 2
+
 ```powershell
 Remove-AutoTaskModuleSettings -AutoTaskConfigPath C:\Celerium.AutoTask -AndVariables
 ```
@@ -52,83 +64,113 @@ The location of the AutoTask configuration folder in this example is:
 
 ## PARAMETERS
 
+### -AndVariables
+
+Define if sensitive AutoTask variables should be removed as well
+
+By default the variables are not removed
+
+```yaml
+Type: System.Management.Automation.SwitchParameter
+DefaultValue: False
+SupportsWildcards: false
+Aliases: []
+ParameterSets:
+- Name: (All)
+  Position: Named
+  IsRequired: false
+  ValueFromPipeline: false
+  ValueFromPipelineByPropertyName: false
+  ValueFromRemainingArguments: false
+DontShow: false
+AcceptedValues: []
+HelpMessage: ''
+```
+
 ### -AutoTaskConfigPath
+
 Define the location of the AutoTask configuration folder
 
 By default the configuration folder is located at:
     $env:USERPROFILE\Celerium.AutoTask
 
 ```yaml
-Type: String
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: 1
-Default value: $(Join-Path -Path $home -ChildPath $(if ($IsWindows -or $PSEdition -eq 'Desktop') {"Celerium.AutoTask"}else{".Celerium.AutoTask"}) )
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -AndVariables
-Define if sensitive AutoTask variables should be removed as well
-
-By default the variables are not removed
-
-```yaml
-Type: SwitchParameter
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: Named
-Default value: False
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -WhatIf
-Shows what would happen if the cmdlet runs.
-The cmdlet is not run.
-
-```yaml
-Type: SwitchParameter
-Parameter Sets: (All)
-Aliases: wi
-
-Required: False
-Position: Named
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
+Type: System.String
+DefaultValue: $(Join-Path -Path $home -ChildPath $(if ($IsWindows -or $PSEdition -eq 'Desktop') {"Celerium.AutoTask"}else{".Celerium.AutoTask"}) )
+SupportsWildcards: false
+Aliases: []
+ParameterSets:
+- Name: (All)
+  Position: 0
+  IsRequired: false
+  ValueFromPipeline: false
+  ValueFromPipelineByPropertyName: false
+  ValueFromRemainingArguments: false
+DontShow: false
+AcceptedValues: []
+HelpMessage: ''
 ```
 
 ### -Confirm
+
 Prompts you for confirmation before running the cmdlet.
 
 ```yaml
-Type: SwitchParameter
-Parameter Sets: (All)
-Aliases: cf
+Type: System.Management.Automation.SwitchParameter
+DefaultValue: ''
+SupportsWildcards: false
+Aliases:
+- cf
+ParameterSets:
+- Name: (All)
+  Position: Named
+  IsRequired: false
+  ValueFromPipeline: false
+  ValueFromPipelineByPropertyName: false
+  ValueFromRemainingArguments: false
+DontShow: false
+AcceptedValues: []
+HelpMessage: ''
+```
 
-Required: False
-Position: Named
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
+### -WhatIf
+
+Runs the command in a mode that only reports what would happen without performing the actions.
+
+```yaml
+Type: System.Management.Automation.SwitchParameter
+DefaultValue: ''
+SupportsWildcards: false
+Aliases:
+- wi
+ParameterSets:
+- Name: (All)
+  Position: Named
+  IsRequired: false
+  ValueFromPipeline: false
+  ValueFromPipelineByPropertyName: false
+  ValueFromRemainingArguments: false
+DontShow: false
+AcceptedValues: []
+HelpMessage: ''
 ```
 
 ### CommonParameters
-This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see [about_CommonParameters](http://go.microsoft.com/fwlink/?LinkID=113216).
+
+This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable,
+-InformationAction, -InformationVariable, -OutBuffer, -OutVariable, -PipelineVariable,
+-ProgressAction, -Verbose, -WarningAction, and -WarningVariable. For more information, see
+[about_CommonParameters](https://go.microsoft.com/fwlink/?LinkID=113216).
 
 ## INPUTS
 
 ## OUTPUTS
 
 ## NOTES
+
 N/A
+
 
 ## RELATED LINKS
 
-[https://celerium.github.io/Celerium.AutoTask/site/Internal/Remove-AutoTaskModuleSettings.html](https://celerium.github.io/Celerium.AutoTask/site/Internal/Remove-AutoTaskModuleSettings.html)
-
+- [](https://celerium.github.io/Celerium.AutoTask/site/Internal/Remove-AutoTaskModuleSettings.html)

@@ -8,7 +8,7 @@ function Get-AutoTaskBaseURI {
         the global variable
 
     .PARAMETER AndApiUri
-        Also include the default Api version uri
+        Also include the API version uri, such as /V1.0
 
     .EXAMPLE
         Get-AutoTaskBaseURI
@@ -18,7 +18,7 @@ function Get-AutoTaskBaseURI {
     .EXAMPLE
         Get-AutoTaskBaseURI -AndApiUri
 
-        Shows the AutoTask base URI value with the default Api version uri defined in the global variable
+        Shows the AutoTask base URI value with the API version uri defined in the global variable
 
     .NOTES
         N/A
@@ -37,13 +37,11 @@ function Get-AutoTaskBaseURI {
 
     process {
 
-        switch ([bool]$AutoTaskModuleBaseUri) {
-            $true   {
-                if ($AndApiUri) { $AutoTaskModuleBaseUri + "/" + $AutoTaskModuleBaseUriApiVersion }
-                else { $AutoTaskModuleBaseUri }
-            }
-            $false  { Write-Warning "The AutoTask base URI is not set. Run Add-AutoTaskBaseURI to set the base URI." }
+        if ([bool]$AutoTaskModuleBaseUri) {
+            if ($AndApiUri) { $AutoTaskModuleBaseUriComplete }
+            else { $AutoTaskModuleBaseUri }
         }
+        else { Write-Warning "The AutoTask base URI is not set. Run Add-AutoTaskBaseURI to set the base URI." }
 
     }
 

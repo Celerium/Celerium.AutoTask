@@ -35,7 +35,7 @@ function Get-AutoTaskModuleSettings {
             $env:USERPROFILE\Celerium.AutoTask\config.psd1
 
     .EXAMPLE
-        Get-AutoTaskModuleSettings -AutoTaskConfigPath C:\Celerium.AutoTask -AutoTaskConfigFile MyConfig.psd1 -OpenConfFile
+        Get-AutoTaskModuleSettings -AutoTaskConfigPath C:\Celerium.AutoTask -AutoTaskConfigFile MyConfig.psd1 -OpenConfigFile
 
         Opens the configuration file from the defined location in the default editor
 
@@ -69,15 +69,15 @@ function Get-AutoTaskModuleSettings {
 
         if (Test-Path -Path $AutoTaskConfig) {
 
-            if($OpenConfigFile) {
+            if ($OpenConfigFile) {
                 Invoke-Item -Path $AutoTaskConfig
             }
-            else{
-                Import-LocalizedData -BaseDirectory $AutoTaskConfigPath -FileName $AutoTaskConfigFile
+            else {
+                Import-PowerShellDataFile -Path $AutoTaskConfig
             }
 
         }
-        else{
+        else {
             Write-Verbose "No configuration file found at [ $AutoTaskConfig ]"
         }
 

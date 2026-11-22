@@ -1,41 +1,38 @@
 <#
 .NOTES
-    Copyright 1990-2024 Celerium
+    Copyright 1990-2027 Celerium
 
     NAME: HelpComment.Tests.ps1
     Type: PowerShell
 
         AUTHOR:  David Schulte
-        DATE:    2023-04-1
         EMAIL:   celerium@Celerium.org
-        Updated: 2023-09-16
-
-    TODO:
-    Build out more robust, logical, & scalable pester tests
-    Huge thank you to LazyWinAdmin, Vexx32, & JeffBrown for their blog posts!
 
 .SYNOPSIS
-    Pester tests for the PowerShell help comments
+    Pester tests for the comment based help of every function in the module
 
 .DESCRIPTION
-    Pester tests for the PowerShell help comments
+    Pester tests for the comment based help of every function in the module
 
-.PARAMETER moduleName
+    The link tests make web requests & are tagged with 'Online' so they are
+    excluded unless the GitHub pages site has been published
+
+.PARAMETER ModuleName
     The name of the local module to import
+
+    Default value: Celerium.AutoTask
 
 .PARAMETER Version
     The version of the local module to import
 
-.PARAMETER buildTarget
+.PARAMETER BuildTarget
     Which version of the module to run tests against
 
     Allowed values:
         'built', 'notBuilt'
 
 .EXAMPLE
-    Invoke-Pester -Path .\Tests\Private\apiKeys\Get-AutoTaskAPIKey.Tests.ps1 -Output Detailed
-
-    Runs a pester test and outputs detailed results
+    Invoke-Pester -Path .\HelpComment.Tests.ps1
 
 .INPUTS
     N/A
@@ -46,19 +43,13 @@
 .LINK
     https://celerium.org
 
-.LINK
-    https://vexx32.github.io/2020/07/08/Verify-Module-Help-Pester/
-    https://lazywinadmin.com/2016/05/using-pester-to-test-your-comment-based.html
-    https://jeffbrown.tech/getting-started-with-pester-testing-in-powershell/
-    https://github.com/Celerium/Celerium.AutoTask
-
 #>
 
 <############################################################################################
                                         Code
 ############################################################################################>
 #Requires -Version 5.1
-#Requires -Modules @{ ModuleName='Pester'; ModuleVersion='5.6.1' }
+#Requires -Modules @{ ModuleName='Pester'; ModuleVersion='6.0.0' }
 
 #Region     [ Parameters ]
 
@@ -67,15 +58,15 @@
 param (
     [Parameter(Mandatory = $false)]
     [ValidateNotNullOrEmpty()]
-    [string]$moduleName = 'Celerium.AutoTask',
+    [string]$ModuleName = 'Celerium.AutoTask',
 
     [Parameter(Mandatory=$true)]
     [ValidateNotNullOrEmpty()]
-    [string]$version,
+    [string]$Version,
 
     [Parameter(Mandatory=$true)]
     [ValidateSet('built','notBuilt')]
-    [string]$buildTarget
+    [string]$BuildTarget
 )
 
 #EndRegion  [ Parameters ]
@@ -83,172 +74,112 @@ param (
 #Region     [ Prerequisites ]
 
 #Available in Describe and Context but NOT It
-#Can be used in [ It ] with [ -TestCases @{ VariableName = $VariableName } ]
     BeforeDiscovery{
 
-        if ($IsWindows -or $PSEdition -eq 'Desktop') {
-            $rootPath = "$( $PSCommandPath.Substring(0, $PSCommandPath.IndexOf('\tests', [System.StringComparison]::OrdinalIgnoreCase)) )"
-        }
-        else{
-            $rootPath = "$( $PSCommandPath.Substring(0, $PSCommandPath.IndexOf('/tests', [System.StringComparison]::OrdinalIgnoreCase)) )"
-        }
-        $pester_TestName = (Get-Item -Path $PSCommandPath).Name
+        $TestsPath = $PSScriptRoot
+        while ($TestsPath -and -not (Test-Path -Path (Join-Path -Path $TestsPath -ChildPath 'TestHelper.ps1'))) { $TestsPath = Split-Path -Path $TestsPath -Parent }
+        . (Join-Path -Path $TestsPath -ChildPath 'TestHelper.ps1')
 
-        switch ($buildTarget) {
-            'built'     { $modulePath = Join-Path -Path $rootPath -ChildPath "\build\$moduleName\$version" }
-            'notBuilt'  { $modulePath = Join-Path -Path $rootPath -ChildPath "$moduleName" }
-        }
+        $PesterTestName = (Get-Item -Path $PSCommandPath).Name
 
-        if (Get-Module -Name $moduleName) {
-            Remove-Module -Name $moduleName -Force
-        }
+        Import-TestModule -ModuleName $ModuleName -Version $Version -BuildTarget $BuildTarget
 
-        $modulePsd1 = Join-Path -Path $modulePath -ChildPath "$moduleName.psd1"
+        $ModuleFunctions = @( (Get-Module -Name $ModuleName).ExportedFunctions.Keys | Sort-Object )
 
-        Import-Module -Name $modulePsd1 -ErrorAction Stop -ErrorVariable moduleError *> $null
+    }
 
-        if ($moduleError) {
-            $moduleError
-            exit 1
-        }
+    BeforeAll {
 
-        $module = Get-Module $moduleName
-        $moduleFunctions = @(
-                                $Module.ExportedFunctions.Keys
-                                $Module.ExportedCmdlets.Keys
-                            )
+        $TestsPath = $PSScriptRoot
+        while ($TestsPath -and -not (Test-Path -Path (Join-Path -Path $TestsPath -ChildPath 'TestHelper.ps1'))) { $TestsPath = Split-Path -Path $TestsPath -Parent }
+        . (Join-Path -Path $TestsPath -ChildPath 'TestHelper.ps1')
 
     }
 
     AfterAll{
-
-        if (Get-Module -Name $moduleName) {
-            Remove-Module -Name $moduleName -Force
-        }
-
+        Remove-TestModule -ModuleName $ModuleName
     }
 
 #EndRegion  [ Prerequisites ]
 
-Describe "Testing the [ $buildTarget ] version of [ $moduleName ] with [ $pester_TestName ]" {
+Describe "Testing the [ $BuildTarget ] version of [ $ModuleName ] with [ $PesterTestName ]" {
 
-    Describe "[ $moduleName ] module help tests" -ForEach $moduleFunctions {
+    Describe "[ $ModuleName ] module help tests" -ForEach $ModuleFunctions {
 
         BeforeDiscovery {
 
-            $functionName = $_
+            $FunctionName   = $_
+            $HelpFunction  = Get-Help -Name $FunctionName -Full
+
             $ShouldProcessParameters = 'WhatIf', 'Confirm'
 
-            $help_Function = Get-Help -Name $functionName -Full
-
-            $help_Parameters = [System.Collections.Generic.List[object]]::new()
-            Get-Help -Name $functionName -Parameter * -ErrorAction Ignore |
+            $HelpParameters = [System.Collections.Generic.List[object]]::new()
+            $HelpFunction.parameters.parameter |
                 Where-Object { $_.Name -and $_.Name -notin $ShouldProcessParameters } |
                     ForEach-Object {
-                        $data = [PSCustomObject]@{
+                        $HelpParameters.Add([PSCustomObject]@{
                             name            = $_.name
-                            description     = $_.description.Text
-                            defaultValue    = $_.defaultValue
-                            parameterValue  = $_.parameterValue
-                            type            = $_.type
-                            required        = $_.required
-                            globbing        = $_.globbing
-                            pipelineInput   = $_.pipelineInput
-                            position        = $_.position
-                        }
-                        $help_Parameters.Add($data) > $null
-                }
-
-            <#
-                #PowerShell Abstract Syntax Tree \ will be $null if the command is a compiled cmdlet
-                #https://vexx32.github.io/2020/07/08/Verify-Module-Help-Pester/
-                $help_Ast = @{
-                    Ast        = (Get-Content -Path "function:\$functionName" -ErrorAction Ignore).Ast
-                    Parameters = $help_Parameters
-                }
-            #>
-
-                $help_Examples = [System.Collections.Generic.List[object]]::new()
-                $help_Function.Examples.Example |
-                    ForEach-Object {
-                        $data = [PSCustomObject]@{
-                            introduction    = $_.introduction
-                            code            = $_.code
-                            remarks         = $_.remarks
-                            title           = $_.title -replace '-',''
-                        }
-                        $help_Examples.Add($data) > $null
+                            description     = ($_.description.Text -join '').Trim()
+                        }) > $null
                     }
+
+            $HelpExamples = [System.Collections.Generic.List[object]]::new()
+            $HelpFunction.Examples.Example |
+                ForEach-Object {
+                    $HelpExamples.Add([PSCustomObject]@{
+                        code    = $_.code
+                        remarks = ($_.remarks.Text -join '').Trim()
+                        title   = ($_.title -replace '-','')
+                    }) > $null
+                }
+
+            $HelpLinks = @($HelpFunction.relatedLinks.navigationLink.uri | Where-Object { $_ })
 
         }
 
-        Context "[ $functionName ]" -ForEach @{ help_Function = $help_Function } {
+        Context "[ $FunctionName ]" -ForEach @{ FunctionName = $FunctionName; HelpFunction = $HelpFunction; HelpParameters = $HelpParameters; HelpExamples = $HelpExamples; HelpLinks = $HelpLinks } {
 
-            It "[ $functionName ] contains comment based help" {
-                $help_Function | Should -Not -BeNullOrEmpty
+            It "[ $FunctionName ] contains comment based help" {
+                $HelpFunction | Should -Not -BeNullOrEmpty
             }
 
-            It "[ $functionName ] contains a synopsis" {
-                $help_Function.Synopsis | Should -Not -BeNullOrEmpty
+            It "[ $FunctionName ] contains a synopsis" {
+                $HelpFunction.Synopsis | Should -Not -BeNullOrEmpty
             }
 
-            It "[ $functionName ] contains a description" {
-                $help_Function.Description | Should -Not -BeNullOrEmpty
+            It "[ $FunctionName ] contains a description" {
+                $HelpFunction.Description | Should -Not -BeNullOrEmpty
             }
 
-            It "[ $functionName ] contains at least one usage example" {
-                $help_Function.Examples | Should -Not -BeNullOrEmpty
-                ($help_Function.Examples.Example | Measure-Object).Count | Should -BeGreaterOrEqual 1
+            It "[ $FunctionName ] contains at least one usage example" {
+                $HelpFunction.Examples | Should -Not -BeNullOrEmpty
+                ($HelpFunction.Examples.Example | Measure-Object).Count | Should -BeGreaterOrEqual 1
             }
 
-            It "[ $functionName ] contains a note" {
-                $help_Function.alertSet.alert.text -split '\n' | Should -Not -BeNullOrEmpty
+            It "[ $FunctionName ] contains a note" {
+                $HelpFunction.alertSet.alert.text -split '\n' | Should -Not -BeNullOrEmpty
             }
 
-            It "[ $functionName ] contains a link" {
-                $help_Function.relatedLinks.navigationLink.uri| Should -Not -BeNullOrEmpty
+            It "[ $FunctionName ] contains a link" {
+                $HelpLinks | Should -Not -BeNullOrEmpty
             }
 
-            It "[ $functionName ] link should return 200" {
-
-                $FunctionUris = $help_Function.relatedLinks.navigationLink.uri
-
-                foreach ($Uri in $FunctionUris) {
-
-                    try {
-                        $Link = Invoke-WebRequest -Uri $Uri -UseBasicParsing -ErrorAction SilentlyContinue
-                    }
-                    catch [System.Net.WebException] {
-                        Write-Warning "Bad Uri - [ $Uri ]"
-                        $Link = $_.Exception.Response.StatusCode.Value__
-                    }
-
-                    $Link.StatusCode | Should -Be '200'
-                }
-
-            }
-
-        <#
-            # This will be skipped for compiled commands ($help_Ast.Ast will be $null)
-            It "[ $functionName ] has a help entry for all parameters" -Skip:(-not ($help_Parameters -and $help_Ast.Ast) ) {
-                @($help_Parameters).Count | Should -Be $help_Ast.Ast.Body.ParamBlock.Parameters.Count -Because 'the number of parameters in the help should match the number in the function script'
-            }
-        #>
-
-            if ($null -eq $help_Parameters.Name) {
-                It "[ $functionName ] - Parameter has a description -" {
-                    Set-ItResult -Skipped -Because "there are no parameters in this function"
-                }
-            }
-            else{
-                It "[ $functionName ] - Parameter has a description - [ <_.name> ]" -TestCases $help_Parameters {
-                    $_.description | Should -Not -BeNullOrEmpty -Because "[ <_.name> ] should have a description!"
+            It "[ $FunctionName ] link should return 200" -Tag 'Online' {
+                foreach ($Uri in $HelpLinks) {
+                    $Status = try { (Invoke-WebRequest -Uri $Uri -UseBasicParsing -ErrorAction Stop).StatusCode } catch { [int]$_.Exception.Response.StatusCode }
+                    $Status | Should -Be 200 -Because "[ $Uri ] should be reachable"
                 }
             }
 
-            It "[ $functionName ] - Example has example code & description   - [ <_.title -replace '-'.''> ]" -TestCases $help_Examples {
-                $_.code | Should -Not -BeNullOrEmpty -Because "[ <_.title -replace '-'.''> ] should have example code!"
-                $_.Remarks | Should -Not -BeNullOrEmpty -Because "[ <_.title -replace '-'.''> ] should have a description!"
+            It "[ $FunctionName ] - All parameters have a description" {
+                if ($HelpParameters.Count -eq 0) { Set-ItResult -Skipped -Because "there are no parameters in this function"; return }
+                $Missing = @($HelpParameters | Where-Object { -not $_.description } | ForEach-Object { $_.name })
+                $Missing | Should -BeNullOrEmpty -Because "[ $($Missing -join ', ') ] should have a description"
+            }
+
+            It "[ $FunctionName ] - All examples have example code & a description" {
+                $Missing = @($HelpExamples | Where-Object { -not $_.code -or -not $_.remarks } | ForEach-Object { $_.title })
+                $Missing | Should -BeNullOrEmpty -Because "[ $($Missing -join ', ') ] should have example code & a description"
             }
 
         }

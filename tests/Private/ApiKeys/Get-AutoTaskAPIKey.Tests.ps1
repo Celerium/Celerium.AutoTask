@@ -1,158 +1,105 @@
 <#
-    .SYNOPSIS
-        Pester tests for the Celerium.AutoTask apiKeys functions
+.NOTES
+    Copyright 1990-2027 Celerium
 
-    .DESCRIPTION
-        Pester tests for the Celerium.AutoTask apiKeys functions
+    NAME: Get-AutoTaskAPIKey.Tests.ps1
+    Type: PowerShell
 
-    .PARAMETER moduleName
-        The name of the local module to import
+.SYNOPSIS
+    Pester tests for the Get-AutoTaskAPIKey function
 
-    .PARAMETER Version
-        The version of the local module to import
+.PARAMETER ModuleName
+    The name of the local module to import
 
-    .PARAMETER buildTarget
-        Which version of the module to run tests against
+.PARAMETER Version
+    The version of the local module to import
 
-        Allowed values:
-            'built', 'notBuilt'
+.PARAMETER BuildTarget
+    Which version of the module to run tests against
 
-    .EXAMPLE
-        Invoke-Pester -Path .\Tests\Private\apiKeys\Get-AutoTaskAPIKey.Tests.ps1
+    Allowed values:
+        'built', 'notBuilt'
 
-        Runs a pester test and outputs simple results
-
-    .EXAMPLE
-        Invoke-Pester -Path .\Tests\Private\apiKeys\Get-AutoTaskAPIKey.Tests.ps1 -Output Detailed
-
-        Runs a pester test and outputs detailed results
-
-    .INPUTS
-        N/A
-
-    .OUTPUTS
-        N/A
-
-    .NOTES
-        N/A
-
-    .LINK
-        https://celerium.org
+.LINK
+    https://celerium.org
 
 #>
 
-<############################################################################################
-                                        Code
-############################################################################################>
 #Requires -Version 5.1
-#Requires -Modules @{ ModuleName='Pester'; ModuleVersion='5.6.1' }
+#Requires -Modules @{ ModuleName='Pester'; ModuleVersion='6.0.0' }
 
-#Region     [ Parameters ]
-
-#Available in Discovery & Run
 [CmdletBinding()]
 param (
     [Parameter(Mandatory = $false)]
     [ValidateNotNullOrEmpty()]
-    [string]$moduleName = 'Celerium.AutoTask',
+    [string]$ModuleName = 'Celerium.AutoTask',
 
     [Parameter(Mandatory=$true)]
     [ValidateNotNullOrEmpty()]
-    [string]$version,
+    [string]$Version,
 
     [Parameter(Mandatory=$true)]
     [ValidateSet('built','notBuilt')]
-    [string]$buildTarget
+    [string]$BuildTarget
 )
 
-#EndRegion  [ Parameters ]
+BeforeAll {
+    $TestsPath = $PSScriptRoot
+    while ($TestsPath -and -not (Test-Path -Path (Join-Path -Path $TestsPath -ChildPath 'TestHelper.ps1'))) { $TestsPath = Split-Path -Path $TestsPath -Parent }
+    . (Join-Path -Path $TestsPath -ChildPath 'TestHelper.ps1')
 
-#Region     [ Prerequisites ]
+    Import-TestModule -ModuleName $ModuleName -Version $Version -BuildTarget $BuildTarget
+    Add-FakeHttpException
 
-#Available inside It but NOT Describe or Context
-    BeforeAll {
+    # Safety net so that a test can never make a real request
+    Mock Invoke-WebRequest -ModuleName $ModuleName { throw 'Unexpected un-mocked request' }
+    Mock Invoke-RestMethod -ModuleName $ModuleName { throw 'Unexpected un-mocked request' }
+}
 
-        if ($IsWindows -or $PSEdition -eq 'Desktop') {
-            $rootPath = "$( $PSCommandPath.Substring(0, $PSCommandPath.IndexOf('\tests', [System.StringComparison]::OrdinalIgnoreCase)) )"
-        }
-        else{
-            $rootPath = "$( $PSCommandPath.Substring(0, $PSCommandPath.IndexOf('/tests', [System.StringComparison]::OrdinalIgnoreCase)) )"
-        }
+AfterAll {
+    Remove-TestModule -ModuleName $ModuleName
+}
 
-        switch ($buildTarget) {
-            'built'     { $modulePath = Join-Path -Path $rootPath -ChildPath "\build\$moduleName\$version" }
-            'notBuilt'  { $modulePath = Join-Path -Path $rootPath -ChildPath "$moduleName" }
-        }
+BeforeDiscovery {
+    $PesterTestName = (Get-Item -Path $PSCommandPath).Name
+    $CommandName = $PesterTestName -replace '.Tests.ps1',''
+    $IsWindowsPlatform = ($PSEdition -eq 'Desktop' -or $IsWindows)
+}
+Describe "Testing [ $CommandName ] function with [ $PesterTestName ]" -Tag @('apiKeys') {
 
-        if (Get-Module -Name $moduleName) {
-            Remove-Module -Name $moduleName -Force
-        }
-
-        $modulePsd1 = Join-Path -Path $modulePath -ChildPath "$moduleName.psd1"
-
-        Import-Module -Name $modulePsd1 -ErrorAction Stop -ErrorVariable moduleError *> $null
-
-        if ($moduleError) {
-            $moduleError
-            exit 1
-        }
-
-    }
-
-    AfterAll{
-
+    BeforeEach {
         Remove-AutoTaskAPIKey -WarningAction SilentlyContinue
-
-        if (Get-Module -Name $moduleName) {
-            Remove-Module -Name $moduleName -Force
-        }
-
     }
 
-#Available in Describe and Context but NOT It
-#Can be used in [ It ] with [ -TestCases @{ VariableName = $VariableName } ]
-    BeforeDiscovery{
+    Context "[ $CommandName ] testing function" {
 
-        $pester_TestName = (Get-Item -Path $PSCommandPath).Name
-        $commandName = $pester_TestName -replace '.Tests.ps1',''
-
-    }
-
-#EndRegion  [ Prerequisites ]
-
-Describe "Testing [ $commandName ] function with [ $pester_TestName ]" -Tag @('apiKeys') {
-
-    Context "[ $commandName ] testing function" {
-
-        It "When both parameter [ -ApiKey ] is called it should not return empty" {
-            Add-AutoTaskAPIKey -ApiIntegrationCode '12345' -ApiUsername '12345' -ApiSecretKey '12345'
+        It "Returns the API values when they are set" {
+            Add-AutoTaskAPIKey -ApiUsername 'user@example.org' -ApiSecretKey 'secret123' -ApiIntegrationCode 'code123'
             Get-AutoTaskAPIKey | Should -Not -BeNullOrEmpty
         }
 
-        It "Pipeline - [ -ApiKey ] should return a secure string" {
-            "AutoTaskAPIKey" | Add-AutoTaskAPIKey -ApiIntegrationCode '12345' -ApiSecretKey '12345'
-            (Get-AutoTaskAPIKey).Password | Should -BeOfType SecureString
+        It "Returns the secret as a SecureString by default" {
+            Add-AutoTaskAPIKey -ApiUsername 'user@example.org' -ApiSecretKey 'secret123' -ApiIntegrationCode 'code123'
+            (Get-AutoTaskAPIKey).Password | Should -BeOfType [System.Security.SecureString]
         }
 
-        It "Parameter - [ -ApiKey ] should return a secure string" {
-            Add-AutoTaskAPIKey -ApiIntegrationCode '12345' -ApiUsername '12345' -ApiSecretKey '12345'
-            (Get-AutoTaskAPIKey).Password | Should -BeOfType SecureString
+        It "Returns the secret as a SecureString when it was passed in from the pipeline" {
+            'secret123' | Add-AutoTaskAPIKey -ApiUsername 'user@example.org' -ApiIntegrationCode 'code123'
+            (Get-AutoTaskAPIKey).Password | Should -BeOfType [System.Security.SecureString]
         }
 
-        It "Using [ -AsPlainText ] should return [ -ApiKey ] as a string" {
-            Add-AutoTaskAPIKey -ApiIntegrationCode '12345' -ApiUsername '12345' -ApiSecretKey '12345'
-            (Get-AutoTaskAPIKey -AsPlainText).Password | Should -BeOfType String
+        It "Returns plain text with -AsPlainText" {
+            Add-AutoTaskAPIKey -ApiUsername 'user@example.org' -ApiSecretKey 'secret123' -ApiIntegrationCode 'code123'
+            $Key = Get-AutoTaskAPIKey -AsPlainText
+            $Key.Password | Should -BeOfType [string]
+            $Key.Password | Should -BeExactly 'secret123'
+            $Key.Username | Should -BeExactly 'user@example.org'
+            $Key.ApiIntegrationCode | Should -BeExactly 'code123'
         }
 
-        It "Using [ -AsPlainText ] should return the API key entered" {
-            Add-AutoTaskApiKey -ApiIntegrationCode '12345' -ApiUsername '12345' -ApiSecretKey '12345'
-            (Get-AutoTaskApiKey -AsPlainText).Password | Should -Be '12345'
-        }
-
-        It "If [ -ApiKey ] is empty it should throw a warning" {
-            Remove-AutoTaskAPIKey
-            Get-AutoTaskAPIKey -WarningAction SilentlyContinue -WarningVariable apiKeyWarning
-            [bool]$apiKeyWarning | Should -BeTrue
+        It "Warns when no values are set" {
+            Get-AutoTaskAPIKey -WarningVariable KeyWarning -WarningAction SilentlyContinue | Should -BeNullOrEmpty
+            $KeyWarning | Should -Not -BeNullOrEmpty
         }
 
     }

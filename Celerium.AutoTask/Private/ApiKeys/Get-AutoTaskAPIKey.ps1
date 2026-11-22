@@ -1,26 +1,26 @@
 function Get-AutoTaskAPIKey {
 <#
     .SYNOPSIS
-        Gets the AutoTask API key
+        Gets the AutoTask API username, secret, & integration code
 
     .DESCRIPTION
-        The Get-AutoTaskAPIKey cmdlet gets the AutoTask API key from
-        the global variable and returns it as an object
+        The Get-AutoTaskAPIKey cmdlet gets the AutoTask API username, secret, & integration code
+        from the global variables and returns them as an object
+
+        By default the secret is returned as a SecureString
 
     .PARAMETER AsPlainText
-        Decrypt and return the API key in plain text
+        Decrypt and return the API secret in plain text
 
     .EXAMPLE
         Get-AutoTaskAPIKey
 
-        Gets the Api keys and returns them as an object. The
-        API secret key is returned as a secure string
+        Gets the API values and returns them as an object with the secret as a SecureString
 
     .EXAMPLE
         Get-AutoTaskAPIKey -AsPlainText
 
-        Gets the Api keys and returns them as an object. The
-        API secret key is returned as plain text
+        Gets the API values and returns them as an object with the secret as plain text
 
     .NOTES
         N/A
@@ -44,11 +44,10 @@ function Get-AutoTaskAPIKey {
             if ($AutoTaskModuleApiSecretKey) {
 
                 if ($AsPlainText) {
-                    $ApiSecretKey = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($AutoTaskModuleApiSecretKey)
-
+                    $BSTR = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($AutoTaskModuleApiSecretKey)
                     [PSCustomObject]@{
                         Username            = $AutoTaskModuleApiUsername
-                        Password            = ( [System.Runtime.InteropServices.Marshal]::PtrToStringBSTR($ApiSecretKey) ).ToString()
+                        Password            = [System.Runtime.InteropServices.Marshal]::PtrToStringBSTR($BSTR)
                         ApiIntegrationCode  = $AutoTaskModuleApiIntegrationCode
                     }
                 }
@@ -61,18 +60,15 @@ function Get-AutoTaskAPIKey {
                 }
 
             }
-            else { Write-Warning "The AutoTask API secret key is not set. Run Add-AutoTaskAPIKey to set the API key" }
+            else { Write-Warning "The AutoTask API secret is not set. Run Add-AutoTaskAPIKey to set the API values" }
 
         }
         catch {
             Write-Error $_
         }
         finally {
-            if ($ApiSecretKey) {
-                [System.Runtime.InteropServices.Marshal]::ZeroFreeBSTR($ApiSecretKey)
-            }
+            if ($BSTR) { [System.Runtime.InteropServices.Marshal]::ZeroFreeBSTR($BSTR) }
         }
-
 
     }
 

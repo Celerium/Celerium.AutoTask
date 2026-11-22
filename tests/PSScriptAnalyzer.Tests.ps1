@@ -1,45 +1,36 @@
 <#
 .NOTES
-    Copyright 1990-2024 Celerium
+    Copyright 1990-2027 Celerium
 
-    NAME: PSScriptAnalyzer.tests.ps1
+    NAME: PSScriptAnalyzer.Tests.ps1
     Type: PowerShell
 
         AUTHOR:  David Schulte
-        DATE:    2023-04-1
         EMAIL:   celerium@Celerium.org
-        Updated: 2023-09-16
-
-    TODO:
 
 .SYNOPSIS
-    Pester tests for the PSScriptAnalyzer
+    Pester tests for PSScriptAnalyzer rules against the module files
 
 .DESCRIPTION
-    The PSScriptAnalyzer.tests.ps1 script test every rule against
-    every module file
+    Pester tests that run PSScriptAnalyzer once against the module folder
+    and then verify that every file has no warnings or errors
 
-.PARAMETER moduleName
+.PARAMETER ModuleName
     The name of the local module to import
+
+    Default value: Celerium.AutoTask
 
 .PARAMETER Version
     The version of the local module to import
 
-.PARAMETER buildTarget
+.PARAMETER BuildTarget
     Which version of the module to run tests against
 
     Allowed values:
         'built', 'notBuilt'
 
 .EXAMPLE
-    Invoke-Pester -Path .\Tests\Private\apiKeys\Get-AutoTaskAPIKey.Tests.ps1
-
-    Runs a pester test and outputs simple results
-
-.EXAMPLE
-    Invoke-Pester -Path .\Tests\Private\apiKeys\Get-AutoTaskAPIKey.Tests.ps1 -Output Detailed
-
-    Runs a pester test and outputs detailed results
+    Invoke-Pester -Path .\PSScriptAnalyzer.Tests.ps1
 
 .INPUTS
     N/A
@@ -56,7 +47,7 @@
                                         Code
 ############################################################################################>
 #Requires -Version 5.1
-#Requires -Modules @{ ModuleName='Pester'; ModuleVersion='5.6.1' }
+#Requires -Modules @{ ModuleName='Pester'; ModuleVersion='6.0.0' }
 
 #Region     [ Parameters ]
 
@@ -65,100 +56,67 @@
 param (
     [Parameter(Mandatory = $false)]
     [ValidateNotNullOrEmpty()]
-    [string]$moduleName = 'Celerium.AutoTask',
+    [string]$ModuleName = 'Celerium.AutoTask',
 
     [Parameter(Mandatory=$true)]
     [ValidateNotNullOrEmpty()]
-    [string]$version,
+    [string]$Version,
 
     [Parameter(Mandatory=$true)]
     [ValidateSet('built','notBuilt')]
-    [string]$buildTarget
+    [string]$BuildTarget
 )
 
 #EndRegion  [ Parameters ]
 
 #Region     [ Prerequisites ]
 
-#Available in Describe and Context but NOT It
-#Can be used in [ It ] with [ -TestCases @{ VariableName = $VariableName } ]
     BeforeDiscovery{
 
-        if ($IsWindows -or $PSEdition -eq 'Desktop') {
-            $rootPath = "$( $PSCommandPath.Substring(0, $PSCommandPath.IndexOf('\tests', [System.StringComparison]::OrdinalIgnoreCase)) )"
-        }
-        else{
-            $rootPath = "$( $PSCommandPath.Substring(0, $PSCommandPath.IndexOf('/tests', [System.StringComparison]::OrdinalIgnoreCase)) )"
-        }
-        $pester_TestName = (Get-Item -Path $PSCommandPath).Name
-        #$commandName = $pester_TestName -replace '.Tests.ps1',''
+        $TestsPath = $PSScriptRoot
+        while ($TestsPath -and -not (Test-Path -Path (Join-Path -Path $TestsPath -ChildPath 'TestHelper.ps1'))) { $TestsPath = Split-Path -Path $TestsPath -Parent }
+        . (Join-Path -Path $TestsPath -ChildPath 'TestHelper.ps1')
 
-        switch ($buildTarget) {
-            'built'     { $modulePath = Join-Path -Path $rootPath -ChildPath "\build\$moduleName\$version" }
-            'notBuilt'  { $modulePath = Join-Path -Path $rootPath -ChildPath "$moduleName" }
-        }
+        $PesterTestName = (Get-Item -Path $PSCommandPath).Name
+        $ModulePath = Get-TestModulePath -ModuleName $ModuleName -Version $Version -BuildTarget $BuildTarget
 
-        if (Get-Module -Name $moduleName) {
-            Remove-Module -Name $moduleName -Force
-        }
-
-        $modulePsd1 = Join-Path -Path $modulePath -ChildPath "$moduleName.psd1"
-
-        Import-Module -Name $modulePsd1 -ErrorAction Stop -ErrorVariable moduleError *> $null
-
-        if ($moduleError) {
-            $moduleError
-            exit 1
-        }
-
-        $moduleFiles = Get-ChildItem -Path $modulePath -Include *.ps* -Recurse
-        $ScriptAnalyzerRules = Get-ScriptAnalyzerRule
+        $ModuleFiles = @(Get-ChildItem -Path $ModulePath -Include *.ps1, *.psm1, *.psd1 -Recurse | ForEach-Object {
+            # Pester only exposes the keys of hashtables as variables in -ForEach tests
+            @{ Name = $_.Name; FullName = $_.FullName }
+        })
 
     }
 
-    AfterAll{
+    BeforeAll {
 
-        if (Get-Module -Name $moduleName) {
-            Remove-Module -Name $moduleName -Force
+        $TestsPath = $PSScriptRoot
+        while ($TestsPath -and -not (Test-Path -Path (Join-Path -Path $TestsPath -ChildPath 'TestHelper.ps1'))) { $TestsPath = Split-Path -Path $TestsPath -Parent }
+        . (Join-Path -Path $TestsPath -ChildPath 'TestHelper.ps1')
+
+        $ModulePath = Get-TestModulePath -ModuleName $ModuleName -Version $Version -BuildTarget $BuildTarget
+
+        $AnalyzerParams = @{
+            Path        = $ModulePath
+            Recurse     = $true
+            ExcludeRule = 'PSUseSingularNouns', 'PSAvoidUsingConvertToSecureStringWithPlainText', 'PSAvoidUsingPlainTextForPassword', 'PSAvoidUsingUsernameAndPasswordParams'
+            Severity    = 'Warning', 'Error'
         }
+        $AnalyzerResults = @(Invoke-ScriptAnalyzer @AnalyzerParams)
 
     }
 
 #EndRegion  [ Prerequisites ]
 
-Describe "Testing the [ $buildTarget ] version of [ $moduleName ] with [ $pester_TestName ]" {
+Describe "Testing the [ $BuildTarget ] version of [ $ModuleName ] with [ $PesterTestName ]" {
 
-    Describe "[ $moduleName ] module PSScriptAnalyzer tests" -ForEach $moduleFiles {
+    Context "[ $ModuleName ] module PSScriptAnalyzer tests" {
 
-        BeforeDiscovery { $moduleFile = $_ }
+        It "Should have no findings in [ <Name> ]" -ForEach $ModuleFiles {
 
-        Context "[ $($moduleFile.Name) ]" -ForEach $ScriptAnalyzerRules {
+            $FileResults = @($AnalyzerResults | Where-Object { $_.ScriptPath -eq $FullName })
 
-            BeforeDiscovery { $Rule = $_ }
-
-            It "Should pass rule [ $($Rule.RuleName) ]" -TestCases @{ moduleFile = $moduleFile ; Rule = $Rule } {
-
-                $invoke_Params = @{
-                    Path        = $moduleFile.FullName
-                    IncludeRule = $($Rule.RuleName)
-                    ExcludeRule = 'PSUseSingularNouns','PSAvoidUsingConvertToSecureStringWithPlainText', 'PSAvoidUsingPlainTextForPassword', 'PSAvoidUsingUsernameAndPasswordParams'
-                    Severity    = 'Warning','Error'
-                }
-                $invoke_Results = Invoke-ScriptAnalyzer @invoke_Params
-
-                ($invoke_Results | Measure-Object).Count | Should -Be 0
-
-                    if ( ($invoke_Results | Measure-Object).Count -ne 0 ) {
-
-                        #Help show what & where a rule errored [ $PesterPreference.Should.ErrorAction = 'Continue' ]
-                        foreach ($result in $invoke_Results) {
-                            $result.Line | Should -Be "$($result.ScriptName) - $($result.Line)"
-                            $result.Message | Should -Be "$($result.ScriptName) - $($result.Line)"
-                        }
-
-                    }
-
-            }
+            $Summary = ($FileResults | ForEach-Object { "$($_.RuleName) (line $($_.Line)): $($_.Message)" }) -join "`n"
+            $FileResults.Count | Should -Be 0 -Because "PSScriptAnalyzer found:`n$Summary"
 
         }
 

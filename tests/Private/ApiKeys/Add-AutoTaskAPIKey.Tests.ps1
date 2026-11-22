@@ -1,138 +1,119 @@
 <#
-    .SYNOPSIS
-        Pester tests for the Celerium.AutoTask apiKeys functions
+.NOTES
+    Copyright 1990-2027 Celerium
 
-    .DESCRIPTION
-        Pester tests for the Celerium.AutoTask apiKeys functions
+    NAME: Add-AutoTaskAPIKey.Tests.ps1
+    Type: PowerShell
 
-    .PARAMETER moduleName
-        The name of the local module to import
+.SYNOPSIS
+    Pester tests for the Add-AutoTaskAPIKey function
 
-    .PARAMETER Version
-        The version of the local module to import
+.PARAMETER ModuleName
+    The name of the local module to import
 
-    .PARAMETER buildTarget
-        Which version of the module to run tests against
+.PARAMETER Version
+    The version of the local module to import
 
-        Allowed values:
-            'built', 'notBuilt'
+.PARAMETER BuildTarget
+    Which version of the module to run tests against
 
-    .EXAMPLE
-        Invoke-Pester -Path .\Tests\Private\apiKeys\Get-AutoTaskAPIKey.Tests.ps1
+    Allowed values:
+        'built', 'notBuilt'
 
-        Runs a pester test and outputs simple results
-
-    .EXAMPLE
-        Invoke-Pester -Path .\Tests\Private\apiKeys\Get-AutoTaskAPIKey.Tests.ps1 -Output Detailed
-
-        Runs a pester test and outputs detailed results
-
-    .INPUTS
-        N/A
-
-    .OUTPUTS
-        N/A
-
-    .NOTES
-        N/A
-
-    .LINK
-        https://celerium.org
+.LINK
+    https://celerium.org
 
 #>
 
-<############################################################################################
-                                        Code
-############################################################################################>
 #Requires -Version 5.1
-#Requires -Modules @{ ModuleName='Pester'; ModuleVersion='5.6.1' }
+#Requires -Modules @{ ModuleName='Pester'; ModuleVersion='6.0.0' }
 
-#Region     [ Parameters ]
-
-#Available in Discovery & Run
 [CmdletBinding()]
 param (
     [Parameter(Mandatory = $false)]
     [ValidateNotNullOrEmpty()]
-    [string]$moduleName = 'Celerium.AutoTask',
+    [string]$ModuleName = 'Celerium.AutoTask',
 
     [Parameter(Mandatory=$true)]
     [ValidateNotNullOrEmpty()]
-    [string]$version,
+    [string]$Version,
 
     [Parameter(Mandatory=$true)]
     [ValidateSet('built','notBuilt')]
-    [string]$buildTarget
+    [string]$BuildTarget
 )
 
-#EndRegion  [ Parameters ]
+BeforeAll {
+    $TestsPath = $PSScriptRoot
+    while ($TestsPath -and -not (Test-Path -Path (Join-Path -Path $TestsPath -ChildPath 'TestHelper.ps1'))) { $TestsPath = Split-Path -Path $TestsPath -Parent }
+    . (Join-Path -Path $TestsPath -ChildPath 'TestHelper.ps1')
 
-#Region     [ Prerequisites ]
+    Import-TestModule -ModuleName $ModuleName -Version $Version -BuildTarget $BuildTarget
+}
 
-#Available inside It but NOT Describe or Context
-    BeforeAll {
+AfterAll {
+    Remove-TestModule -ModuleName $ModuleName
+}
 
-        if ($IsWindows -or $PSEdition -eq 'Desktop') {
-            $rootPath = "$( $PSCommandPath.Substring(0, $PSCommandPath.IndexOf('\tests', [System.StringComparison]::OrdinalIgnoreCase)) )"
-        }
-        else{
-            $rootPath = "$( $PSCommandPath.Substring(0, $PSCommandPath.IndexOf('/tests', [System.StringComparison]::OrdinalIgnoreCase)) )"
-        }
+BeforeDiscovery {
+    $PesterTestName = (Get-Item -Path $PSCommandPath).Name
+    $CommandName = $PesterTestName -replace '.Tests.ps1',''
+}
 
-        switch ($buildTarget) {
-            'built'     { $modulePath = Join-Path -Path $rootPath -ChildPath "\build\$moduleName\$version" }
-            'notBuilt'  { $modulePath = Join-Path -Path $rootPath -ChildPath "$moduleName" }
-        }
+Describe "Testing [ $CommandName ] function with [ $PesterTestName ]" -Tag @('apiKeys') {
 
-        if (Get-Module -Name $moduleName) {
-            Remove-Module -Name $moduleName -Force
-        }
-
-        $modulePsd1 = Join-Path -Path $modulePath -ChildPath "$moduleName.psd1"
-
-        Import-Module -Name $modulePsd1 -ErrorAction Stop -ErrorVariable moduleError *> $null
-
-
-        if ($moduleError) {
-            $moduleError
-            exit 1
-        }
-
-    }
-
-    AfterAll{
-
+    BeforeEach {
         Remove-AutoTaskAPIKey -WarningAction SilentlyContinue
-
-        if (Get-Module -Name $moduleName) {
-            Remove-Module -Name $moduleName -Force
-        }
-
     }
 
-#Available in Describe and Context but NOT It
-#Can be used in [ It ] with [ -TestCases @{ VariableName = $VariableName } ]
-    BeforeDiscovery{
+    Context "[ $CommandName ] testing function" {
 
-        $pester_TestName = (Get-Item -Path $PSCommandPath).Name
-        $commandName = $pester_TestName -replace '.Tests.ps1',''
-
-    }
-
-#EndRegion  [ Prerequisites ]
-
-
-Describe "Testing the [ $buildTarget ] version of [ $commandName ] functions with [ $pester_TestName ]" -Tag @('apiKeys') {
-
-    Context "[ $commandName ] testing functions" {
-
-        It "[ $commandName ] should have an alias of [ Set-AutoTaskAPIKey ]" {
-            Get-Alias -Name Set-AutoTaskAPIKey | Should -BeTrue
+        It "Should have an alias of [ Set-AutoTaskAPIKey ]" {
+            (Get-Alias -Name Set-AutoTaskAPIKey).ReferencedCommand.Name | Should -Be 'Add-AutoTaskAPIKey'
         }
 
-        It "[ -ApiKey ] should accept a value from the pipeline" {
-            "AutoTaskAPIUsername" | Add-AutoTaskAPIKey -ApiIntegrationCode '12345' -ApiSecretKey '12345'
-            Get-AutoTaskAPIKey | Should -Not -BeNullOrEmpty
+        It "Stores the username & integration code as plain text & the secret as a SecureString" {
+            Add-AutoTaskAPIKey -ApiUsername 'user@example.org' -ApiSecretKey 'secret123' -ApiIntegrationCode 'code123'
+            $Key = Get-AutoTaskAPIKey
+            $Key.Username | Should -BeExactly 'user@example.org'
+            $Key.ApiIntegrationCode | Should -BeExactly 'code123'
+            $Key.Password | Should -BeOfType [System.Security.SecureString]
+        }
+
+        It "Should accept the secret from the pipeline" {
+            'secret123' | Add-AutoTaskAPIKey -ApiUsername 'user@example.org' -ApiIntegrationCode 'code123'
+            (Get-AutoTaskAPIKey -AsPlainText).Password | Should -Be 'secret123'
+        }
+
+        It "Should accept a SecureString secret" {
+            $Secure = ConvertTo-SecureString 'secure123' -AsPlainText -Force
+            Add-AutoTaskAPIKey -ApiUsername 'user@example.org' -ApiKeySecureString $Secure -ApiIntegrationCode 'code123'
+            (Get-AutoTaskAPIKey -AsPlainText).Password | Should -Be 'secure123'
+        }
+
+        It "Prompts for the secret when none is provided" {
+            Mock Read-Host -ModuleName $ModuleName { ConvertTo-SecureString 'prompted' -AsPlainText -Force }
+            Add-AutoTaskAPIKey -ApiUsername 'user@example.org' -ApiIntegrationCode 'code123'
+            (Get-AutoTaskAPIKey -AsPlainText).Password | Should -Be 'prompted'
+            Should -Invoke Read-Host -ModuleName $ModuleName -Times 1 -Exactly
+        }
+
+        It "Does not write the prompt text to the output" {
+            Mock Read-Host -ModuleName $ModuleName { ConvertTo-SecureString 'prompted' -AsPlainText -Force }
+            Add-AutoTaskAPIKey -ApiUsername 'user@example.org' -ApiIntegrationCode 'code123' | Should -BeNullOrEmpty
+        }
+
+        It "Requires the [ <_> ] parameter" -ForEach 'ApiUsername', 'ApiIntegrationCode' {
+            (Get-Command -Name Add-AutoTaskAPIKey).Parameters[$_].Attributes.Mandatory | Should -Contain $true
+        }
+
+        It "Replaces existing values" {
+            Add-AutoTaskAPIKey -ApiUsername 'user1' -ApiSecretKey 'first' -ApiIntegrationCode 'code1'
+            Add-AutoTaskAPIKey -ApiUsername 'user2' -ApiSecretKey 'second' -ApiIntegrationCode 'code2'
+            $Key = Get-AutoTaskAPIKey -AsPlainText
+            $Key.Username | Should -Be 'user2'
+            $Key.Password | Should -Be 'second'
+            $Key.ApiIntegrationCode | Should -Be 'code2'
         }
 
     }

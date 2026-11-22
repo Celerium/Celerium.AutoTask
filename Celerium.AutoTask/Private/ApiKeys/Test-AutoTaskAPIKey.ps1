@@ -1,36 +1,42 @@
 function Test-AutoTaskAPIKey {
 <#
     .SYNOPSIS
-        Test the AutoTask API key
+        Test the AutoTask API username, secret, & integration code
 
     .DESCRIPTION
-        The Test-AutoTaskAPIKey cmdlet tests the base URI & API key that
-        are defined in the Get-AutoTaskBaseURI & Get-AutoTaskAPIKey cmdlets
+        The Test-AutoTaskAPIKey cmdlet tests the base URI & API values that
+        are defined by the Add-AutoTaskBaseURI & Add-AutoTaskAPIKey cmdlets
 
         Helpful when needing to validate general functionality or when using
         RMM deployment tools
 
-    .PARAMETER BaseUri
+        The test makes a single read-only GET query that only asks for the ID of one company
+
+        A 200 status code means the base URI & API values are valid. A 401 status code means
+        the API values were not accepted & a 403 status code means the API user is not
+        allowed to read companies
+
+    .PARAMETER BaseURI
         Define the base URI for the AutoTask API connection
         using AutoTask's URI or a custom URI
 
         By default the value used is the one defined by the
-        Get-AutoTaskBaseURI function
+        Add-AutoTaskBaseURI function
 
     .EXAMPLE
         Test-AutoTaskAPIKey
 
-        Tests the base URI & API key that are defined in the
-        Get-AutoTaskBaseURI & Get-AutoTaskAPIKey cmdlets
+        Tests the base URI & API values that are defined by the
+        Add-AutoTaskBaseURI & Add-AutoTaskAPIKey cmdlets
 
     .EXAMPLE
-        Test-AutoTaskAPIKey -BaseUri http://myapi.gateway.celerium.org
+        Test-AutoTaskAPIKey -BaseURI https://myapi.gateway.celerium.org
 
-        Tests the defined base URI & API key that was defined in
-        the Get-AutoTaskAPIKey cmdlet
+        Tests the defined base URI & the API values that were defined by
+        the Add-AutoTaskAPIKey cmdlet
 
-        The full base uri test path in this example is:
-            http://myapi.gateway.celerium.org/Companies/query
+        The full test uri in this example is:
+            https://myapi.gateway.celerium.org/V1.0/Companies/query?search=...
 
     .NOTES
         N/A
@@ -41,50 +47,48 @@ function Test-AutoTaskAPIKey {
 
     [CmdletBinding(DefaultParameterSetName = 'Test')]
     Param (
-        [parameter(Mandatory = $false)]
+        [Parameter(Mandatory = $false)]
         [ValidateNotNullOrEmpty()]
-        [string]$BaseUri = $AutoTaskModuleBaseUriComplete
+        [string]$BaseURI = $AutoTaskModuleBaseUri
     )
 
-    begin { $ResourceUri = "/Companies/query?Search" }
+    begin {
+        $Search         = '{"MaxRecords":1,"IncludeFields":["id"],"filter":[{"op":"gte","field":"id","value":0}]}'
+        $ResourceUri    = '/V1.0/Companies/query?search=' + [System.Uri]::EscapeDataString($Search)
+    }
 
     process {
 
-        if ([bool]$BaseUri -eq $false -or [bool](Get-AutoTaskAPIKey -ErrorAction Stop) -eq $false) {
-            Write-Error "The BaseUri and or ApiKeys are not set. Please run the Get-AutoTaskApiKey & Get-AutoTaskBaseURI cmdlets before running this function"
+        $ApiKey = Get-AutoTaskAPIKey -AsPlainText -WarningAction SilentlyContinue
+
+        if ([bool]$BaseURI -eq $false -or [bool]$ApiKey -eq $false) {
+            Write-Error "The BaseURI and or API values are not set. Please run the Add-AutoTaskAPIKey & Add-AutoTaskBaseURI cmdlets before running this function"
             return
         }
 
-        Write-Verbose "Testing API key against [ $($BaseUri + $ResourceUri) ]"
+        $TargetUri = ($BaseURI.TrimEnd('/') -replace '(?i)/v\d+(\.\d+)?$', '') + $ResourceUri
+        Write-Verbose "Testing API values against [ $TargetUri ]"
+
+        # Windows PowerShell does not always negotiate TLS 1.2 by default
+        if ($PSEdition -eq 'Desktop') {
+            [Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12
+        }
 
         try {
 
-            $ApiSecret  = Get-AutoTaskAPIKey -AsPlainText
-            $Headers    = @{
-                'ApiIntegrationCode'    = $ApiSecret.ApiIntegrationCode
-                'UserName'              = $ApiSecret.Username
-                'Secret'                = $ApiSecret.Password
-                'Content-Type'          = "application/json"
+            $Headers = @{
+                'ApiIntegrationCode'    = $ApiKey.ApiIntegrationCode
+                'UserName'              = $ApiKey.Username
+                'Secret'                = $ApiKey.Password
+                'Accept'                = 'application/json'
             }
 
-            $Body = @{
-                MaxRecords = 1
-                filter = @(
-                    @{
-                        op    = "gte"
-                        field = "id"
-                        value = 0
-                    }
-                )
-            } | ConvertTo-Json -Depth 5
-
             $Parameters = @{
-                'Method'        = 'POST'
-                'Uri'           = $BaseUri + $ResourceUri
-                'Headers'       = $Headers
-                'Body'          = $Body
-                'UserAgent'     = $AutoTaskModuleUserAgent
-                UseBasicParsing = $true
+                'Method'            = 'GET'
+                'Uri'               = $TargetUri
+                'Headers'           = $Headers
+                'UserAgent'         = $AutoTaskModuleUserAgent
+                'UseBasicParsing'   = $true
             }
 
             $RestOutput = Invoke-WebRequest @Parameters -ErrorAction Stop
@@ -92,27 +96,31 @@ function Test-AutoTaskAPIKey {
         }
         catch {
 
+            # Windows PowerShell exposes StatusDescription, PowerShell Core exposes ReasonPhrase
+            $Description = if ($PSEdition -eq 'Desktop') { $_.Exception.Response.StatusDescription } else { $_.Exception.Response.ReasonPhrase }
+
             [PSCustomObject]@{
-                Method              = $_.Exception.Response.Method
-                StatusCode          = $_.Exception.Response.StatusCode.value__
-                StatusDescription   = $_.Exception.Response.StatusDescription
+                Method              = 'GET'
+                StatusCode          = [int]$_.Exception.Response.StatusCode
+                StatusDescription   = $Description
                 Message             = $_.Exception.Message
-                URI                 = $($BaseUri + $ResourceUri)
+                URI                 = $TargetUri
             }
 
-        } finally {
-            [void] ($Headers)
+        }
+        finally {
+            $Headers    = $null
+            $ApiKey     = $null
         }
 
         if ($RestOutput) {
-            $Data = @{}
-            $Data = $RestOutput
 
             [PSCustomObject]@{
-                StatusCode          = $Data.StatusCode
-                StatusDescription   = $Data.StatusDescription
-                URI                 = $($BaseUri + $ResourceUri)
+                StatusCode          = [int]$RestOutput.StatusCode
+                StatusDescription   = $RestOutput.StatusDescription
+                URI                 = $TargetUri
             }
+
         }
 
     }

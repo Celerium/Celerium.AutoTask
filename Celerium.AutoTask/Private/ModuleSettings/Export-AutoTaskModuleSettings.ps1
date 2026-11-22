@@ -6,9 +6,14 @@ function Export-AutoTaskModuleSettings {
     .DESCRIPTION
         The Export-AutoTaskModuleSettings cmdlet exports the AutoTask BaseURI, API, & JSON configuration information to file
 
-        Making use of PowerShell's System.Security.SecureString type, exporting module settings encrypts your API key in a format
-        that can only be unencrypted with the your Windows account as this encryption is tied to your user principal
-        This means that you cannot copy your configuration file to another computer or user account and expect it to work
+        Making use of PowerShell's System.Security.SecureString type, exporting module settings encrypts your API secret &
+        integration code in a format that can only be unencrypted with the your Windows account as this encryption is tied
+        to your user principal. This means that you cannot copy your configuration file to another computer or user account
+        and expect it to work
+
+        On Linux & macOS the SecureString is NOT encrypted, it is recommended to use the AUTOTASK_BASE_URI,
+        AUTOTASK_API_USERNAME, AUTOTASK_API_SECRET, & AUTOTASK_API_INTEGRATION_CODE environment variables
+        or a secret store instead
 
     .PARAMETER AutoTaskConfigPath
         Define the location to store the AutoTask configuration file
@@ -56,46 +61,46 @@ function Export-AutoTaskModuleSettings {
 
     process {
 
-        Write-Warning "Secrets are stored using Windows Data Protection API (DPAPI)"
-        Write-Warning "DPAPI provides user context encryption in Windows but NOT in other operating systems like Linux or UNIX. It is recommended to use a more secure & cross-platform storage method"
+        if ($IsWindows -or $PSEdition -eq 'Desktop') {
+            Write-Verbose "Secrets are stored using the Windows Data Protection API (DPAPI)"
+        }
+        else {
+            Write-Warning "DPAPI provides user context encryption in Windows but NOT in other operating systems like Linux or UNIX. It is recommended to use the AUTOTASK_BASE_URI, AUTOTASK_API_USERNAME, AUTOTASK_API_SECRET, & AUTOTASK_API_INTEGRATION_CODE environment variables or a more secure & cross-platform storage method"
+        }
 
         $AutoTaskConfig = Join-Path -Path $AutoTaskConfigPath -ChildPath $AutoTaskConfigFile
 
-        $GlobalModuleVariables = @('AutoTaskModuleBaseUri', 'AutoTaskModuleBaseUriApiVersion', 'AutoTaskModuleApiUsername', 'AutoTaskModuleApiSecretKey', 'AutoTaskModuleUserAgent', 'AutoTaskModuleJSONConversionDepth')
-        foreach ($GlobalVariable in  $GlobalModuleVariables) {
-            if (-not (Get-Variable -Name $GlobalVariable -ErrorAction SilentlyContinue -ErrorVariable GlobalVariableCheck)){
-                Write-Error "The required module variable [ $GlobalVariable ] is not set"
-            }
+        $GlobalModuleVariables = @('AutoTaskModuleBaseUri', 'AutoTaskModuleBaseUriApiVersion', 'AutoTaskModuleBaseUriComplete', 'AutoTaskModuleApiUsername', 'AutoTaskModuleApiSecretKey', 'AutoTaskModuleApiIntegrationCode', 'AutoTaskModuleJSONConversionDepth')
+
+        $MissingVariables = foreach ($GlobalVariable in $GlobalModuleVariables) {
+            if (-not (Get-Variable -Name $GlobalVariable -ErrorAction SilentlyContinue)) { $GlobalVariable }
         }
 
-        # Confirm variables exist and are not null before exporting
-        if (-not $GlobalVariableCheck) {
-            $SecureString = $AutoTaskModuleApiSecretKey | ConvertFrom-SecureString
+        if ($MissingVariables) {
+            throw "Failed to export AutoTask Module settings, the required module variables [ $($MissingVariables -join ', ') ] are not set"
+        }
 
-            if ($IsWindows -or $PSEdition -eq 'Desktop') {
-                New-Item -Path $AutoTaskConfigPath -ItemType Directory -Force | ForEach-Object { $_.Attributes = $_.Attributes -bor "Hidden" }
-            }
-            else{
-                New-Item -Path $AutoTaskConfigPath -ItemType Directory -Force
-            }
-@"
-    @{
-        AutoTaskModuleBaseUri             = '$AutoTaskModuleBaseUri'
-        AutoTaskModuleBaseUriApiVersion   = '$AutoTaskModuleBaseUriApiVersion'
-        AutoTaskModuleBaseUriComplete     = '$AutoTaskModuleBaseUriComplete'
-        AutoTaskModuleApiUsername         = '$AutoTaskModuleApiUsername'
-        AutoTaskModuleApiSecretKey        = '$SecureString'
-        AutoTaskModuleApiIntegrationCode  = '$AutoTaskModuleApiIntegrationCode'
-        AutoTaskModuleUserAgent           = '$AutoTaskModuleUserAgent'
-        AutoTaskModuleJSONConversionDepth = '$AutoTaskModuleJSONConversionDepth'
-    }
-"@ | Out-File -FilePath $AutoTaskConfig -Force
+        $SecretKey          = $AutoTaskModuleApiSecretKey | ConvertFrom-SecureString
+        $IntegrationCode    = ConvertTo-SecureString -String $AutoTaskModuleApiIntegrationCode -AsPlainText -Force | ConvertFrom-SecureString
+
+        if ($IsWindows -or $PSEdition -eq 'Desktop') {
+            New-Item -Path $AutoTaskConfigPath -ItemType Directory -Force | ForEach-Object { $_.Attributes = $_.Attributes -bor "Hidden" }
         }
         else {
-            Write-Error "Failed to export AutoTask Module settings to [ $AutoTaskConfig ]"
-            Write-Error $_
-            exit 1
+            New-Item -Path $AutoTaskConfigPath -ItemType Directory -Force > $null
         }
+
+@"
+@{
+    AutoTaskModuleBaseUri             = '$($AutoTaskModuleBaseUri -replace "'","''")'
+    AutoTaskModuleBaseUriApiVersion   = '$($AutoTaskModuleBaseUriApiVersion -replace "'","''")'
+    AutoTaskModuleBaseUriComplete     = '$($AutoTaskModuleBaseUriComplete -replace "'","''")'
+    AutoTaskModuleApiUsername         = '$($AutoTaskModuleApiUsername -replace "'","''")'
+    AutoTaskModuleApiSecretKey        = '$SecretKey'
+    AutoTaskModuleApiIntegrationCode  = '$IntegrationCode'
+    AutoTaskModuleJSONConversionDepth = '$AutoTaskModuleJSONConversionDepth'
+}
+"@ | Out-File -FilePath $AutoTaskConfig -Force
 
     }
 

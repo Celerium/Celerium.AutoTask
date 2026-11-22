@@ -1,116 +1,142 @@
 ---
-external help file: Celerium.AutoTask-help.xml
+document type: cmdlet
+external help file: Celerium.AutoTask-Help.xml
 grand_parent: Internal
+HelpUri: https://celerium.github.io/Celerium.AutoTask/site/Internal/Add-AutoTaskBaseURI.html
+Locale: en-US
 Module Name: Celerium.AutoTask
-online version: https://celerium.github.io/Celerium.AutoTask/site/Internal/Add-AutoTaskBaseURI.html
 parent: PUT
-schema: 2.0.0
+PlatyPS schema version: 2024-05-01
 title: Add-AutoTaskBaseURI
 ---
 
 # Add-AutoTaskBaseURI
 
 ## SYNOPSIS
+
 Sets the base URI for the AutoTask API connection
 
 ## SYNTAX
 
 ### AutoDetect (Default)
-```powershell
-Add-AutoTaskBaseURI [-AutoDetect] [-Version <String>] [<CommonParameters>]
+
+```
+Add-AutoTaskBaseURI [-AutoDetect] [-Version <string>]
 ```
 
 ### CustomUri
-```powershell
-Add-AutoTaskBaseURI [-Version <String>] -BaseUri <String> [<CommonParameters>]
+
+```
+Add-AutoTaskBaseURI [-BaseURI] <string> [-Version <string>]
 ```
 
-### Datacenter
-```powershell
-Add-AutoTaskBaseURI [-Version <String>] [-DataCenter <String>] [<CommonParameters>]
+### DataCenter
+
 ```
+Add-AutoTaskBaseURI -DataCenter <string> [-Version <string>]
+```
+
+## ALIASES
+
+This cmdlet has the following aliases,
+  - Set-AutoTaskBaseURI
 
 ## DESCRIPTION
+
 The Add-AutoTaskBaseURI cmdlet sets the base URI which is used
 to construct the full URI for all API calls
+
+The base URI is the zone url of the AutoTask API without the API version,
+such as https://webservices24.autotask.net/atservicesrest
+
+The API version such as /V1.0 is part of each resource path, a base URI
+that ends with an API version is accepted & the version is removed
 
 ## EXAMPLES
 
 ### EXAMPLE 1
+
 ```powershell
 Add-AutoTaskBaseURI
 ```
 
-Attempts to automatically detect the base URI for the AutoTask API connection
+Detects the base URI of the API user that was set by Add-AutoTaskAPIKey
 
 ### EXAMPLE 2
+
 ```powershell
-Add-AutoTaskBaseURI -BaseUri 'https://gateway.celerium.org'
+Add-AutoTaskBaseURI -BaseURI 'https://gateway.celerium.org'
 ```
 
 The base URI will use https://gateway.celerium.org
 
 ### EXAMPLE 3
+
 ```powershell
 Add-AutoTaskBaseURI -DataCenter 'America West 3'
 ```
 
-The base URI will use https://webservices24.autotask.net/atservicesrest/v1.0
+The base URI will use https://webservices24.autotask.net/atservicesrest
 
 ## PARAMETERS
 
 ### -AutoDetect
-Attempts to automatically detect the base URI for the AutoTask API connection
+
+Automatically detects the base URI (zone) of the AutoTask API user
+
+The username set by Add-AutoTaskAPIKey is used to make a single unauthenticated
+GET request to the AutoTask ZoneInformation endpoint
+
+This is the default when no other parameter is used
 
 ```yaml
-Type: SwitchParameter
-Parameter Sets: AutoDetect
-Aliases:
-
-Required: False
-Position: Named
-Default value: False
-Accept pipeline input: False
-Accept wildcard characters: False
+Type: System.Management.Automation.SwitchParameter
+DefaultValue: False
+SupportsWildcards: false
+Aliases: []
+ParameterSets:
+- Name: AutoDetect
+  Position: Named
+  IsRequired: false
+  ValueFromPipeline: false
+  ValueFromPipelineByPropertyName: false
+  ValueFromRemainingArguments: false
+DontShow: false
+AcceptedValues: []
+HelpMessage: ''
 ```
 
-### -Version
-Defines the API version to use when constructing the full URI for all API calls
+### -BaseURI
 
-```yaml
-Type: String
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: Named
-Default value: $((Invoke-RestMethod -Uri "https://webservices2.autotask.net/atservicesrest/VersionInformation").apiVersions | Select-Object -Last 1)
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -BaseUri
 Sets the base URI for the AutoTask API connection.
 Helpful
 if using a custom API gateway or an undocumented AutoTask API endpoint
 
-```yaml
-Type: String
-Parameter Sets: CustomUri
-Aliases:
+The URL must use https
 
-Required: True
-Position: Named
-Default value: None
-Accept pipeline input: True (ByValue)
-Accept wildcard characters: False
+```yaml
+Type: System.String
+DefaultValue: ''
+SupportsWildcards: false
+Aliases: []
+ParameterSets:
+- Name: CustomUri
+  Position: 0
+  IsRequired: true
+  ValueFromPipeline: true
+  ValueFromPipelineByPropertyName: false
+  ValueFromRemainingArguments: false
+DontShow: false
+AcceptedValues: []
+HelpMessage: ''
 ```
 
 ### -DataCenter
-Defines the data center (platform) to use which in turn defines which
+
+Defines the data center (zone) to use which in turn defines which
 base API URL is used
 
-https://ww24.autotask.net/DeveloperHelp/Content/APIs/General/API_Zones.htm
+https://www.autotask.net/help/developerhelp/Content/APIs/General/API_Zones.htm
 
 Allowed values are:
 America East                    https://webservices3.autotask.net/atservicesrest
@@ -137,28 +163,66 @@ UK2                             https://webservices16.autotask.net/atservicesres
 UK3                             https://webservices28.autotask.net/atservicesrest
 
 ```yaml
-Type: String
-Parameter Sets: Datacenter
-Aliases: Platform
+Type: System.String
+DefaultValue: ''
+SupportsWildcards: false
+Aliases:
+- Platform
+ParameterSets:
+- Name: DataCenter
+  Position: Named
+  IsRequired: true
+  ValueFromPipeline: false
+  ValueFromPipelineByPropertyName: false
+  ValueFromRemainingArguments: false
+DontShow: false
+AcceptedValues: []
+HelpMessage: ''
+```
 
-Required: False
-Position: Named
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
+### -Version
+
+Defines the API version that is stored with the base URI & used by -AutoDetect
+
+Default value: V1.0
+
+```yaml
+Type: System.String
+DefaultValue: V1.0
+SupportsWildcards: false
+Aliases: []
+ParameterSets:
+- Name: (All)
+  Position: Named
+  IsRequired: false
+  ValueFromPipeline: false
+  ValueFromPipelineByPropertyName: false
+  ValueFromRemainingArguments: false
+DontShow: false
+AcceptedValues: []
+HelpMessage: ''
 ```
 
 ### CommonParameters
-This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see [about_CommonParameters](http://go.microsoft.com/fwlink/?LinkID=113216).
+
+This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable,
+-InformationAction, -InformationVariable, -OutBuffer, -OutVariable, -PipelineVariable,
+-ProgressAction, -Verbose, -WarningAction, and -WarningVariable. For more information, see
+[about_CommonParameters](https://go.microsoft.com/fwlink/?LinkID=113216).
 
 ## INPUTS
+
+### System.String
+
+{{ Fill in the Description }}
 
 ## OUTPUTS
 
 ## NOTES
+
 N/A
+
 
 ## RELATED LINKS
 
-[https://celerium.github.io/Celerium.AutoTask/site/Internal/Add-AutoTaskBaseURI.html](https://celerium.github.io/Celerium.AutoTask/site/Internal/Add-AutoTaskBaseURI.html)
-
+- [](https://celerium.github.io/Celerium.AutoTask/site/Internal/Add-AutoTaskBaseURI.html)

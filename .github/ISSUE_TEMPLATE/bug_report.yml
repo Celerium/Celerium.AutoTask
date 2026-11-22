@@ -8,81 +8,78 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thank you for taking the time to fill out this bug report!
+        Thank you for helping improve this project. Please include enough detail for maintainers to understand and reproduce the problem.
   - type: textarea
     id: what-happened
     attributes:
       label: What happened?
-      placeholder: Tell us what you see!
-      value: "A bug happened!"
+      description: Describe the problem clearly, including the action you took and the result you saw.
+      placeholder: "Example: Running <command or step> showed an error instead of the expected result."
     validations:
       required: true
   - type: textarea
-    id: ExpectedBehavior
+    id: expected-behavior
     attributes:
-      label: Expected behavior?
-      placeholder: Tell us what you see!
-      value: "A bug shouldn't have happened!"
+      label: What did you expect to happen?
+      description: Describe the result you expected in a few sentences.
+      placeholder: "Example: The command should complete and return the expected output."
     validations:
       required: true
   - type: textarea
-    id: PossibleSolution
+    id: reproduction-steps
     attributes:
-      label: Possible Solution?
+      label: Steps to reproduce
+      description: List the smallest sequence of steps that consistently reproduces the issue.
+      placeholder: |
+        1. Run ...
+        2. Enter or select ...
+        3. Observe ...
     validations:
       required: false
-  - type: dropdown
-    id: PowerShellVersion
+  - type: textarea
+    id: workaround
     attributes:
-      label: PowerShell Version
-      description: What version of PowerShell are you running?
-      options:
-        - 5.1 - (PowerShell)
-        - 7.2.x - (PowerShell Core)
-        - 7.3.x - (PowerShell Core)
-        - 7.4.x - (PowerShell Core)
-  - type: dropdown
-    id: OperatingSystem
+      label: Possible workaround or solution
+      description: Optional. Share a workaround or suggested fix if you have one.
+      placeholder: "Leave blank if you do not know of one."
+    validations:
+      required: false
+  - type: input
+    id: powershell-version
     attributes:
-      label: What operating system are you seeing the problem on?
-      multiple: true
-      options:
-        - Windows
-        - Linux - Ubuntu\Debian
-        - Linux - CentOS\RedHat\Fedora
-        - Linux - openSUSE
-        - macOS
+      label: PowerShell version
+      description: Optional. Enter the output of `$PSVersionTable.PSVersion`, or "Not sure".
+      placeholder: "Example: 7.4.6"
+  - type: input
+    id: operating-system
+    attributes:
+      label: Operating system
+      description: Optional. Include the operating system and version, for example Windows 11 or Ubuntu 24.04.
+      placeholder: "Example: Windows 11"
   - type: textarea
     id: logs
     attributes:
       label: Relevant log output
-      description: Please copy and paste any relevant log output. This will be automatically formatted into code, so no need for backticks.
-      render: PowerShell
+      description: Optional. Paste relevant error messages or logs here. Redact secrets, keys, tokens, passwords, personal data, and other sensitive values.
+      placeholder: "Paste only the relevant error or log lines."
+      render: powershell
   - type: textarea
-    id: HelpCommands
+    id: environment-info
     attributes:
-      label: Help Commands
-      description: Please share additional details about your environment.
-      value: "$PSversionTable
+      label: Environment diagnostics
+      description: |
+        Optional. If you can, run the commands below in PowerShell and paste their output. Remove credentials and sensitive personal or system information before posting.
+
+        $PSVersionTable
 
         Get-Package -Name Celerium.AutoTask | Select-Object Name,Version,Source,ProviderName
-
-        Get-ComputerInfo -Property @(
-        'OsName',
-        'OsVersion',
-        'OsOperatingSystemSKU',
-        'OSArchitecture',
-        'WindowsVersion',
-        'WindowsBuildLabEx',
-        'OsLanguage',
-        'OsMuiLanguages'
-        )"
-      render: PowerShell
+      placeholder: "Paste diagnostic output here."
+      render: powershell
   - type: checkboxes
     id: terms
     attributes:
       label: Code of Conduct
-      description: By submitting this issue, you agree to follow our [Code of Conduct](https://github.com/Celerium/Celerium.AutoTask/blob/master/.github/CODE_OF_CONDUCT.md)
+      description: By submitting this issue, you agree to follow our [Code of Conduct](https://github.com/Celerium/Celerium.AutoTask/blob/main/.github/CODE_OF_CONDUCT.md)
       options:
         - label: I agree to follow this project's Code of Conduct
           required: true

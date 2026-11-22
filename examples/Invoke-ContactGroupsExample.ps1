@@ -1,3 +1,12 @@
+# =====================================================================================================
+#   LEGACY EXAMPLE - THIS SCRIPT CREATES, UPDATES, & DELETES DATA IN AUTOTASK
+#
+#   Kept for reference from version 1.x of the module. It is not tested & is not part of the read-only
+#   examples. Since version 2.0.0 New-AutoTaskResource, Set-AutoTaskResource, & Remove-AutoTaskResource
+#   ask for confirmation before each request (ConfirmImpact High), use -WhatIf to preview the requests.
+#   Only run it against a test (sandbox) AutoTask instance.
+# =====================================================================================================
+
 <#
     .SYNOPSIS
         Populates example data using the Celerium.AutoTask module

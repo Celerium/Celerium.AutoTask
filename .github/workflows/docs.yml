@@ -1,0 +1,52 @@
+name: Documentation
+
+# Regenerates the GitHub pages documentation in /docs with the scripts in /build
+# Uses Microsoft.PowerShell.PlatyPS, which runs on any platform (no cab files are built)
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ "main" ]
+    paths:
+      - 'Celerium.AutoTask/**'
+      - 'build/Update-HelpContent.ps1'
+      - 'build/Invoke-HelpContent.ps1'
+      - 'docs/endpoints.csv'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: docs-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+
+  docs:
+    name: Build documentation
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    defaults:
+      run:
+        shell: pwsh
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Install prerequisites
+        run: ./build/Install-Prerequisites.ps1 -Verbose
+
+      - name: Build the documentation
+        run: ./build/Invoke-HelpContent.ps1 -Verbose
+
+      - name: Commit the documentation changes
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add docs
+          if (git status --porcelain docs) {
+            git commit -m 'docs: regenerate documentation'
+            git push
+          }
+          else { Write-Output 'The documentation is up to date' }

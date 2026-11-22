@@ -1,0 +1,10 @@
+# Pester test results
+build/*_Results.xml
+TestResults.xml
+
+# Local secrets & configuration
+.env
+*.secret
+
+# Files moved aside by the build scripts (git history keeps the originals)
+build/Archive/

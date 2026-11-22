@@ -1,14 +1,19 @@
 function Show-AutoTaskResource {
 <#
     .SYNOPSIS
-        Shows available values from the dynamically generated
-        resource parameter
+        Shows the available resources & operations of the AutoTask API
 
     .DESCRIPTION
-        The Show-AutoTaskResource cmdlet shows available values
-        from the dynamically generated resource parameter
+        The Show-AutoTaskResource cmdlet shows the resources & operations that can be
+        used with the -Resource & -Operation parameters of the public functions
 
-        By default all available values are show
+        By default all available values are shown. The values come from the resource map
+        that is created from the AutoTask OpenAPI spec when the module is built
+
+        GET     -> Get-AutoTaskResource (POST Query & QueryCount operations as well)
+        POST    -> New-AutoTaskResource
+        PATCH   -> Set-AutoTaskResource (PUT operations as well)
+        DELETE  -> Remove-AutoTaskResource
 
     .PARAMETER Name
         Defines the name of the resource to limit the output to
@@ -26,13 +31,13 @@ function Show-AutoTaskResource {
         Returns only unique resource names
 
     .PARAMETER JsonSpec
-        Defines the path to the swagger json file to use when creating
-        the dynamic parameter
+        Defines the path to an AutoTask OpenAPI (swagger) json file to read the
+        resources from instead of the resource map of the module
 
     .EXAMPLE
         Show-AutoTaskResource
 
-        Show all available values from the dynamically generated resource parameter
+        Show all available resources & operations
 
     .EXAMPLE
         Show-AutoTaskResource -Name Companies
@@ -51,27 +56,28 @@ function Show-AutoTaskResource {
         https://celerium.github.io/Celerium.AutoTask/site/Resource/Show-AutoTaskResource.html
 #>
 
-    [CmdletBinding(defaultParameterSetName = 'All')]
+    [CmdletBinding(DefaultParameterSetName = 'All')]
     Param(
-        [Parameter(Mandatory = $false)]
+        [Parameter(Mandatory = $false, Position = 0)]
+        [ArgumentCompleter({ Complete-AutoTaskResource @args })]
         [string]$Name,
 
         [Parameter(Mandatory = $false)]
         [ValidateSet('GET', 'PUT', 'POST', 'PATCH', 'DELETE')]
-        [String]$Method,
+        [string]$Method,
 
         [Parameter(Mandatory = $false, ParameterSetName = 'UniqueOnly')]
         [switch]$UniqueOnly,
 
         [Parameter(Mandatory = $false)]
-        [string]$JsonSpec = $(Join-Path -Path "$($MyInvocation.MyCommand.Module.ModuleBase)" -ChildPath "AutoTaskAPI-2023.6.json")
+        [ValidateNotNullOrEmpty()]
+        [string]$JsonSpec
     )
-
 
     begin {
 
-        $FunctionName       = $MyInvocation.InvocationName
-        $ParameterName      = $functionName + '_Parameters'      -replace '-','_'
+        $FunctionName   = $MyInvocation.MyCommand.Name
+        $ParameterName  = $FunctionName + '_Parameters' -replace '-','_'
 
     }
 
@@ -79,46 +85,30 @@ function Show-AutoTaskResource {
 
         Write-Verbose "[ $FunctionName ] - Running the [ $($PSCmdlet.ParameterSetName) ] parameterSet"
 
-        if (-not $AutoTaskModuleSwagger) {
-            $Swagger = Get-Content $JsonSpec -Raw | ConvertFrom-Json
+        $Operations = if ($JsonSpec) { Get-AutoTaskSpecOperation -JsonSpec $JsonSpec } else { Get-AutoTaskResourceMap }
 
-            $Queries = foreach ($Path in $Swagger.Paths.PSObject.Properties) {
-                [PSCustomObject]@{
-                    Index  = $Path.Name.Split('/')[2]
-                    Name   = $Path.Name
-                    GET    = $Path.Value.GET.Tags
-                    PUT    = $Path.Value.PUT.Tags
-                    POST   = $Path.Value.POST.Tags
-                    PATCH  = $Path.Value.PATCH.Tags
-                    DELETE = $Path.Value.DELETE.Tags
-                }
-            }
-        }
-        else {
-            $Queries = $AutoTaskModuleQueries
-        }
-
-        $ResourceList = foreach ($Type in 'GET','PUT','POST','PATCH','DELETE') {
-            foreach ($Query in $Queries | Where-Object { $null -ne $_.$Type }) {
-                [PSCustomObject]@{
-                    Method   = $Type
-                    Resource = $Query.$Type | Select-Object -Last 1
-                    Path     = $Query.Name
-                    Index    = $Query.Index
-                }
+        $ResourceList = foreach ($Entry in $Operations) {
+            [PSCustomObject]@{
+                Method      = $Entry.Method
+                Resource    = $Entry.Resource
+                Operation   = $Entry.Operation
+                Path        = $Entry.Path
+                Index       = ($Entry.Path -split '/')[2]
             }
         }
 
-        $ResourceList = $ResourceList | Sort-Object Resource,Method,Path
+        $ResourceList = $ResourceList | Sort-Object Resource, Method, Path
 
-        if ($Name)      { $ResourceList = $ResourceList | Where-Object Resource -like "$Name*"}
-        if ($Method)    { $ResourceList = $ResourceList | Where-Object Method -eq $Method }
+        if ($Name)      { $ResourceList = $ResourceList | Where-Object { $_.Resource -like "$Name*" } }
+        if ($Method)    { $ResourceList = $ResourceList | Where-Object { $_.Method -eq $Method } }
         if ($UniqueOnly){ $ResourceList = $ResourceList | Select-Object -Property Resource -Unique }
 
         Set-Variable -Name $ParameterName -Value $PSBoundParameters -Scope Global -Force -Confirm:$false
 
-        return $ResourceList
+        $ResourceList
 
     }
+
+    end {}
 
 }

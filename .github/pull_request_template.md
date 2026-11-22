@@ -1,35 +1,39 @@
 # Pull Request
 
-## Description
+## Summary
 
-Please include a summary of any changes. Please also include relevant motivation and context.
+What changed, and why was this change needed?
 
-Fixes: #12345
+<!-- Briefly describe the change and the motivation or context behind it. -->
 
-Fixes: <https://github.com/Celerium/Celerium.AutoTask/issues/12345>
+## Related issue(s)
 
-## Type of change
+<!-- Link issues with GitHub closing keywords when applicable, for example: Fixes ISSUE_URL_OR_NUMBER.
+You can include multiple references. Remove this section if no issue is related. -->
 
-Please delete options that are not relevant.
+## Change type
 
-- [ ] Bug fix (non-breaking change which fixes an issue)
-- [ ] New feature (non-breaking change which adds functionality)
-- [ ] Breaking change (fix or feature that would cause existing functionality to not work as expected)
-- [ ] General code cleanup (non-breaking change which improves readability)
+Select all applicable options:
+
+- [ ] Bug fix
+- [ ] New feature
+- [ ] Breaking change
+- [ ] Code cleanup or refactoring
+
+## Implementation notes
+
+<!-- Optional: Call out important design decisions or affected areas. -->
+
+## Testing
+
+Summarize the automated or manual tests performed. Include reproducible steps or relevant environment details when they are needed to review or repeat the verification.
+
+If tests could not be run, explain why.
 
 ## Checklist
 
-- [ ] I have reviewed the [Contributing](https://github.com/Celerium/Celerium.AutoTask/blob/master/.github/CONTRIBUTING.md) guide
-- [ ] I am pulling to the **main** branch
-- [ ] I have performed a self-review of my own code
-- [ ] I have commented my code, particularly in hard-to-understand areas
-- [ ] I have made corresponding changes to the documentation
-- [ ] I have added tests that prove my fix is effective or that my feature works
-- [ ] New and existing unit tests pass locally with my changes
-
-## How Has This Been Tested?
-
-Please describe the tests that you ran to verify your changes. Provide instructions so we can reproduce. Please also list any relevant details for your test configuration
-
-- [ ] Test A
-- [x] Test B
+- [ ] I have reviewed the changes and addressed relevant feedback
+- [ ] I added or updated comments where the code may be difficult to understand
+- [ ] I updated documentation where it is needed
+- [ ] I added or updated tests where they are applicable
+- [ ] Relevant local tests pass with these changes

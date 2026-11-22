@@ -1,34 +1,49 @@
 ---
-external help file: Celerium.AutoTask-help.xml
+document type: cmdlet
+external help file: Celerium.AutoTask-Help.xml
 grand_parent: Resource
+HelpUri: https://celerium.github.io/Celerium.AutoTask/site/Resource/New-AutoTaskBody.html
+Locale: en-US
 Module Name: Celerium.AutoTask
-online version: https://celerium.github.io/Celerium.AutoTask/site/Resource/New-AutoTaskBody.html
-parent: PUT
-schema: 2.0.0
+parent: GET
+PlatyPS schema version: 2024-05-01
 title: New-AutoTaskBody
 ---
 
 # New-AutoTaskBody
 
 ## SYNOPSIS
+
 Creates a new resource body object
 
 ## SYNTAX
 
-```powershell
-New-AutoTaskBody [-Empty] [-WhatIf] [-Confirm] -Resource <String> [<CommonParameters>]
+### Template (Default)
+
+```
+New-AutoTaskBody [-Resource] <string> [-Empty] [-ParentId <long>] [-WhatIf] [-Confirm]
 ```
 
+## ALIASES
+
+This cmdlet has the following aliases,
+  - None
+
 ## DESCRIPTION
+
 The New-AutoTaskBody cmdlet creates a new resource body
 for the AutoTask API
 
 Helpful when working with resource queries, modifications,
 and creating filters for advanced searches
 
+The field definitions are read with two GET requests (fields & user defined fields),
+no data is changed in AutoTask
+
 ## EXAMPLES
 
 ### EXAMPLE 1
+
 ```powershell
 New-AutoTaskBody -Resource ContactGroups
 ```
@@ -36,6 +51,7 @@ New-AutoTaskBody -Resource ContactGroups
 Creates a template showing all available fields with their types and picklist values
 
 ### EXAMPLE 2
+
 ```powershell
 New-AutoTaskBody -Resource Companies -Empty
 ```
@@ -44,78 +60,133 @@ Creates a new resource body for the company with no content
 
 ## PARAMETERS
 
-### -Empty
-Creates a new resource body with no content
-
-```yaml
-Type: SwitchParameter
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: Named
-Default value: False
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -WhatIf
-Shows what would happen if the cmdlet runs.
-The cmdlet is not run.
-
-```yaml
-Type: SwitchParameter
-Parameter Sets: (All)
-Aliases: wi
-
-Required: False
-Position: Named
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
 ### -Confirm
+
 Prompts you for confirmation before running the cmdlet.
 
 ```yaml
-Type: SwitchParameter
-Parameter Sets: (All)
-Aliases: cf
+Type: System.Management.Automation.SwitchParameter
+DefaultValue: ''
+SupportsWildcards: false
+Aliases:
+- cf
+ParameterSets:
+- Name: (All)
+  Position: Named
+  IsRequired: false
+  ValueFromPipeline: false
+  ValueFromPipelineByPropertyName: false
+  ValueFromRemainingArguments: false
+DontShow: false
+AcceptedValues: []
+HelpMessage: ''
+```
 
-Required: False
-Position: Named
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
+### -Empty
+
+Creates a new resource body with no content
+
+Only the fields that are not read-only are included
+
+```yaml
+Type: System.Management.Automation.SwitchParameter
+DefaultValue: False
+SupportsWildcards: false
+Aliases: []
+ParameterSets:
+- Name: (All)
+  Position: Named
+  IsRequired: false
+  ValueFromPipeline: false
+  ValueFromPipelineByPropertyName: false
+  ValueFromRemainingArguments: false
+DontShow: false
+AcceptedValues: []
+HelpMessage: ''
+```
+
+### -ParentId
+
+The parent resource ID used to read the field definitions of a child resource
+
+Default value: 0
+
+```yaml
+Type: System.Int64
+DefaultValue: 0
+SupportsWildcards: false
+Aliases: []
+ParameterSets:
+- Name: (All)
+  Position: Named
+  IsRequired: false
+  ValueFromPipeline: false
+  ValueFromPipelineByPropertyName: false
+  ValueFromRemainingArguments: false
+DontShow: false
+AcceptedValues: []
+HelpMessage: ''
 ```
 
 ### -Resource
-{{ Fill Resource Description }}
+
+Defines the name of the resource to create a body for, such as Companies or CompanyNotesChild
 
 ```yaml
-Type: String
-Parameter Sets: (All)
-Aliases:
+Type: System.String
+DefaultValue: ''
+SupportsWildcards: false
+Aliases: []
+ParameterSets:
+- Name: (All)
+  Position: 0
+  IsRequired: true
+  ValueFromPipeline: false
+  ValueFromPipelineByPropertyName: false
+  ValueFromRemainingArguments: false
+DontShow: false
+AcceptedValues: []
+HelpMessage: ''
+```
 
-Required: True
-Position: Named
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
+### -WhatIf
+
+Runs the command in a mode that only reports what would happen without performing the actions.
+
+```yaml
+Type: System.Management.Automation.SwitchParameter
+DefaultValue: ''
+SupportsWildcards: false
+Aliases:
+- wi
+ParameterSets:
+- Name: (All)
+  Position: Named
+  IsRequired: false
+  ValueFromPipeline: false
+  ValueFromPipelineByPropertyName: false
+  ValueFromRemainingArguments: false
+DontShow: false
+AcceptedValues: []
+HelpMessage: ''
 ```
 
 ### CommonParameters
-This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see [about_CommonParameters](http://go.microsoft.com/fwlink/?LinkID=113216).
+
+This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable,
+-InformationAction, -InformationVariable, -OutBuffer, -OutVariable, -PipelineVariable,
+-ProgressAction, -Verbose, -WarningAction, and -WarningVariable. For more information, see
+[about_CommonParameters](https://go.microsoft.com/fwlink/?LinkID=113216).
 
 ## INPUTS
 
 ## OUTPUTS
 
 ## NOTES
+
 N/A
+
 
 ## RELATED LINKS
 
-[https://celerium.github.io/Celerium.AutoTask/site/Resource/New-AutoTaskBody.html](https://celerium.github.io/Celerium.AutoTask/site/Resource/New-AutoTaskBody.html)
-
+- [](https://celerium.github.io/Celerium.AutoTask/site/Resource/New-AutoTaskBody.html)

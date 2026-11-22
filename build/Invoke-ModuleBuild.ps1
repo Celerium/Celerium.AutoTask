@@ -1,14 +1,14 @@
 <#
 .NOTES
-    Copyright 1990-2024 Celerium
+    Copyright 1990-2027 Celerium
 
-    NAME: Invoke-moduleBuild.ps1
+    NAME: Invoke-ModuleBuild.ps1
     Type: PowerShell
 
         AUTHOR:  David Schulte
         DATE:    2023-04-1
         EMAIL:   celerium@Celerium.org
-        Updated: 2023-09-16
+        Updated: 2026-11-21
 
     TODO:
 
@@ -16,10 +16,16 @@
     Builds & prepares a PowerShell module for deployment
 
 .DESCRIPTION
-    The Invoke-moduleBuild.ps1 script builds & prepares a PowerShell
+    The Invoke-ModuleBuild.ps1 script builds & prepares a PowerShell
     module for deployment
 
-.PARAMETER moduleName
+    The built module (build\<ModuleName>\<Version>) contains the module manifest, a single
+    .psm1 file with every private & public function, & the newest OpenAPI spec from the module folder
+
+    The AutoTask spec is the known exception of the Celerium projects that is stored in the module
+    folder (Celerium.AutoTask\AutoTaskAPI-<version>.json) instead of the docs folder
+
+.PARAMETER ModuleName
     The name of the module to build
 
     Example: Celerium.AutoTask
@@ -31,7 +37,7 @@
     Overrides the VersionedOutputDirectory, producing an OutputDirectory without a version number as the last folder
 
 .EXAMPLE
-    .\Invoke-moduleBuild.ps1 -Version 1.2.3
+    .\Invoke-ModuleBuild.ps1 -Version 1.2.3
 
     Compiles the module files located in ..\moduleName and builds
     a combined module in ...\build\moduleName\1.2.3
@@ -51,9 +57,7 @@
                                         Code
 ############################################################################################>
 #Requires -Version 5.1
-#Requires -Modules @{ ModuleName="ModuleBuilder";   ModuleVersion="3.1.0" }
-#Requires -Modules @{ ModuleName="Pester";          ModuleVersion="5.5.0" }
-#Requires -Modules @{ ModuleName="platyPS";         ModuleVersion="0.14.2" }
+#Requires -Modules @{ ModuleName="ModuleBuilder";   ModuleVersion="3.2.18" }
 
 #Region  [ Parameters ]
 
@@ -61,18 +65,14 @@
     param (
         [Parameter(Mandatory = $false)]
         [ValidateNotNullOrEmpty()]
-        [string]$moduleName = 'Celerium.AutoTask',
+        [string]$ModuleName = 'Celerium.AutoTask',
 
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
         [string]$Version,
 
         [Parameter(Mandatory=$false)]
-        [switch]$UnversionedOutputDirectory,
-
-        [Parameter(Mandatory=$false)]
-        [ValidateNotNullOrEmpty()]
-        [string]$JsonSpec
+        [switch]$UnversionedOutputDirectory
     )
 
 #EndRegion  [ Parameters ]
@@ -91,18 +91,13 @@ $StartDate = Get-Date
 
 try {
 
-    if ($IsWindows -or $PSEdition -eq 'Desktop') {
-        $rootPath = "$( $PSCommandPath.Substring(0, $PSCommandPath.IndexOf('\build', [System.StringComparison]::OrdinalIgnoreCase)) )"
-    }
-    else{
-        $rootPath = "$( $PSCommandPath.Substring(0, $PSCommandPath.IndexOf('/build', [System.StringComparison]::OrdinalIgnoreCase)) )"
-    }
+    $RootPath = Split-Path -Path $PSScriptRoot -Parent
 
-    $modulePath         = Join-Path -Path $rootPath -ChildPath $moduleName
-    $SourcePath         = Join-Path -Path $modulePath -ChildPath "$moduleName.psd1"
-    $OutputDirectory    = Join-Path -Path $rootPath -ChildPath "build"
+    $ModulePath         = Join-Path -Path $RootPath -ChildPath $ModuleName
+    $SourcePath         = Join-Path -Path $ModulePath -ChildPath "$ModuleName.psd1"
+    $OutputDirectory    = Join-Path -Path $RootPath -ChildPath "build"
 
-    $params = @{
+    $Params = @{
         SourcePath      = $SourcePath
         OutputDirectory = $OutputDirectory
         Version         = $Version
@@ -110,20 +105,23 @@ try {
         UnversionedOutputDirectory = $UnversionedOutputDirectory
     }
 
-    Build-Module @params -Verbose
-
-    if ($JsonSpec) {
-        Copy-Item $JsonSpec -Destination $(Join-Path -Path $OutputDirectory -ChildPath "$moduleName\$Version")
-    }
-    else{
-        Copy-Item $(Join-Path -Path $modulePath -ChildPath "AutoTaskAPI-2023.6.json") -Destination $(Join-Path -Path $OutputDirectory -ChildPath "$moduleName\$Version")
-    }
+    Build-Module @Params -Verbose
 
     #Replace & comment out NestedModules from nonBuilt module
-    $modulePath_Built = Join-Path -Path $OutputDirectory -ChildPath "$moduleName\$Version\$moduleName.psd1"
+    $ModulePathBuilt = if ($UnversionedOutputDirectory) { Join-Path -Path (Join-Path -Path $OutputDirectory -ChildPath $ModuleName) -ChildPath "$ModuleName.psd1" }
+                        else { Join-Path -Path (Join-Path -Path (Join-Path -Path $OutputDirectory -ChildPath $ModuleName) -ChildPath $Version) -ChildPath "$ModuleName.psd1" }
+    Update-Metadata -Path $ModulePathBuilt -PropertyName NestedModules -Value  @()
+    (Get-Content -Path $ModulePathBuilt -Raw) -replace 'NestedModules = @\(\)', '# NestedModules = @()' | Set-Content -Path $ModulePathBuilt
 
-    Update-Metadata -Path $modulePath_Built -PropertyName NestedModules -Value  @()
-    (Get-Content -Path $modulePath_Built -Raw) -replace 'NestedModules = @\(\)', '# NestedModules = @()' | Set-Content -Path $modulePath_Built
+    # The OpenAPI spec (newest AutoTaskAPI-<version>.json in the module folder) is part of the built module
+    $SpecFile = Get-ChildItem -Path $ModulePath -Filter 'AutoTaskAPI-*.json' -File -ErrorAction SilentlyContinue |
+                    Sort-Object -Property @{ Expression = { $Text = $_.BaseName -replace '^AutoTaskAPI-v?', ''; if ($Text -match '^\d+$') { $Text += '.0' }; $Parsed = $null; if ([System.Version]::TryParse($Text, [ref]$Parsed)) { $Parsed } else { [System.Version]'0.0' } } }, Name -Descending |
+                        Select-Object -First 1
+
+    if (-not $SpecFile) { throw "No AutoTaskAPI-<version>.json spec was found in [ $ModulePath ], the built module must include the spec" }
+
+    Copy-Item -Path $SpecFile.FullName -Destination (Split-Path -Path $ModulePathBuilt -Parent) -Force
+    Write-Verbose "Copied the OpenAPI spec [ $($SpecFile.Name) ] to the built module"
 
 }
 catch {

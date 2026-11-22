@@ -5,36 +5,21 @@ labels: ["help wanted"]
 assignees:
   - Celerium
 body:
-  - type: checkboxes
-    id: ReadME
+  - type: markdown
     attributes:
-      label: Project README
-      description: "[Project README](https://github.com/Celerium/Celerium.AutoTask/blob/master/README.md)"
-      options:
-        - label: "Have you read the projects README?"
-  - type: checkboxes
-    id: WebDocumentation
-    attributes:
-      label: Online Documentation
-      description: "[Online Documentation](https://Celerium.github.io/Celerium.AutoTask/)"
-      options:
-        - label: "Have you read the online documentation"
-  - type: checkboxes
-    id: PowerShellHelp
-    attributes:
-      label: PowerShell Help
-      description: "Get-Help Get-AutoTask<RESOURCES-NAME> -Full"
-      options:
-        - label: "Have you read the help output?"
+      value: |
+        Helpful resources (optional): [Project README](https://github.com/Celerium/Celerium.AutoTask/blob/main/README.md), [online documentation](https://Celerium.github.io/Celerium.AutoTask/), and `Get-Help <command-name> -Full`. You do not need to confirm that you read these resources before submitting.
   - type: textarea
-    id: HelpRequest
+    id: help-request
     attributes:
-      label: Help Request
-      description: What would you like help with?
-      render: Text
+      label: What do you need help with?
+      description: Explain what you are trying to do, what you have tried, and where you are stuck. Include relevant commands or error messages if available.
+      placeholder: "I am trying to ... I already tried ... The issue is ..."
+    validations:
+      required: true
   - type: textarea
-    id: ExistingIssue
+    id: related-issue
     attributes:
-      label: Existing Issue?
-      description: Is this related to an existing issue? If so please describe or link.
-      value: "Issue: #12345"
+      label: Related issue or pull request
+      description: Optional. Provide an issue or pull request URL or number if this request is related to existing work.
+      placeholder: "Issue or PR URL or number"
