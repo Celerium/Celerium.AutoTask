@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<helpItems xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10" xmlns:maml="http://schemas.microsoft.com/maml/2004/10" schema="maml" xmlns="http://msh">
+<helpItems xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10" schema="maml" xmlns="http://msh">
   <command:command>
     <command:details>
       <command:name>Add-AutoTaskAPIKey</command:name>
@@ -24,7 +24,7 @@ The API tracking identifier of the API user is the integration code</maml:para>
     <command:syntax>
       <command:syntaxItem>
         <maml:name>Add-AutoTaskAPIKey</maml:name>
-        <command:parameter pipelineInput="false" position="named" aliases="none" required="true" variableLength="false" globbing="false">
+        <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="named" aliases="none">
           <maml:name>ApiUsername</maml:name>
           <maml:description />
           <command:parameterValue required="true" variableLength="false">string</command:parameterValue>
@@ -32,7 +32,7 @@ The API tracking identifier of the API user is the integration code</maml:para>
             <maml:name>System.String</maml:name>
           </dev:type>
         </command:parameter>
-        <command:parameter pipelineInput="false" position="named" aliases="none" required="true" variableLength="false" globbing="false">
+        <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="named" aliases="none">
           <maml:name>ApiIntegrationCode</maml:name>
           <maml:description />
           <command:parameterValue required="true" variableLength="false">string</command:parameterValue>
@@ -40,7 +40,7 @@ The API tracking identifier of the API user is the integration code</maml:para>
             <maml:name>System.String</maml:name>
           </dev:type>
         </command:parameter>
-        <command:parameter pipelineInput="false" position="named" aliases="none" required="false" variableLength="false" globbing="false">
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named" aliases="none">
           <maml:name>ApiSecretKey</maml:name>
           <maml:description />
           <command:parameterValue required="true" variableLength="false">string</command:parameterValue>
@@ -51,7 +51,7 @@ The API tracking identifier of the API user is the integration code</maml:para>
       </command:syntaxItem>
       <command:syntaxItem>
         <maml:name>Add-AutoTaskAPIKey</maml:name>
-        <command:parameter pipelineInput="false" position="named" aliases="none" required="true" variableLength="false" globbing="false">
+        <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="named" aliases="none">
           <maml:name>ApiUsername</maml:name>
           <maml:description />
           <command:parameterValue required="true" variableLength="false">string</command:parameterValue>
@@ -59,7 +59,7 @@ The API tracking identifier of the API user is the integration code</maml:para>
             <maml:name>System.String</maml:name>
           </dev:type>
         </command:parameter>
-        <command:parameter pipelineInput="false" position="named" aliases="none" required="true" variableLength="false" globbing="false">
+        <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="named" aliases="none">
           <maml:name>ApiKeySecureString</maml:name>
           <maml:description />
           <command:parameterValue required="true" variableLength="false">securestring</command:parameterValue>
@@ -67,7 +67,7 @@ The API tracking identifier of the API user is the integration code</maml:para>
             <maml:name>System.Security.SecureString</maml:name>
           </dev:type>
         </command:parameter>
-        <command:parameter pipelineInput="false" position="named" aliases="none" required="true" variableLength="false" globbing="false">
+        <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="named" aliases="none">
           <maml:name>ApiIntegrationCode</maml:name>
           <maml:description />
           <command:parameterValue required="true" variableLength="false">string</command:parameterValue>
@@ -78,7 +78,7 @@ The API tracking identifier of the API user is the integration code</maml:para>
       </command:syntaxItem>
     </command:syntax>
     <command:parameters>
-      <command:parameter pipelineInput="false" position="Named" aliases="none" required="true" variableLength="false" globbing="false">
+      <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="Named" aliases="none">
         <maml:name>ApiIntegrationCode</maml:name>
         <maml:description>
           <maml:para>Defines the API integration code (tracking identifier) of the API user</maml:para>
@@ -88,7 +88,7 @@ The API tracking identifier of the API user is the integration code</maml:para>
           <maml:name>System.String</maml:name>
         </dev:type>
       </command:parameter>
-      <command:parameter pipelineInput="false" position="Named" aliases="none" required="true" variableLength="false" globbing="false">
+      <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="Named" aliases="none">
         <maml:name>ApiKeySecureString</maml:name>
         <maml:description>
           <maml:para>Input a SecureString object containing the secret of the API user</maml:para>
@@ -98,7 +98,7 @@ The API tracking identifier of the API user is the integration code</maml:para>
           <maml:name>System.Security.SecureString</maml:name>
         </dev:type>
       </command:parameter>
-      <command:parameter pipelineInput="true (ByValue)" position="Named" aliases="none" required="false" variableLength="false" globbing="false">
+      <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="true (ByValue)" position="Named" aliases="none">
         <maml:name>ApiSecretKey</maml:name>
         <maml:description>
           <maml:para>Defines the secret (password) of the API user as plain text</maml:para>
@@ -110,7 +110,7 @@ to enter the secret which will be stored as a SecureString</maml:para>
           <maml:name>System.String</maml:name>
         </dev:type>
       </command:parameter>
-      <command:parameter pipelineInput="false" position="Named" aliases="none" required="true" variableLength="false" globbing="false">
+      <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="Named" aliases="none">
         <maml:name>ApiUsername</maml:name>
         <maml:description>
           <maml:para>Defines the username of the API user</maml:para>
@@ -208,14 +208,14 @@ that ends with an API version is accepted &amp; the version is removed</maml:par
     <command:syntax>
       <command:syntaxItem>
         <maml:name>Add-AutoTaskBaseURI</maml:name>
-        <command:parameter pipelineInput="false" position="named" aliases="none" required="false" variableLength="false" globbing="false">
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named" aliases="none">
           <maml:name>AutoDetect</maml:name>
           <maml:description />
           <dev:type>
             <maml:name>System.Management.Automation.SwitchParameter</maml:name>
           </dev:type>
         </command:parameter>
-        <command:parameter pipelineInput="false" position="named" aliases="none" required="false" variableLength="false" globbing="false">
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named" aliases="none">
           <maml:name>Version</maml:name>
           <maml:description />
           <command:parameterValue required="true" variableLength="false">string</command:parameterValue>
@@ -226,7 +226,7 @@ that ends with an API version is accepted &amp; the version is removed</maml:par
       </command:syntaxItem>
       <command:syntaxItem>
         <maml:name>Add-AutoTaskBaseURI</maml:name>
-        <command:parameter pipelineInput="false" position="0" aliases="none" required="true" variableLength="false" globbing="false">
+        <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="0" aliases="none">
           <maml:name>BaseURI</maml:name>
           <maml:description />
           <command:parameterValue required="true" variableLength="false">string</command:parameterValue>
@@ -234,7 +234,7 @@ that ends with an API version is accepted &amp; the version is removed</maml:par
             <maml:name>System.String</maml:name>
           </dev:type>
         </command:parameter>
-        <command:parameter pipelineInput="false" position="named" aliases="none" required="false" variableLength="false" globbing="false">
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named" aliases="none">
           <maml:name>Version</maml:name>
           <maml:description />
           <command:parameterValue required="true" variableLength="false">string</command:parameterValue>
@@ -245,7 +245,7 @@ that ends with an API version is accepted &amp; the version is removed</maml:par
       </command:syntaxItem>
       <command:syntaxItem>
         <maml:name>Add-AutoTaskBaseURI</maml:name>
-        <command:parameter pipelineInput="false" position="named" aliases="Platform" required="true" variableLength="false" globbing="false">
+        <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="named" aliases="Platform">
           <maml:name>DataCenter</maml:name>
           <maml:description />
           <command:parameterValue required="true" variableLength="false">string</command:parameterValue>
@@ -253,7 +253,7 @@ that ends with an API version is accepted &amp; the version is removed</maml:par
             <maml:name>System.String</maml:name>
           </dev:type>
         </command:parameter>
-        <command:parameter pipelineInput="false" position="named" aliases="none" required="false" variableLength="false" globbing="false">
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named" aliases="none">
           <maml:name>Version</maml:name>
           <maml:description />
           <command:parameterValue required="true" variableLength="false">string</command:parameterValue>
@@ -264,7 +264,7 @@ that ends with an API version is accepted &amp; the version is removed</maml:par
       </command:syntaxItem>
     </command:syntax>
     <command:parameters>
-      <command:parameter pipelineInput="false" position="Named" aliases="none" required="false" variableLength="false" globbing="false">
+      <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="Named" aliases="none">
         <maml:name>AutoDetect</maml:name>
         <maml:description>
           <maml:para>Automatically detects the base URI (zone) of the AutoTask API user</maml:para>
@@ -276,7 +276,7 @@ GET request to the AutoTask ZoneInformation endpoint</maml:para>
           <maml:name>System.Management.Automation.SwitchParameter</maml:name>
         </dev:type>
       </command:parameter>
-      <command:parameter pipelineInput="true (ByValue)" position="0" aliases="none" required="true" variableLength="false" globbing="false">
+      <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="true (ByValue)" position="0" aliases="none">
         <maml:name>BaseURI</maml:name>
         <maml:description>
           <maml:para>Sets the base URI for the AutoTask API connection.
@@ -289,7 +289,7 @@ if using a custom API gateway or an undocumented AutoTask API endpoint</maml:par
           <maml:name>System.String</maml:name>
         </dev:type>
       </command:parameter>
-      <command:parameter pipelineInput="false" position="Named" aliases="Platform" required="true" variableLength="false" globbing="false">
+      <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="Named" aliases="Platform">
         <maml:name>DataCenter</maml:name>
         <maml:description>
           <maml:para>Defines the data center (zone) to use which in turn defines which
@@ -324,7 +324,7 @@ UK3                             https://webservices28.autotask.net/atservicesres
           <maml:name>System.String</maml:name>
         </dev:type>
       </command:parameter>
-      <command:parameter pipelineInput="false" position="Named" aliases="none" required="false" variableLength="false" globbing="false">
+      <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="Named" aliases="none">
         <maml:name>Version</maml:name>
         <maml:description>
           <maml:para>Defines the API version that is stored with the base URI &amp; used by -AutoDetect</maml:para>
@@ -422,7 +422,7 @@ The values come from the resource map that is created from the AutoTask OpenAPI 
     <command:syntax>
       <command:syntaxItem>
         <maml:name>Complete-AutoTaskResource</maml:name>
-        <command:parameter pipelineInput="false" position="0" aliases="none" required="false" variableLength="false" globbing="false">
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="0" aliases="none">
           <maml:name>CommandName</maml:name>
           <maml:description />
           <command:parameterValue required="true" variableLength="false">string</command:parameterValue>
@@ -430,7 +430,7 @@ The values come from the resource map that is created from the AutoTask OpenAPI 
             <maml:name>System.String</maml:name>
           </dev:type>
         </command:parameter>
-        <command:parameter pipelineInput="false" position="1" aliases="none" required="false" variableLength="false" globbing="false">
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="1" aliases="none">
           <maml:name>ParameterName</maml:name>
           <maml:description />
           <command:parameterValue required="true" variableLength="false">string</command:parameterValue>
@@ -438,7 +438,7 @@ The values come from the resource map that is created from the AutoTask OpenAPI 
             <maml:name>System.String</maml:name>
           </dev:type>
         </command:parameter>
-        <command:parameter pipelineInput="false" position="2" aliases="none" required="false" variableLength="false" globbing="false">
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="2" aliases="none">
           <maml:name>WordToComplete</maml:name>
           <maml:description />
           <command:parameterValue required="true" variableLength="false">string</command:parameterValue>
@@ -446,7 +446,7 @@ The values come from the resource map that is created from the AutoTask OpenAPI 
             <maml:name>System.String</maml:name>
           </dev:type>
         </command:parameter>
-        <command:parameter pipelineInput="false" position="3" aliases="none" required="false" variableLength="false" globbing="false">
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="3" aliases="none">
           <maml:name>CommandAst</maml:name>
           <maml:description />
           <command:parameterValue required="true" variableLength="false">Object</command:parameterValue>
@@ -454,7 +454,7 @@ The values come from the resource map that is created from the AutoTask OpenAPI 
             <maml:name>System.Object</maml:name>
           </dev:type>
         </command:parameter>
-        <command:parameter pipelineInput="false" position="4" aliases="none" required="false" variableLength="false" globbing="false">
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="4" aliases="none">
           <maml:name>FakeBoundParameters</maml:name>
           <maml:description />
           <command:parameterValue required="true" variableLength="false">IDictionary</command:parameterValue>
@@ -465,7 +465,7 @@ The values come from the resource map that is created from the AutoTask OpenAPI 
       </command:syntaxItem>
     </command:syntax>
     <command:parameters>
-      <command:parameter pipelineInput="false" position="3" aliases="none" required="false" variableLength="false" globbing="false">
+      <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="3" aliases="none">
         <maml:name>CommandAst</maml:name>
         <maml:description>
           <maml:para>The syntax tree of the command that is being completed</maml:para>
@@ -475,7 +475,7 @@ The values come from the resource map that is created from the AutoTask OpenAPI 
           <maml:name>System.Object</maml:name>
         </dev:type>
       </command:parameter>
-      <command:parameter pipelineInput="false" position="0" aliases="none" required="false" variableLength="false" globbing="false">
+      <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="0" aliases="none">
         <maml:name>CommandName</maml:name>
         <maml:description>
           <maml:para>The name of the command that is being completed</maml:para>
@@ -485,7 +485,7 @@ The values come from the resource map that is created from the AutoTask OpenAPI 
           <maml:name>System.String</maml:name>
         </dev:type>
       </command:parameter>
-      <command:parameter pipelineInput="false" position="4" aliases="none" required="false" variableLength="false" globbing="false">
+      <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="4" aliases="none">
         <maml:name>FakeBoundParameters</maml:name>
         <maml:description>
           <maml:para>The parameters that were already typed, used to find the resource when an operation is completed</maml:para>
@@ -495,7 +495,7 @@ The values come from the resource map that is created from the AutoTask OpenAPI 
           <maml:name>System.Collections.IDictionary</maml:name>
         </dev:type>
       </command:parameter>
-      <command:parameter pipelineInput="false" position="1" aliases="none" required="false" variableLength="false" globbing="false">
+      <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="1" aliases="none">
         <maml:name>ParameterName</maml:name>
         <maml:description>
           <maml:para>The name of the parameter that is being completed, Resource or Operation</maml:para>
@@ -505,7 +505,7 @@ The values come from the resource map that is created from the AutoTask OpenAPI 
           <maml:name>System.String</maml:name>
         </dev:type>
       </command:parameter>
-      <command:parameter pipelineInput="false" position="2" aliases="none" required="false" variableLength="false" globbing="false">
+      <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="2" aliases="none">
         <maml:name>WordToComplete</maml:name>
         <maml:description>
           <maml:para>The text that was typed so far</maml:para>
@@ -594,7 +594,7 @@ or a secret store instead</maml:para>
     <command:syntax>
       <command:syntaxItem>
         <maml:name>Export-AutoTaskModuleSettings</maml:name>
-        <command:parameter pipelineInput="false" position="0" aliases="none" required="false" variableLength="false" globbing="false">
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="0" aliases="none">
           <maml:name>AutoTaskConfigPath</maml:name>
           <maml:description />
           <command:parameterValue required="true" variableLength="false">string</command:parameterValue>
@@ -602,7 +602,7 @@ or a secret store instead</maml:para>
             <maml:name>System.String</maml:name>
           </dev:type>
         </command:parameter>
-        <command:parameter pipelineInput="false" position="1" aliases="none" required="false" variableLength="false" globbing="false">
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="1" aliases="none">
           <maml:name>AutoTaskConfigFile</maml:name>
           <maml:description />
           <command:parameterValue required="true" variableLength="false">string</command:parameterValue>
@@ -613,7 +613,7 @@ or a secret store instead</maml:para>
       </command:syntaxItem>
     </command:syntax>
     <command:parameters>
-      <command:parameter pipelineInput="false" position="1" aliases="none" required="false" variableLength="false" globbing="false">
+      <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="1" aliases="none">
         <maml:name>AutoTaskConfigFile</maml:name>
         <maml:description>
           <maml:para>Define the name of the AutoTask configuration file</maml:para>
@@ -625,7 +625,7 @@ or a secret store instead</maml:para>
           <maml:name>System.String</maml:name>
         </dev:type>
       </command:parameter>
-      <command:parameter pipelineInput="false" position="0" aliases="none" required="false" variableLength="false" globbing="false">
+      <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="0" aliases="none">
         <maml:name>AutoTaskConfigPath</maml:name>
         <maml:description>
           <maml:para>Define the location to store the AutoTask configuration file</maml:para>
@@ -704,7 +704,7 @@ By default the secret is returned as a SecureString</maml:para>
     <command:syntax>
       <command:syntaxItem>
         <maml:name>Get-AutoTaskAPIKey</maml:name>
-        <command:parameter pipelineInput="false" position="named" aliases="none" required="false" variableLength="false" globbing="false">
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named" aliases="none">
           <maml:name>AsPlainText</maml:name>
           <maml:description />
           <dev:type>
@@ -714,7 +714,7 @@ By default the secret is returned as a SecureString</maml:para>
       </command:syntaxItem>
     </command:syntax>
     <command:parameters>
-      <command:parameter pipelineInput="false" position="Named" aliases="none" required="false" variableLength="false" globbing="false">
+      <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="Named" aliases="none">
         <maml:name>AsPlainText</maml:name>
         <maml:description>
           <maml:para>Decrypt and return the API secret in plain text</maml:para>
@@ -784,7 +784,7 @@ the global variable</maml:para>
     <command:syntax>
       <command:syntaxItem>
         <maml:name>Get-AutoTaskBaseURI</maml:name>
-        <command:parameter pipelineInput="false" position="named" aliases="none" required="false" variableLength="false" globbing="false">
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named" aliases="none">
           <maml:name>AndApiUri</maml:name>
           <maml:description />
           <dev:type>
@@ -794,7 +794,7 @@ the global variable</maml:para>
       </command:syntaxItem>
     </command:syntax>
     <command:parameters>
-      <command:parameter pipelineInput="false" position="Named" aliases="none" required="false" variableLength="false" globbing="false">
+      <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="Named" aliases="none">
         <maml:name>AndApiUri</maml:name>
         <maml:description>
           <maml:para>Also include the API version uri, such as /V1.0</maml:para>
@@ -867,7 +867,7 @@ By default the configuration file is stored in the following location:
     <command:syntax>
       <command:syntaxItem>
         <maml:name>Get-AutoTaskModuleSettings</maml:name>
-        <command:parameter pipelineInput="false" position="0" aliases="none" required="false" variableLength="false" globbing="false">
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="0" aliases="none">
           <maml:name>AutoTaskConfigPath</maml:name>
           <maml:description />
           <command:parameterValue required="true" variableLength="false">string</command:parameterValue>
@@ -875,7 +875,7 @@ By default the configuration file is stored in the following location:
             <maml:name>System.String</maml:name>
           </dev:type>
         </command:parameter>
-        <command:parameter pipelineInput="false" position="1" aliases="none" required="false" variableLength="false" globbing="false">
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="1" aliases="none">
           <maml:name>AutoTaskConfigFile</maml:name>
           <maml:description />
           <command:parameterValue required="true" variableLength="false">string</command:parameterValue>
@@ -883,7 +883,7 @@ By default the configuration file is stored in the following location:
             <maml:name>System.String</maml:name>
           </dev:type>
         </command:parameter>
-        <command:parameter pipelineInput="false" position="named" aliases="none" required="false" variableLength="false" globbing="false">
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named" aliases="none">
           <maml:name>OpenConfigFile</maml:name>
           <maml:description />
           <dev:type>
@@ -893,7 +893,7 @@ By default the configuration file is stored in the following location:
       </command:syntaxItem>
     </command:syntax>
     <command:parameters>
-      <command:parameter pipelineInput="false" position="1" aliases="none" required="false" variableLength="false" globbing="false">
+      <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="1" aliases="none">
         <maml:name>AutoTaskConfigFile</maml:name>
         <maml:description>
           <maml:para>Define the name of the AutoTask configuration file</maml:para>
@@ -905,7 +905,7 @@ By default the configuration file is stored in the following location:
           <maml:name>System.String</maml:name>
         </dev:type>
       </command:parameter>
-      <command:parameter pipelineInput="false" position="0" aliases="none" required="false" variableLength="false" globbing="false">
+      <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="0" aliases="none">
         <maml:name>AutoTaskConfigPath</maml:name>
         <maml:description>
           <maml:para>Define the location to store the AutoTask configuration file</maml:para>
@@ -917,7 +917,7 @@ By default the configuration file is stored in the following location:
           <maml:name>System.String</maml:name>
         </dev:type>
       </command:parameter>
-      <command:parameter pipelineInput="false" position="Named" aliases="none" required="false" variableLength="false" globbing="false">
+      <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="Named" aliases="none">
         <maml:name>OpenConfigFile</maml:name>
         <maml:description>
           <maml:para>Opens the AutoTask configuration file</maml:para>
@@ -1003,7 +1003,7 @@ Without -ID or a search query every item of the resource is queried, the first
     <command:syntax>
       <command:syntaxItem>
         <maml:name>Get-AutoTaskResource</maml:name>
-        <command:parameter pipelineInput="false" position="0" aliases="none" required="true" variableLength="false" globbing="false">
+        <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="0" aliases="none">
           <maml:name>Resource</maml:name>
           <maml:description />
           <command:parameterValue required="true" variableLength="false">string</command:parameterValue>
@@ -1011,7 +1011,7 @@ Without -ID or a search query every item of the resource is queried, the first
             <maml:name>System.String</maml:name>
           </dev:type>
         </command:parameter>
-        <command:parameter pipelineInput="false" position="named" aliases="none" required="false" variableLength="false" globbing="false">
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named" aliases="none">
           <maml:name>Operation</maml:name>
           <maml:description />
           <command:parameterValue required="true" variableLength="false">string</command:parameterValue>
@@ -1019,14 +1019,14 @@ Without -ID or a search query every item of the resource is queried, the first
             <maml:name>System.String</maml:name>
           </dev:type>
         </command:parameter>
-        <command:parameter pipelineInput="false" position="named" aliases="none" required="false" variableLength="false" globbing="false">
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named" aliases="none">
           <maml:name>AllResults</maml:name>
           <maml:description />
           <dev:type>
             <maml:name>System.Management.Automation.SwitchParameter</maml:name>
           </dev:type>
         </command:parameter>
-        <command:parameter pipelineInput="false" position="named" aliases="none" required="false" variableLength="false" globbing="false">
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named" aliases="none">
           <maml:name>Raw</maml:name>
           <maml:description />
           <dev:type>
@@ -1036,7 +1036,7 @@ Without -ID or a search query every item of the resource is queried, the first
       </command:syntaxItem>
       <command:syntaxItem>
         <maml:name>Get-AutoTaskResource</maml:name>
-        <command:parameter pipelineInput="false" position="0" aliases="none" required="true" variableLength="false" globbing="false">
+        <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="0" aliases="none">
           <maml:name>Resource</maml:name>
           <maml:description />
           <command:parameterValue required="true" variableLength="false">string</command:parameterValue>
@@ -1044,7 +1044,7 @@ Without -ID or a search query every item of the resource is queried, the first
             <maml:name>System.String</maml:name>
           </dev:type>
         </command:parameter>
-        <command:parameter pipelineInput="false" position="named" aliases="none" required="true" variableLength="false" globbing="false">
+        <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="named" aliases="none">
           <maml:name>ID</maml:name>
           <maml:description />
           <command:parameterValue required="true" variableLength="false">long</command:parameterValue>
@@ -1052,7 +1052,7 @@ Without -ID or a search query every item of the resource is queried, the first
             <maml:name>System.Int64</maml:name>
           </dev:type>
         </command:parameter>
-        <command:parameter pipelineInput="false" position="named" aliases="none" required="false" variableLength="false" globbing="false">
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named" aliases="none">
           <maml:name>ChildID</maml:name>
           <maml:description />
           <command:parameterValue required="true" variableLength="false">long</command:parameterValue>
@@ -1060,7 +1060,7 @@ Without -ID or a search query every item of the resource is queried, the first
             <maml:name>System.Int64</maml:name>
           </dev:type>
         </command:parameter>
-        <command:parameter pipelineInput="false" position="named" aliases="none" required="false" variableLength="false" globbing="false">
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named" aliases="none">
           <maml:name>Operation</maml:name>
           <maml:description />
           <command:parameterValue required="true" variableLength="false">string</command:parameterValue>
@@ -1068,7 +1068,7 @@ Without -ID or a search query every item of the resource is queried, the first
             <maml:name>System.String</maml:name>
           </dev:type>
         </command:parameter>
-        <command:parameter pipelineInput="false" position="named" aliases="none" required="false" variableLength="false" globbing="false">
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named" aliases="none">
           <maml:name>Raw</maml:name>
           <maml:description />
           <dev:type>
@@ -1078,7 +1078,7 @@ Without -ID or a search query every item of the resource is queried, the first
       </command:syntaxItem>
       <command:syntaxItem>
         <maml:name>Get-AutoTaskResource</maml:name>
-        <command:parameter pipelineInput="false" position="0" aliases="none" required="true" variableLength="false" globbing="false">
+        <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="0" aliases="none">
           <maml:name>Resource</maml:name>
           <maml:description />
           <command:parameterValue required="true" variableLength="false">string</command:parameterValue>
@@ -1086,7 +1086,7 @@ Without -ID or a search query every item of the resource is queried, the first
             <maml:name>System.String</maml:name>
           </dev:type>
         </command:parameter>
-        <command:parameter pipelineInput="false" position="named" aliases="none" required="true" variableLength="false" globbing="false">
+        <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="named" aliases="none">
           <maml:name>SimpleSearch</maml:name>
           <maml:description />
           <command:parameterValue required="true" variableLength="false">string</command:parameterValue>
@@ -1094,7 +1094,7 @@ Without -ID or a search query every item of the resource is queried, the first
             <maml:name>System.String</maml:name>
           </dev:type>
         </command:parameter>
-        <command:parameter pipelineInput="false" position="named" aliases="none" required="false" variableLength="false" globbing="false">
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named" aliases="none">
           <maml:name>Operation</maml:name>
           <maml:description />
           <command:parameterValue required="true" variableLength="false">string</command:parameterValue>
@@ -1102,14 +1102,14 @@ Without -ID or a search query every item of the resource is queried, the first
             <maml:name>System.String</maml:name>
           </dev:type>
         </command:parameter>
-        <command:parameter pipelineInput="false" position="named" aliases="none" required="false" variableLength="false" globbing="false">
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named" aliases="none">
           <maml:name>AllResults</maml:name>
           <maml:description />
           <dev:type>
             <maml:name>System.Management.Automation.SwitchParameter</maml:name>
           </dev:type>
         </command:parameter>
-        <command:parameter pipelineInput="false" position="named" aliases="none" required="false" variableLength="false" globbing="false">
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named" aliases="none">
           <maml:name>Raw</maml:name>
           <maml:description />
           <dev:type>
@@ -1119,7 +1119,7 @@ Without -ID or a search query every item of the resource is queried, the first
       </command:syntaxItem>
       <command:syntaxItem>
         <maml:name>Get-AutoTaskResource</maml:name>
-        <command:parameter pipelineInput="false" position="0" aliases="none" required="true" variableLength="false" globbing="false">
+        <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="0" aliases="none">
           <maml:name>Resource</maml:name>
           <maml:description />
           <command:parameterValue required="true" variableLength="false">string</command:parameterValue>
@@ -1127,7 +1127,7 @@ Without -ID or a search query every item of the resource is queried, the first
             <maml:name>System.String</maml:name>
           </dev:type>
         </command:parameter>
-        <command:parameter pipelineInput="false" position="named" aliases="none" required="true" variableLength="false" globbing="false">
+        <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="named" aliases="none">
           <maml:name>AdvancedSearch</maml:name>
           <maml:description />
           <command:parameterValue required="true" variableLength="false">string</command:parameterValue>
@@ -1135,7 +1135,7 @@ Without -ID or a search query every item of the resource is queried, the first
             <maml:name>System.String</maml:name>
           </dev:type>
         </command:parameter>
-        <command:parameter pipelineInput="false" position="named" aliases="none" required="false" variableLength="false" globbing="false">
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named" aliases="none">
           <maml:name>Method</maml:name>
           <maml:description />
           <command:parameterValue required="true" variableLength="false">string</command:parameterValue>
@@ -1143,7 +1143,7 @@ Without -ID or a search query every item of the resource is queried, the first
             <maml:name>System.String</maml:name>
           </dev:type>
         </command:parameter>
-        <command:parameter pipelineInput="false" position="named" aliases="none" required="false" variableLength="false" globbing="false">
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named" aliases="none">
           <maml:name>Operation</maml:name>
           <maml:description />
           <command:parameterValue required="true" variableLength="false">string</command:parameterValue>
@@ -1151,14 +1151,14 @@ Without -ID or a search query every item of the resource is queried, the first
             <maml:name>System.String</maml:name>
           </dev:type>
         </command:parameter>
-        <command:parameter pipelineInput="false" position="named" aliases="none" required="false" variableLength="false" globbing="false">
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named" aliases="none">
           <maml:name>AllResults</maml:name>
           <maml:description />
           <dev:type>
             <maml:name>System.Management.Automation.SwitchParameter</maml:name>
           </dev:type>
         </command:parameter>
-        <command:parameter pipelineInput="false" position="named" aliases="none" required="false" variableLength="false" globbing="false">
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named" aliases="none">
           <maml:name>Raw</maml:name>
           <maml:description />
           <dev:type>
@@ -1168,7 +1168,7 @@ Without -ID or a search query every item of the resource is queried, the first
       </command:syntaxItem>
     </command:syntax>
     <command:parameters>
-      <command:parameter pipelineInput="false" position="Named" aliases="none" required="true" variableLength="false" globbing="false">
+      <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="Named" aliases="none">
         <maml:name>AdvancedSearch</maml:name>
         <maml:description>
           <maml:para>Defines an advanced search query to use when getting the resource</maml:para>
@@ -1187,7 +1187,7 @@ Without -ID or a search query every item of the resource is queried, the first
           <maml:name>System.String</maml:name>
         </dev:type>
       </command:parameter>
-      <command:parameter pipelineInput="false" position="Named" aliases="none" required="false" variableLength="false" globbing="false">
+      <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="Named" aliases="none">
         <maml:name>AllResults</maml:name>
         <maml:description>
           <maml:para>Returns all items from an endpoint</maml:para>
@@ -1197,7 +1197,7 @@ Without -ID or a search query every item of the resource is queried, the first
           <maml:name>System.Management.Automation.SwitchParameter</maml:name>
         </dev:type>
       </command:parameter>
-      <command:parameter pipelineInput="false" position="Named" aliases="none" required="false" variableLength="false" globbing="false">
+      <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="Named" aliases="none">
         <maml:name>ChildID</maml:name>
         <maml:description>
           <maml:para>Defines the ID of the child resource to get</maml:para>
@@ -1207,7 +1207,7 @@ Without -ID or a search query every item of the resource is queried, the first
           <maml:name>System.Int64</maml:name>
         </dev:type>
       </command:parameter>
-      <command:parameter pipelineInput="true (ByPropertyName)" position="Named" aliases="none" required="true" variableLength="false" globbing="false">
+      <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="true (ByPropertyName)" position="Named" aliases="none">
         <maml:name>ID</maml:name>
         <maml:description>
           <maml:para>Defines the ID of the resource to get</maml:para>
@@ -1219,7 +1219,7 @@ every child item of the parent is returned</maml:para>
           <maml:name>System.Int64</maml:name>
         </dev:type>
       </command:parameter>
-      <command:parameter pipelineInput="false" position="Named" aliases="none" required="false" variableLength="false" globbing="false">
+      <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="Named" aliases="none">
         <maml:name>Method</maml:name>
         <maml:description>
           <maml:para>Defines the type of API method to use for an advanced search query</maml:para>
@@ -1233,7 +1233,7 @@ than 2048 characters, then a POST request is used</maml:para>
           <maml:name>System.String</maml:name>
         </dev:type>
       </command:parameter>
-      <command:parameter pipelineInput="false" position="Named" aliases="none" required="false" variableLength="false" globbing="false">
+      <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="Named" aliases="none">
         <maml:name>Operation</maml:name>
         <maml:description>
           <maml:para>Defines the operation of the resource to use, such as QueryCount, QueryFieldDefinitions,
@@ -1247,7 +1247,7 @@ the other GET operations of a resource, Show-AutoTaskResource lists the operatio
           <maml:name>System.String</maml:name>
         </dev:type>
       </command:parameter>
-      <command:parameter pipelineInput="false" position="Named" aliases="none" required="false" variableLength="false" globbing="false">
+      <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="Named" aliases="none">
         <maml:name>Raw</maml:name>
         <maml:description>
           <maml:para>Returns the full API response object, such as the items &amp; the page details of a query</maml:para>
@@ -1256,7 +1256,7 @@ the other GET operations of a resource, Show-AutoTaskResource lists the operatio
           <maml:name>System.Management.Automation.SwitchParameter</maml:name>
         </dev:type>
       </command:parameter>
-      <command:parameter pipelineInput="false" position="0" aliases="none" required="true" variableLength="false" globbing="false">
+      <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="0" aliases="none">
         <maml:name>Resource</maml:name>
         <maml:description>
           <maml:para>Defines the name of the resource to get, such as Companies or CompanyAlertsChild</maml:para>
@@ -1267,7 +1267,7 @@ the other GET operations of a resource, Show-AutoTaskResource lists the operatio
           <maml:name>System.String</maml:name>
         </dev:type>
       </command:parameter>
-      <command:parameter pipelineInput="false" position="Named" aliases="none" required="true" variableLength="false" globbing="false">
+      <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="Named" aliases="none">
         <maml:name>SimpleSearch</maml:name>
         <maml:description>
           <maml:para>Defines a simple search query to use when getting the resource</maml:para>
@@ -1483,7 +1483,7 @@ Every operation of the AutoTask API is supported by one of the public functions:
     <command:syntax>
       <command:syntaxItem>
         <maml:name>Get-AutoTaskResourceOperation</maml:name>
-        <command:parameter pipelineInput="false" position="0" aliases="none" required="false" variableLength="false" globbing="false">
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="0" aliases="none">
           <maml:name>Resource</maml:name>
           <maml:description />
           <command:parameterValue required="true" variableLength="false">string</command:parameterValue>
@@ -1491,7 +1491,7 @@ Every operation of the AutoTask API is supported by one of the public functions:
             <maml:name>System.String</maml:name>
           </dev:type>
         </command:parameter>
-        <command:parameter pipelineInput="false" position="1" aliases="none" required="false" variableLength="false" globbing="false">
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="1" aliases="none">
           <maml:name>CommandName</maml:name>
           <maml:description />
           <command:parameterValue required="true" variableLength="false">string</command:parameterValue>
@@ -1502,7 +1502,7 @@ Every operation of the AutoTask API is supported by one of the public functions:
       </command:syntaxItem>
     </command:syntax>
     <command:parameters>
-      <command:parameter pipelineInput="false" position="1" aliases="none" required="false" variableLength="false" globbing="false">
+      <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="1" aliases="none">
         <maml:name>CommandName</maml:name>
         <maml:description>
           <maml:para>Defines the public function to return the supported operations of</maml:para>
@@ -1515,7 +1515,7 @@ Every operation of the AutoTask API is supported by one of the public functions:
           <maml:name>System.String</maml:name>
         </dev:type>
       </command:parameter>
-      <command:parameter pipelineInput="false" position="0" aliases="none" required="false" variableLength="false" globbing="false">
+      <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="0" aliases="none">
         <maml:name>Resource</maml:name>
         <maml:description>
           <maml:para>Defines the name of the resource to return the operations of, such as Companies</maml:para>
@@ -1603,7 +1603,7 @@ the resource map of the module &amp; by Show-AutoTaskResource -JsonSpec</maml:pa
     <command:syntax>
       <command:syntaxItem>
         <maml:name>Get-AutoTaskSpecOperation</maml:name>
-        <command:parameter pipelineInput="false" position="named" aliases="none" required="true" variableLength="false" globbing="false">
+        <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="named" aliases="none">
           <maml:name>JsonSpec</maml:name>
           <maml:description />
           <command:parameterValue required="true" variableLength="false">string</command:parameterValue>
@@ -1614,7 +1614,7 @@ the resource map of the module &amp; by Show-AutoTaskResource -JsonSpec</maml:pa
       </command:syntaxItem>
       <command:syntaxItem>
         <maml:name>Get-AutoTaskSpecOperation</maml:name>
-        <command:parameter pipelineInput="false" position="named" aliases="none" required="true" variableLength="false" globbing="false">
+        <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="named" aliases="none">
           <maml:name>Spec</maml:name>
           <maml:description />
           <command:parameterValue required="true" variableLength="false">psobject</command:parameterValue>
@@ -1625,7 +1625,7 @@ the resource map of the module &amp; by Show-AutoTaskResource -JsonSpec</maml:pa
       </command:syntaxItem>
     </command:syntax>
     <command:parameters>
-      <command:parameter pipelineInput="false" position="Named" aliases="none" required="true" variableLength="false" globbing="false">
+      <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="Named" aliases="none">
         <maml:name>JsonSpec</maml:name>
         <maml:description>
           <maml:para>Defines the path to the AutoTask OpenAPI (swagger) json file</maml:para>
@@ -1635,7 +1635,7 @@ the resource map of the module &amp; by Show-AutoTaskResource -JsonSpec</maml:pa
           <maml:name>System.String</maml:name>
         </dev:type>
       </command:parameter>
-      <command:parameter pipelineInput="false" position="Named" aliases="none" required="true" variableLength="false" globbing="false">
+      <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="Named" aliases="none">
         <maml:name>Spec</maml:name>
         <maml:description>
           <maml:para>Defines an AutoTask OpenAPI (swagger) spec that was already converted from JSON</maml:para>
@@ -1722,7 +1722,7 @@ configuration file</maml:para>
     <command:syntax>
       <command:syntaxItem>
         <maml:name>Import-AutoTaskModuleSettings</maml:name>
-        <command:parameter pipelineInput="false" position="0" aliases="none" required="false" variableLength="false" globbing="false">
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="0" aliases="none">
           <maml:name>AutoTaskConfigPath</maml:name>
           <maml:description />
           <command:parameterValue required="true" variableLength="false">string</command:parameterValue>
@@ -1730,7 +1730,7 @@ configuration file</maml:para>
             <maml:name>System.String</maml:name>
           </dev:type>
         </command:parameter>
-        <command:parameter pipelineInput="false" position="1" aliases="none" required="false" variableLength="false" globbing="false">
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="1" aliases="none">
           <maml:name>AutoTaskConfigFile</maml:name>
           <maml:description />
           <command:parameterValue required="true" variableLength="false">string</command:parameterValue>
@@ -1741,7 +1741,7 @@ configuration file</maml:para>
       </command:syntaxItem>
     </command:syntax>
     <command:parameters>
-      <command:parameter pipelineInput="false" position="1" aliases="none" required="false" variableLength="false" globbing="false">
+      <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="1" aliases="none">
         <maml:name>AutoTaskConfigFile</maml:name>
         <maml:description>
           <maml:para>Define the name of the AutoTask configuration file</maml:para>
@@ -1753,7 +1753,7 @@ configuration file</maml:para>
           <maml:name>System.String</maml:name>
         </dev:type>
       </command:parameter>
-      <command:parameter pipelineInput="false" position="0" aliases="none" required="false" variableLength="false" globbing="false">
+      <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="0" aliases="none">
         <maml:name>AutoTaskConfigPath</maml:name>
         <maml:description>
           <maml:para>Define the location to store the AutoTask configuration file</maml:para>
@@ -1843,7 +1843,7 @@ Use -Raw to return the full response</maml:para>
     <command:syntax>
       <command:syntaxItem>
         <maml:name>Invoke-AutoTaskRequest</maml:name>
-        <command:parameter pipelineInput="false" position="0" aliases="none" required="false" variableLength="false" globbing="false">
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="0" aliases="none">
           <maml:name>Method</maml:name>
           <maml:description />
           <command:parameterValue required="true" variableLength="false">string</command:parameterValue>
@@ -1851,7 +1851,7 @@ Use -Raw to return the full response</maml:para>
             <maml:name>System.String</maml:name>
           </dev:type>
         </command:parameter>
-        <command:parameter pipelineInput="false" position="1" aliases="none" required="true" variableLength="false" globbing="false">
+        <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="1" aliases="none">
           <maml:name>ResourceURI</maml:name>
           <maml:description />
           <command:parameterValue required="true" variableLength="false">string</command:parameterValue>
@@ -1859,7 +1859,7 @@ Use -Raw to return the full response</maml:para>
             <maml:name>System.String</maml:name>
           </dev:type>
         </command:parameter>
-        <command:parameter pipelineInput="false" position="2" aliases="none" required="false" variableLength="false" globbing="false">
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="2" aliases="none">
           <maml:name>UriFilter</maml:name>
           <maml:description />
           <command:parameterValue required="true" variableLength="false">hashtable</command:parameterValue>
@@ -1867,7 +1867,7 @@ Use -Raw to return the full response</maml:para>
             <maml:name>System.Collections.Hashtable</maml:name>
           </dev:type>
         </command:parameter>
-        <command:parameter pipelineInput="false" position="3" aliases="none" required="false" variableLength="false" globbing="false">
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="3" aliases="none">
           <maml:name>Data</maml:name>
           <maml:description />
           <command:parameterValue required="true" variableLength="false">Object</command:parameterValue>
@@ -1875,21 +1875,21 @@ Use -Raw to return the full response</maml:para>
             <maml:name>System.Object</maml:name>
           </dev:type>
         </command:parameter>
-        <command:parameter pipelineInput="false" position="named" aliases="none" required="false" variableLength="false" globbing="false">
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named" aliases="none">
           <maml:name>AllResults</maml:name>
           <maml:description />
           <dev:type>
             <maml:name>System.Management.Automation.SwitchParameter</maml:name>
           </dev:type>
         </command:parameter>
-        <command:parameter pipelineInput="false" position="named" aliases="none" required="false" variableLength="false" globbing="false">
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named" aliases="none">
           <maml:name>Raw</maml:name>
           <maml:description />
           <dev:type>
             <maml:name>System.Management.Automation.SwitchParameter</maml:name>
           </dev:type>
         </command:parameter>
-        <command:parameter pipelineInput="false" position="named" aliases="none" required="false" variableLength="false" globbing="false">
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named" aliases="none">
           <maml:name>WriteRequest</maml:name>
           <maml:description />
           <dev:type>
@@ -1899,7 +1899,7 @@ Use -Raw to return the full response</maml:para>
       </command:syntaxItem>
     </command:syntax>
     <command:parameters>
-      <command:parameter pipelineInput="false" position="Named" aliases="none" required="false" variableLength="false" globbing="false">
+      <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="Named" aliases="none">
         <maml:name>AllResults</maml:name>
         <maml:description>
           <maml:para>Returns all items from an endpoint by following the next page url of every page of a query</maml:para>
@@ -1909,7 +1909,7 @@ Use -Raw to return the full response</maml:para>
           <maml:name>System.Management.Automation.SwitchParameter</maml:name>
         </dev:type>
       </command:parameter>
-      <command:parameter pipelineInput="false" position="3" aliases="none" required="false" variableLength="false" globbing="false">
+      <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="3" aliases="none">
         <maml:name>Data</maml:name>
         <maml:description>
           <maml:para>Optional object to send as the JSON request body</maml:para>
@@ -1920,7 +1920,7 @@ Use -Raw to return the full response</maml:para>
           <maml:name>System.Object</maml:name>
         </dev:type>
       </command:parameter>
-      <command:parameter pipelineInput="false" position="0" aliases="none" required="false" variableLength="false" globbing="false">
+      <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="0" aliases="none">
         <maml:name>Method</maml:name>
         <maml:description>
           <maml:para>Defines the type of API method to use</maml:para>
@@ -1932,7 +1932,7 @@ Use -Raw to return the full response</maml:para>
           <maml:name>System.String</maml:name>
         </dev:type>
       </command:parameter>
-      <command:parameter pipelineInput="false" position="Named" aliases="none" required="false" variableLength="false" globbing="false">
+      <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="Named" aliases="none">
         <maml:name>Raw</maml:name>
         <maml:description>
           <maml:para>Returns the full API response object instead of only the data</maml:para>
@@ -1941,7 +1941,7 @@ Use -Raw to return the full response</maml:para>
           <maml:name>System.Management.Automation.SwitchParameter</maml:name>
         </dev:type>
       </command:parameter>
-      <command:parameter pipelineInput="false" position="1" aliases="none" required="true" variableLength="false" globbing="false">
+      <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="1" aliases="none">
         <maml:name>ResourceURI</maml:name>
         <maml:description>
           <maml:para>Defines the resource uri (url) path to use when creating the API call, such as /V1.0/Companies/query</maml:para>
@@ -1952,7 +1952,7 @@ Use -Raw to return the full response</maml:para>
           <maml:name>System.String</maml:name>
         </dev:type>
       </command:parameter>
-      <command:parameter pipelineInput="false" position="2" aliases="none" required="false" variableLength="false" globbing="false">
+      <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="2" aliases="none">
         <maml:name>UriFilter</maml:name>
         <maml:description>
           <maml:para>Hashtable of query string parameters to append to the resource uri, such as @{ search = '{...}' }</maml:para>
@@ -1963,7 +1963,7 @@ Use -Raw to return the full response</maml:para>
           <maml:name>System.Collections.Hashtable</maml:name>
         </dev:type>
       </command:parameter>
-      <command:parameter pipelineInput="false" position="Named" aliases="none" required="false" variableLength="false" globbing="false">
+      <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="Named" aliases="none">
         <maml:name>WriteRequest</maml:name>
         <maml:description>
           <maml:para>Marks the request as a write request so that it is never retried, even when it uses the GET method</maml:para>
@@ -2052,7 +2052,7 @@ no data is changed in AutoTask</maml:para>
     <command:syntax>
       <command:syntaxItem>
         <maml:name>New-AutoTaskBody</maml:name>
-        <command:parameter pipelineInput="false" position="0" aliases="none" required="true" variableLength="false" globbing="false">
+        <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="0" aliases="none">
           <maml:name>Resource</maml:name>
           <maml:description />
           <command:parameterValue required="true" variableLength="false">string</command:parameterValue>
@@ -2060,14 +2060,14 @@ no data is changed in AutoTask</maml:para>
             <maml:name>System.String</maml:name>
           </dev:type>
         </command:parameter>
-        <command:parameter pipelineInput="false" position="named" aliases="none" required="false" variableLength="false" globbing="false">
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named" aliases="none">
           <maml:name>Empty</maml:name>
           <maml:description />
           <dev:type>
             <maml:name>System.Management.Automation.SwitchParameter</maml:name>
           </dev:type>
         </command:parameter>
-        <command:parameter pipelineInput="false" position="named" aliases="none" required="false" variableLength="false" globbing="false">
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named" aliases="none">
           <maml:name>ParentId</maml:name>
           <maml:description />
           <command:parameterValue required="true" variableLength="false">long</command:parameterValue>
@@ -2075,14 +2075,14 @@ no data is changed in AutoTask</maml:para>
             <maml:name>System.Int64</maml:name>
           </dev:type>
         </command:parameter>
-        <command:parameter pipelineInput="false" position="named" aliases="none" required="false" variableLength="false" globbing="false">
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named" aliases="none">
           <maml:name>WhatIf</maml:name>
           <maml:description />
           <dev:type>
             <maml:name>System.Management.Automation.SwitchParameter</maml:name>
           </dev:type>
         </command:parameter>
-        <command:parameter pipelineInput="false" position="named" aliases="none" required="false" variableLength="false" globbing="false">
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named" aliases="none">
           <maml:name>Confirm</maml:name>
           <maml:description />
           <dev:type>
@@ -2092,7 +2092,7 @@ no data is changed in AutoTask</maml:para>
       </command:syntaxItem>
     </command:syntax>
     <command:parameters>
-      <command:parameter pipelineInput="false" position="Named" aliases="cf" required="false" variableLength="false" globbing="false">
+      <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="Named" aliases="cf">
         <maml:name>Confirm</maml:name>
         <maml:description>
           <maml:para>Prompts you for confirmation before running the cmdlet.</maml:para>
@@ -2101,7 +2101,7 @@ no data is changed in AutoTask</maml:para>
           <maml:name>System.Management.Automation.SwitchParameter</maml:name>
         </dev:type>
       </command:parameter>
-      <command:parameter pipelineInput="false" position="Named" aliases="none" required="false" variableLength="false" globbing="false">
+      <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="Named" aliases="none">
         <maml:name>Empty</maml:name>
         <maml:description>
           <maml:para>Creates a new resource body with no content</maml:para>
@@ -2111,7 +2111,7 @@ no data is changed in AutoTask</maml:para>
           <maml:name>System.Management.Automation.SwitchParameter</maml:name>
         </dev:type>
       </command:parameter>
-      <command:parameter pipelineInput="false" position="Named" aliases="none" required="false" variableLength="false" globbing="false">
+      <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="Named" aliases="none">
         <maml:name>ParentId</maml:name>
         <maml:description>
           <maml:para>The parent resource ID used to read the field definitions of a child resource</maml:para>
@@ -2122,7 +2122,7 @@ no data is changed in AutoTask</maml:para>
           <maml:name>System.Int64</maml:name>
         </dev:type>
       </command:parameter>
-      <command:parameter pipelineInput="false" position="0" aliases="none" required="true" variableLength="false" globbing="false">
+      <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="0" aliases="none">
         <maml:name>Resource</maml:name>
         <maml:description>
           <maml:para>Defines the name of the resource to create a body for, such as Companies or CompanyNotesChild</maml:para>
@@ -2132,7 +2132,7 @@ no data is changed in AutoTask</maml:para>
           <maml:name>System.String</maml:name>
         </dev:type>
       </command:parameter>
-      <command:parameter pipelineInput="false" position="Named" aliases="wi" required="false" variableLength="false" globbing="false">
+      <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="Named" aliases="wi">
         <maml:name>WhatIf</maml:name>
         <maml:description>
           <maml:para>Runs the command in a mode that only reports what would happen without performing the actions.</maml:para>
@@ -2206,7 +2206,7 @@ Write requests are never retried</maml:para>
     <command:syntax>
       <command:syntaxItem>
         <maml:name>New-AutoTaskResource</maml:name>
-        <command:parameter pipelineInput="false" position="0" aliases="none" required="true" variableLength="false" globbing="false">
+        <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="0" aliases="none">
           <maml:name>Resource</maml:name>
           <maml:description />
           <command:parameterValue required="true" variableLength="false">string</command:parameterValue>
@@ -2214,7 +2214,7 @@ Write requests are never retried</maml:para>
             <maml:name>System.String</maml:name>
           </dev:type>
         </command:parameter>
-        <command:parameter pipelineInput="false" position="named" aliases="none" required="true" variableLength="false" globbing="false">
+        <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="named" aliases="none">
           <maml:name>Data</maml:name>
           <maml:description />
           <command:parameterValue required="true" variableLength="false">Object</command:parameterValue>
@@ -2222,7 +2222,7 @@ Write requests are never retried</maml:para>
             <maml:name>System.Object</maml:name>
           </dev:type>
         </command:parameter>
-        <command:parameter pipelineInput="false" position="named" aliases="none" required="false" variableLength="false" globbing="false">
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named" aliases="none">
           <maml:name>ParentId</maml:name>
           <maml:description />
           <command:parameterValue required="true" variableLength="false">long</command:parameterValue>
@@ -2230,7 +2230,7 @@ Write requests are never retried</maml:para>
             <maml:name>System.Int64</maml:name>
           </dev:type>
         </command:parameter>
-        <command:parameter pipelineInput="false" position="named" aliases="none" required="false" variableLength="false" globbing="false">
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named" aliases="none">
           <maml:name>Operation</maml:name>
           <maml:description />
           <command:parameterValue required="true" variableLength="false">string</command:parameterValue>
@@ -2238,14 +2238,14 @@ Write requests are never retried</maml:para>
             <maml:name>System.String</maml:name>
           </dev:type>
         </command:parameter>
-        <command:parameter pipelineInput="false" position="named" aliases="none" required="false" variableLength="false" globbing="false">
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named" aliases="none">
           <maml:name>WhatIf</maml:name>
           <maml:description />
           <dev:type>
             <maml:name>System.Management.Automation.SwitchParameter</maml:name>
           </dev:type>
         </command:parameter>
-        <command:parameter pipelineInput="false" position="named" aliases="none" required="false" variableLength="false" globbing="false">
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named" aliases="none">
           <maml:name>Confirm</maml:name>
           <maml:description />
           <dev:type>
@@ -2255,7 +2255,7 @@ Write requests are never retried</maml:para>
       </command:syntaxItem>
     </command:syntax>
     <command:parameters>
-      <command:parameter pipelineInput="false" position="Named" aliases="cf" required="false" variableLength="false" globbing="false">
+      <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="Named" aliases="cf">
         <maml:name>Confirm</maml:name>
         <maml:description>
           <maml:para>Prompts you for confirmation before running the cmdlet.</maml:para>
@@ -2264,7 +2264,7 @@ Write requests are never retried</maml:para>
           <maml:name>System.Management.Automation.SwitchParameter</maml:name>
         </dev:type>
       </command:parameter>
-      <command:parameter pipelineInput="true (ByValue)" position="Named" aliases="none" required="true" variableLength="false" globbing="false">
+      <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="true (ByValue)" position="Named" aliases="none">
         <maml:name>Data</maml:name>
         <maml:description>
           <maml:para>The data body to use when creating the resource</maml:para>
@@ -2275,7 +2275,7 @@ Write requests are never retried</maml:para>
           <maml:name>System.Object</maml:name>
         </dev:type>
       </command:parameter>
-      <command:parameter pipelineInput="false" position="Named" aliases="none" required="false" variableLength="false" globbing="false">
+      <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="Named" aliases="none">
         <maml:name>Operation</maml:name>
         <maml:description>
           <maml:para>Defines the operation of the resource to use, such as AddContactRecipients</maml:para>
@@ -2286,7 +2286,7 @@ Write requests are never retried</maml:para>
           <maml:name>System.String</maml:name>
         </dev:type>
       </command:parameter>
-      <command:parameter pipelineInput="false" position="Named" aliases="none" required="false" variableLength="false" globbing="false">
+      <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="Named" aliases="none">
         <maml:name>ParentId</maml:name>
         <maml:description>
           <maml:para>The parent resource ID to use when creating a child resource</maml:para>
@@ -2296,7 +2296,7 @@ Write requests are never retried</maml:para>
           <maml:name>System.Int64</maml:name>
         </dev:type>
       </command:parameter>
-      <command:parameter pipelineInput="false" position="0" aliases="none" required="true" variableLength="false" globbing="false">
+      <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="0" aliases="none">
         <maml:name>Resource</maml:name>
         <maml:description>
           <maml:para>Defines the name of the resource to create, such as Companies or CompanyNotesChild</maml:para>
@@ -2307,7 +2307,7 @@ Write requests are never retried</maml:para>
           <maml:name>System.String</maml:name>
         </dev:type>
       </command:parameter>
-      <command:parameter pipelineInput="false" position="Named" aliases="wi" required="false" variableLength="false" globbing="false">
+      <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="Named" aliases="wi">
         <maml:name>WhatIf</maml:name>
         <maml:description>
           <maml:para>Runs the command in a mode that only reports what would happen without performing the actions.</maml:para>
@@ -2386,14 +2386,14 @@ from the global variables</maml:para>
     <command:syntax>
       <command:syntaxItem>
         <maml:name>Remove-AutoTaskAPIKey</maml:name>
-        <command:parameter pipelineInput="false" position="named" aliases="none" required="false" variableLength="false" globbing="false">
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named" aliases="none">
           <maml:name>WhatIf</maml:name>
           <maml:description />
           <dev:type>
             <maml:name>System.Management.Automation.SwitchParameter</maml:name>
           </dev:type>
         </command:parameter>
-        <command:parameter pipelineInput="false" position="named" aliases="none" required="false" variableLength="false" globbing="false">
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named" aliases="none">
           <maml:name>Confirm</maml:name>
           <maml:description />
           <dev:type>
@@ -2403,7 +2403,7 @@ from the global variables</maml:para>
       </command:syntaxItem>
     </command:syntax>
     <command:parameters>
-      <command:parameter pipelineInput="false" position="Named" aliases="cf" required="false" variableLength="false" globbing="false">
+      <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="Named" aliases="cf">
         <maml:name>Confirm</maml:name>
         <maml:description>
           <maml:para>Prompts you for confirmation before running the cmdlet.</maml:para>
@@ -2412,7 +2412,7 @@ from the global variables</maml:para>
           <maml:name>System.Management.Automation.SwitchParameter</maml:name>
         </dev:type>
       </command:parameter>
-      <command:parameter pipelineInput="false" position="Named" aliases="wi" required="false" variableLength="false" globbing="false">
+      <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="Named" aliases="wi">
         <maml:name>WhatIf</maml:name>
         <maml:description>
           <maml:para>Runs the command in a mode that only reports what would happen without performing the actions.</maml:para>
@@ -2470,14 +2470,14 @@ the global variable</maml:para>
     <command:syntax>
       <command:syntaxItem>
         <maml:name>Remove-AutoTaskBaseURI</maml:name>
-        <command:parameter pipelineInput="false" position="named" aliases="none" required="false" variableLength="false" globbing="false">
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named" aliases="none">
           <maml:name>WhatIf</maml:name>
           <maml:description />
           <dev:type>
             <maml:name>System.Management.Automation.SwitchParameter</maml:name>
           </dev:type>
         </command:parameter>
-        <command:parameter pipelineInput="false" position="named" aliases="none" required="false" variableLength="false" globbing="false">
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named" aliases="none">
           <maml:name>Confirm</maml:name>
           <maml:description />
           <dev:type>
@@ -2487,7 +2487,7 @@ the global variable</maml:para>
       </command:syntaxItem>
     </command:syntax>
     <command:parameters>
-      <command:parameter pipelineInput="false" position="Named" aliases="cf" required="false" variableLength="false" globbing="false">
+      <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="Named" aliases="cf">
         <maml:name>Confirm</maml:name>
         <maml:description>
           <maml:para>Prompts you for confirmation before running the cmdlet.</maml:para>
@@ -2496,7 +2496,7 @@ the global variable</maml:para>
           <maml:name>System.Management.Automation.SwitchParameter</maml:name>
         </dev:type>
       </command:parameter>
-      <command:parameter pipelineInput="false" position="Named" aliases="wi" required="false" variableLength="false" globbing="false">
+      <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="Named" aliases="wi">
         <maml:name>WhatIf</maml:name>
         <maml:description>
           <maml:para>Runs the command in a mode that only reports what would happen without performing the actions.</maml:para>
@@ -2557,7 +2557,7 @@ By default configuration files are stored in the following location and will be 
     <command:syntax>
       <command:syntaxItem>
         <maml:name>Remove-AutoTaskModuleSettings</maml:name>
-        <command:parameter pipelineInput="false" position="0" aliases="none" required="false" variableLength="false" globbing="false">
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="0" aliases="none">
           <maml:name>AutoTaskConfigPath</maml:name>
           <maml:description />
           <command:parameterValue required="true" variableLength="false">string</command:parameterValue>
@@ -2565,21 +2565,21 @@ By default configuration files are stored in the following location and will be 
             <maml:name>System.String</maml:name>
           </dev:type>
         </command:parameter>
-        <command:parameter pipelineInput="false" position="named" aliases="none" required="false" variableLength="false" globbing="false">
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named" aliases="none">
           <maml:name>AndVariables</maml:name>
           <maml:description />
           <dev:type>
             <maml:name>System.Management.Automation.SwitchParameter</maml:name>
           </dev:type>
         </command:parameter>
-        <command:parameter pipelineInput="false" position="named" aliases="none" required="false" variableLength="false" globbing="false">
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named" aliases="none">
           <maml:name>WhatIf</maml:name>
           <maml:description />
           <dev:type>
             <maml:name>System.Management.Automation.SwitchParameter</maml:name>
           </dev:type>
         </command:parameter>
-        <command:parameter pipelineInput="false" position="named" aliases="none" required="false" variableLength="false" globbing="false">
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named" aliases="none">
           <maml:name>Confirm</maml:name>
           <maml:description />
           <dev:type>
@@ -2589,7 +2589,7 @@ By default configuration files are stored in the following location and will be 
       </command:syntaxItem>
     </command:syntax>
     <command:parameters>
-      <command:parameter pipelineInput="false" position="Named" aliases="none" required="false" variableLength="false" globbing="false">
+      <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="Named" aliases="none">
         <maml:name>AndVariables</maml:name>
         <maml:description>
           <maml:para>Define if sensitive AutoTask variables should be removed as well</maml:para>
@@ -2599,7 +2599,7 @@ By default configuration files are stored in the following location and will be 
           <maml:name>System.Management.Automation.SwitchParameter</maml:name>
         </dev:type>
       </command:parameter>
-      <command:parameter pipelineInput="false" position="0" aliases="none" required="false" variableLength="false" globbing="false">
+      <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="0" aliases="none">
         <maml:name>AutoTaskConfigPath</maml:name>
         <maml:description>
           <maml:para>Define the location of the AutoTask configuration folder</maml:para>
@@ -2611,7 +2611,7 @@ By default configuration files are stored in the following location and will be 
           <maml:name>System.String</maml:name>
         </dev:type>
       </command:parameter>
-      <command:parameter pipelineInput="false" position="Named" aliases="cf" required="false" variableLength="false" globbing="false">
+      <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="Named" aliases="cf">
         <maml:name>Confirm</maml:name>
         <maml:description>
           <maml:para>Prompts you for confirmation before running the cmdlet.</maml:para>
@@ -2620,7 +2620,7 @@ By default configuration files are stored in the following location and will be 
           <maml:name>System.Management.Automation.SwitchParameter</maml:name>
         </dev:type>
       </command:parameter>
-      <command:parameter pipelineInput="false" position="Named" aliases="wi" required="false" variableLength="false" globbing="false">
+      <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="Named" aliases="wi">
         <maml:name>WhatIf</maml:name>
         <maml:description>
           <maml:para>Runs the command in a mode that only reports what would happen without performing the actions.</maml:para>
@@ -2704,7 +2704,7 @@ Write requests are never retried</maml:para>
     <command:syntax>
       <command:syntaxItem>
         <maml:name>Remove-AutoTaskResource</maml:name>
-        <command:parameter pipelineInput="false" position="0" aliases="none" required="true" variableLength="false" globbing="false">
+        <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="0" aliases="none">
           <maml:name>Resource</maml:name>
           <maml:description />
           <command:parameterValue required="true" variableLength="false">string</command:parameterValue>
@@ -2712,7 +2712,7 @@ Write requests are never retried</maml:para>
             <maml:name>System.String</maml:name>
           </dev:type>
         </command:parameter>
-        <command:parameter pipelineInput="false" position="named" aliases="none" required="true" variableLength="false" globbing="false">
+        <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="named" aliases="none">
           <maml:name>ID</maml:name>
           <maml:description />
           <command:parameterValue required="true" variableLength="false">long</command:parameterValue>
@@ -2720,7 +2720,7 @@ Write requests are never retried</maml:para>
             <maml:name>System.Int64</maml:name>
           </dev:type>
         </command:parameter>
-        <command:parameter pipelineInput="false" position="named" aliases="none" required="false" variableLength="false" globbing="false">
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named" aliases="none">
           <maml:name>ChildID</maml:name>
           <maml:description />
           <command:parameterValue required="true" variableLength="false">long</command:parameterValue>
@@ -2728,7 +2728,7 @@ Write requests are never retried</maml:para>
             <maml:name>System.Int64</maml:name>
           </dev:type>
         </command:parameter>
-        <command:parameter pipelineInput="false" position="named" aliases="none" required="false" variableLength="false" globbing="false">
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named" aliases="none">
           <maml:name>Operation</maml:name>
           <maml:description />
           <command:parameterValue required="true" variableLength="false">string</command:parameterValue>
@@ -2736,14 +2736,14 @@ Write requests are never retried</maml:para>
             <maml:name>System.String</maml:name>
           </dev:type>
         </command:parameter>
-        <command:parameter pipelineInput="false" position="named" aliases="none" required="false" variableLength="false" globbing="false">
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named" aliases="none">
           <maml:name>WhatIf</maml:name>
           <maml:description />
           <dev:type>
             <maml:name>System.Management.Automation.SwitchParameter</maml:name>
           </dev:type>
         </command:parameter>
-        <command:parameter pipelineInput="false" position="named" aliases="none" required="false" variableLength="false" globbing="false">
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named" aliases="none">
           <maml:name>Confirm</maml:name>
           <maml:description />
           <dev:type>
@@ -2753,7 +2753,7 @@ Write requests are never retried</maml:para>
       </command:syntaxItem>
     </command:syntax>
     <command:parameters>
-      <command:parameter pipelineInput="true (ByPropertyName)" position="Named" aliases="none" required="false" variableLength="false" globbing="false">
+      <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="true (ByPropertyName)" position="Named" aliases="none">
         <maml:name>ChildID</maml:name>
         <maml:description>
           <maml:para>The ID of the child resource to delete</maml:para>
@@ -2763,7 +2763,7 @@ Write requests are never retried</maml:para>
           <maml:name>System.Int64</maml:name>
         </dev:type>
       </command:parameter>
-      <command:parameter pipelineInput="false" position="Named" aliases="cf" required="false" variableLength="false" globbing="false">
+      <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="Named" aliases="cf">
         <maml:name>Confirm</maml:name>
         <maml:description>
           <maml:para>Prompts you for confirmation before running the cmdlet.</maml:para>
@@ -2772,7 +2772,7 @@ Write requests are never retried</maml:para>
           <maml:name>System.Management.Automation.SwitchParameter</maml:name>
         </dev:type>
       </command:parameter>
-      <command:parameter pipelineInput="true (ByPropertyName)" position="Named" aliases="none" required="true" variableLength="false" globbing="false">
+      <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="true (ByPropertyName)" position="Named" aliases="none">
         <maml:name>ID</maml:name>
         <maml:description>
           <maml:para>The ID of the resource to delete</maml:para>
@@ -2783,7 +2783,7 @@ Write requests are never retried</maml:para>
           <maml:name>System.Int64</maml:name>
         </dev:type>
       </command:parameter>
-      <command:parameter pipelineInput="false" position="Named" aliases="none" required="false" variableLength="false" globbing="false">
+      <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="Named" aliases="none">
         <maml:name>Operation</maml:name>
         <maml:description>
           <maml:para>Defines the operation of the resource to use, such as DeleteContactRecipient</maml:para>
@@ -2794,7 +2794,7 @@ Write requests are never retried</maml:para>
           <maml:name>System.String</maml:name>
         </dev:type>
       </command:parameter>
-      <command:parameter pipelineInput="false" position="0" aliases="none" required="true" variableLength="false" globbing="false">
+      <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="0" aliases="none">
         <maml:name>Resource</maml:name>
         <maml:description>
           <maml:para>Defines the name of the resource to delete, such as Companies or CompanyNotesChild</maml:para>
@@ -2805,7 +2805,7 @@ Write requests are never retried</maml:para>
           <maml:name>System.String</maml:name>
         </dev:type>
       </command:parameter>
-      <command:parameter pipelineInput="false" position="Named" aliases="wi" required="false" variableLength="false" globbing="false">
+      <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="Named" aliases="wi">
         <maml:name>WhatIf</maml:name>
         <maml:description>
           <maml:para>Runs the command in a mode that only reports what would happen without performing the actions.</maml:para>
@@ -2887,7 +2887,7 @@ does not support the operation, or when the number of values does not match the 
     <command:syntax>
       <command:syntaxItem>
         <maml:name>Resolve-AutoTaskResource</maml:name>
-        <command:parameter pipelineInput="false" position="0" aliases="none" required="true" variableLength="false" globbing="false">
+        <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="0" aliases="none">
           <maml:name>Resource</maml:name>
           <maml:description />
           <command:parameterValue required="true" variableLength="false">string</command:parameterValue>
@@ -2895,7 +2895,7 @@ does not support the operation, or when the number of values does not match the 
             <maml:name>System.String</maml:name>
           </dev:type>
         </command:parameter>
-        <command:parameter pipelineInput="false" position="1" aliases="none" required="true" variableLength="false" globbing="false">
+        <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="1" aliases="none">
           <maml:name>Operation</maml:name>
           <maml:description />
           <command:parameterValue required="true" variableLength="false">string</command:parameterValue>
@@ -2903,7 +2903,7 @@ does not support the operation, or when the number of values does not match the 
             <maml:name>System.String</maml:name>
           </dev:type>
         </command:parameter>
-        <command:parameter pipelineInput="false" position="2" aliases="none" required="false" variableLength="false" globbing="false">
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="2" aliases="none">
           <maml:name>CommandName</maml:name>
           <maml:description />
           <command:parameterValue required="true" variableLength="false">string</command:parameterValue>
@@ -2911,7 +2911,7 @@ does not support the operation, or when the number of values does not match the 
             <maml:name>System.String</maml:name>
           </dev:type>
         </command:parameter>
-        <command:parameter pipelineInput="false" position="3" aliases="none" required="false" variableLength="false" globbing="false">
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="3" aliases="none">
           <maml:name>PathValue</maml:name>
           <maml:description />
           <command:parameterValue required="true" variableLength="false">Object[]</command:parameterValue>
@@ -2922,7 +2922,7 @@ does not support the operation, or when the number of values does not match the 
       </command:syntaxItem>
     </command:syntax>
     <command:parameters>
-      <command:parameter pipelineInput="false" position="2" aliases="none" required="false" variableLength="false" globbing="false">
+      <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="2" aliases="none">
         <maml:name>CommandName</maml:name>
         <maml:description>
           <maml:para>Defines the public function that makes the request, only the operations that the
@@ -2933,7 +2933,7 @@ function supports are allowed</maml:para>
           <maml:name>System.String</maml:name>
         </dev:type>
       </command:parameter>
-      <command:parameter pipelineInput="false" position="1" aliases="none" required="true" variableLength="false" globbing="false">
+      <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="1" aliases="none">
         <maml:name>Operation</maml:name>
         <maml:description>
           <maml:para>Defines the name of the operation, such as Query, QueryItem, CreateEntity, PatchEntity, or DeleteEntity</maml:para>
@@ -2944,7 +2944,7 @@ function supports are allowed</maml:para>
           <maml:name>System.String</maml:name>
         </dev:type>
       </command:parameter>
-      <command:parameter pipelineInput="false" position="3" aliases="none" required="false" variableLength="false" globbing="false">
+      <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="3" aliases="none">
         <maml:name>PathValue</maml:name>
         <maml:description>
           <maml:para>Defines the values of the path placeholders in the order that they appear in the path</maml:para>
@@ -2955,7 +2955,7 @@ function supports are allowed</maml:para>
           <maml:name>System.Object[]</maml:name>
         </dev:type>
       </command:parameter>
-      <command:parameter pipelineInput="false" position="0" aliases="none" required="true" variableLength="false" globbing="false">
+      <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="0" aliases="none">
         <maml:name>Resource</maml:name>
         <maml:description>
           <maml:para>Defines the name of the resource, such as Companies or CompanyAlertsChild</maml:para>
@@ -3042,7 +3042,7 @@ Write requests are never retried</maml:para>
     <command:syntax>
       <command:syntaxItem>
         <maml:name>Set-AutoTaskResource</maml:name>
-        <command:parameter pipelineInput="false" position="0" aliases="none" required="true" variableLength="false" globbing="false">
+        <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="0" aliases="none">
           <maml:name>Resource</maml:name>
           <maml:description />
           <command:parameterValue required="true" variableLength="false">string</command:parameterValue>
@@ -3050,7 +3050,7 @@ Write requests are never retried</maml:para>
             <maml:name>System.String</maml:name>
           </dev:type>
         </command:parameter>
-        <command:parameter pipelineInput="false" position="named" aliases="none" required="true" variableLength="false" globbing="false">
+        <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="named" aliases="none">
           <maml:name>Data</maml:name>
           <maml:description />
           <command:parameterValue required="true" variableLength="false">Object</command:parameterValue>
@@ -3058,7 +3058,7 @@ Write requests are never retried</maml:para>
             <maml:name>System.Object</maml:name>
           </dev:type>
         </command:parameter>
-        <command:parameter pipelineInput="false" position="named" aliases="none" required="false" variableLength="false" globbing="false">
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named" aliases="none">
           <maml:name>ParentId</maml:name>
           <maml:description />
           <command:parameterValue required="true" variableLength="false">long</command:parameterValue>
@@ -3066,7 +3066,7 @@ Write requests are never retried</maml:para>
             <maml:name>System.Int64</maml:name>
           </dev:type>
         </command:parameter>
-        <command:parameter pipelineInput="false" position="named" aliases="none" required="false" variableLength="false" globbing="false">
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named" aliases="none">
           <maml:name>ID</maml:name>
           <maml:description />
           <command:parameterValue required="true" variableLength="false">long</command:parameterValue>
@@ -3074,7 +3074,7 @@ Write requests are never retried</maml:para>
             <maml:name>System.Int64</maml:name>
           </dev:type>
         </command:parameter>
-        <command:parameter pipelineInput="false" position="named" aliases="none" required="false" variableLength="false" globbing="false">
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named" aliases="none">
           <maml:name>Operation</maml:name>
           <maml:description />
           <command:parameterValue required="true" variableLength="false">string</command:parameterValue>
@@ -3082,14 +3082,14 @@ Write requests are never retried</maml:para>
             <maml:name>System.String</maml:name>
           </dev:type>
         </command:parameter>
-        <command:parameter pipelineInput="false" position="named" aliases="none" required="false" variableLength="false" globbing="false">
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named" aliases="none">
           <maml:name>WhatIf</maml:name>
           <maml:description />
           <dev:type>
             <maml:name>System.Management.Automation.SwitchParameter</maml:name>
           </dev:type>
         </command:parameter>
-        <command:parameter pipelineInput="false" position="named" aliases="none" required="false" variableLength="false" globbing="false">
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named" aliases="none">
           <maml:name>Confirm</maml:name>
           <maml:description />
           <dev:type>
@@ -3099,7 +3099,7 @@ Write requests are never retried</maml:para>
       </command:syntaxItem>
     </command:syntax>
     <command:parameters>
-      <command:parameter pipelineInput="false" position="Named" aliases="cf" required="false" variableLength="false" globbing="false">
+      <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="Named" aliases="cf">
         <maml:name>Confirm</maml:name>
         <maml:description>
           <maml:para>Prompts you for confirmation before running the cmdlet.</maml:para>
@@ -3108,7 +3108,7 @@ Write requests are never retried</maml:para>
           <maml:name>System.Management.Automation.SwitchParameter</maml:name>
         </dev:type>
       </command:parameter>
-      <command:parameter pipelineInput="true (ByValue)" position="Named" aliases="none" required="true" variableLength="false" globbing="false">
+      <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="true (ByValue)" position="Named" aliases="none">
         <maml:name>Data</maml:name>
         <maml:description>
           <maml:para>The data body to use when updating the resource</maml:para>
@@ -3118,7 +3118,7 @@ Write requests are never retried</maml:para>
           <maml:name>System.Object</maml:name>
         </dev:type>
       </command:parameter>
-      <command:parameter pipelineInput="true (ByPropertyName)" position="Named" aliases="none" required="false" variableLength="false" globbing="false">
+      <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="true (ByPropertyName)" position="Named" aliases="none">
         <maml:name>ID</maml:name>
         <maml:description>
           <maml:para>The ID of the resource to update</maml:para>
@@ -3129,7 +3129,7 @@ Write requests are never retried</maml:para>
           <maml:name>System.Int64</maml:name>
         </dev:type>
       </command:parameter>
-      <command:parameter pipelineInput="false" position="Named" aliases="none" required="false" variableLength="false" globbing="false">
+      <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="Named" aliases="none">
         <maml:name>Operation</maml:name>
         <maml:description>
           <maml:para>Defines the operation of the resource to use, such as UpdateEntity (PUT) which replaces the item</maml:para>
@@ -3140,7 +3140,7 @@ Write requests are never retried</maml:para>
           <maml:name>System.String</maml:name>
         </dev:type>
       </command:parameter>
-      <command:parameter pipelineInput="false" position="Named" aliases="none" required="false" variableLength="false" globbing="false">
+      <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="Named" aliases="none">
         <maml:name>ParentId</maml:name>
         <maml:description>
           <maml:para>The ID of the parent resource when updating a child resource</maml:para>
@@ -3150,7 +3150,7 @@ Write requests are never retried</maml:para>
           <maml:name>System.Int64</maml:name>
         </dev:type>
       </command:parameter>
-      <command:parameter pipelineInput="false" position="0" aliases="none" required="true" variableLength="false" globbing="false">
+      <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="0" aliases="none">
         <maml:name>Resource</maml:name>
         <maml:description>
           <maml:para>Defines the name of the resource to update, such as Companies or CompanyNotesChild</maml:para>
@@ -3161,7 +3161,7 @@ Write requests are never retried</maml:para>
           <maml:name>System.String</maml:name>
         </dev:type>
       </command:parameter>
-      <command:parameter pipelineInput="false" position="Named" aliases="wi" required="false" variableLength="false" globbing="false">
+      <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="Named" aliases="wi">
         <maml:name>WhatIf</maml:name>
         <maml:description>
           <maml:para>Runs the command in a mode that only reports what would happen without performing the actions.</maml:para>
@@ -3257,7 +3257,7 @@ DELETE  -&gt; Remove-AutoTaskResource</maml:para>
     <command:syntax>
       <command:syntaxItem>
         <maml:name>Show-AutoTaskResource</maml:name>
-        <command:parameter pipelineInput="false" position="0" aliases="none" required="false" variableLength="false" globbing="false">
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="0" aliases="none">
           <maml:name>Name</maml:name>
           <maml:description />
           <command:parameterValue required="true" variableLength="false">string</command:parameterValue>
@@ -3265,7 +3265,7 @@ DELETE  -&gt; Remove-AutoTaskResource</maml:para>
             <maml:name>System.String</maml:name>
           </dev:type>
         </command:parameter>
-        <command:parameter pipelineInput="false" position="named" aliases="none" required="false" variableLength="false" globbing="false">
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named" aliases="none">
           <maml:name>Method</maml:name>
           <maml:description />
           <command:parameterValue required="true" variableLength="false">string</command:parameterValue>
@@ -3273,7 +3273,7 @@ DELETE  -&gt; Remove-AutoTaskResource</maml:para>
             <maml:name>System.String</maml:name>
           </dev:type>
         </command:parameter>
-        <command:parameter pipelineInput="false" position="named" aliases="none" required="false" variableLength="false" globbing="false">
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named" aliases="none">
           <maml:name>JsonSpec</maml:name>
           <maml:description />
           <command:parameterValue required="true" variableLength="false">string</command:parameterValue>
@@ -3284,7 +3284,7 @@ DELETE  -&gt; Remove-AutoTaskResource</maml:para>
       </command:syntaxItem>
       <command:syntaxItem>
         <maml:name>Show-AutoTaskResource</maml:name>
-        <command:parameter pipelineInput="false" position="0" aliases="none" required="false" variableLength="false" globbing="false">
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="0" aliases="none">
           <maml:name>Name</maml:name>
           <maml:description />
           <command:parameterValue required="true" variableLength="false">string</command:parameterValue>
@@ -3292,7 +3292,7 @@ DELETE  -&gt; Remove-AutoTaskResource</maml:para>
             <maml:name>System.String</maml:name>
           </dev:type>
         </command:parameter>
-        <command:parameter pipelineInput="false" position="named" aliases="none" required="false" variableLength="false" globbing="false">
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named" aliases="none">
           <maml:name>Method</maml:name>
           <maml:description />
           <command:parameterValue required="true" variableLength="false">string</command:parameterValue>
@@ -3300,14 +3300,14 @@ DELETE  -&gt; Remove-AutoTaskResource</maml:para>
             <maml:name>System.String</maml:name>
           </dev:type>
         </command:parameter>
-        <command:parameter pipelineInput="false" position="named" aliases="none" required="false" variableLength="false" globbing="false">
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named" aliases="none">
           <maml:name>UniqueOnly</maml:name>
           <maml:description />
           <dev:type>
             <maml:name>System.Management.Automation.SwitchParameter</maml:name>
           </dev:type>
         </command:parameter>
-        <command:parameter pipelineInput="false" position="named" aliases="none" required="false" variableLength="false" globbing="false">
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named" aliases="none">
           <maml:name>JsonSpec</maml:name>
           <maml:description />
           <command:parameterValue required="true" variableLength="false">string</command:parameterValue>
@@ -3318,7 +3318,7 @@ DELETE  -&gt; Remove-AutoTaskResource</maml:para>
       </command:syntaxItem>
     </command:syntax>
     <command:parameters>
-      <command:parameter pipelineInput="false" position="Named" aliases="none" required="false" variableLength="false" globbing="false">
+      <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="Named" aliases="none">
         <maml:name>JsonSpec</maml:name>
         <maml:description>
           <maml:para>Defines the path to an AutoTask OpenAPI (swagger) json file to read the
@@ -3329,7 +3329,7 @@ resources from instead of the resource map of the module</maml:para>
           <maml:name>System.String</maml:name>
         </dev:type>
       </command:parameter>
-      <command:parameter pipelineInput="false" position="Named" aliases="none" required="false" variableLength="false" globbing="false">
+      <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="Named" aliases="none">
         <maml:name>Method</maml:name>
         <maml:description>
           <maml:para>Defines the type of API method to show available values for</maml:para>
@@ -3341,7 +3341,7 @@ resources from instead of the resource map of the module</maml:para>
           <maml:name>System.String</maml:name>
         </dev:type>
       </command:parameter>
-      <command:parameter pipelineInput="false" position="0" aliases="none" required="false" variableLength="false" globbing="false">
+      <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="0" aliases="none">
         <maml:name>Name</maml:name>
         <maml:description>
           <maml:para>Defines the name of the resource to limit the output to</maml:para>
@@ -3353,7 +3353,7 @@ that start with the provided value</maml:para>
           <maml:name>System.String</maml:name>
         </dev:type>
       </command:parameter>
-      <command:parameter pipelineInput="false" position="Named" aliases="none" required="false" variableLength="false" globbing="false">
+      <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="Named" aliases="none">
         <maml:name>UniqueOnly</maml:name>
         <maml:description>
           <maml:para>Returns only unique resource names</maml:para>
@@ -3445,7 +3445,7 @@ allowed to read companies</maml:para>
     <command:syntax>
       <command:syntaxItem>
         <maml:name>Test-AutoTaskAPIKey</maml:name>
-        <command:parameter pipelineInput="false" position="0" aliases="none" required="false" variableLength="false" globbing="false">
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="0" aliases="none">
           <maml:name>BaseURI</maml:name>
           <maml:description />
           <command:parameterValue required="true" variableLength="false">string</command:parameterValue>
@@ -3456,7 +3456,7 @@ allowed to read companies</maml:para>
       </command:syntaxItem>
     </command:syntax>
     <command:parameters>
-      <command:parameter pipelineInput="false" position="0" aliases="none" required="false" variableLength="false" globbing="false">
+      <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="0" aliases="none">
         <maml:name>BaseURI</maml:name>
         <maml:description>
           <maml:para>Define the base URI for the AutoTask API connection
